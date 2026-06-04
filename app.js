@@ -144,12 +144,18 @@ async function loadMap() {
   map.on("focus", () => map.scrollWheelZoom.enable());
   map.on("blur",  () => map.scrollWheelZoom.disable());
 
-  const osm = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    attribution: "© OpenStreetMap doprinosioci",
+  // CartoDB Voyager — OSM-bazirani tile-ovi, dozvoljava javni embed bez API ključa
+  const carto = L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
+    attribution: "© <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> · © <a href='https://carto.com/attributions'>CARTO</a>",
+    subdomains: "abcd",
     maxZoom: 19,
   }).addTo(map);
   const sat = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {
     attribution: "Tiles © Esri",
+    maxZoom: 19,
+  });
+  const osmHot = L.tileLayer("https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png", {
+    attribution: "© OpenStreetMap · HOT",
     maxZoom: 19,
   });
 
@@ -236,9 +242,9 @@ async function loadMap() {
     "Ostala urbana oprema": ostaloLayer,
   };
   L.control.layers(
-    { "Mapa (OSM)": osm, "Satelit": sat },
+    { "Mapa": carto, "Mapa (HOT)": osmHot, "Satelit": sat },
     overlays,
-    { collapsed: false, position: "topright" }
+    { collapsed: window.innerWidth < 900, position: "topright" }
   ).addTo(map);
 }
 
