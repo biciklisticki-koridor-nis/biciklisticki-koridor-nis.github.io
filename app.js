@@ -241,11 +241,22 @@ async function loadMap() {
     "Zelena infrastruktura": zelenaLayer,
     "Ostala urbana oprema": ostaloLayer,
   };
-  L.control.layers(
+  const layersCtrl = L.control.layers(
     { "Mapa": carto, "Mapa (HOT)": osmHot, "Satelit": sat },
     overlays,
     { collapsed: window.innerWidth < 900, position: "topright" }
   ).addTo(map);
+
+  // Auto-collapse / expand on viewport resize (desktop ↔ mobile)
+  let lastCollapsed = window.innerWidth < 900;
+  window.addEventListener("resize", () => {
+    const shouldCollapse = window.innerWidth < 900;
+    if (shouldCollapse !== lastCollapsed) {
+      lastCollapsed = shouldCollapse;
+      if (shouldCollapse) layersCtrl.collapse();
+      else                layersCtrl.expand();
+    }
+  });
 }
 
 // ---------- boot ----------
