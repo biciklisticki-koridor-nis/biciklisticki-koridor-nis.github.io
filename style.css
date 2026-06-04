@@ -1,0 +1,220 @@
+/* ---------- design tokens ---------- */
+:root {
+  --green-900: #1f3b2d;
+  --green-700: #2f6b46;
+  --green-500: #4a9367;
+  --green-100: #e6f1eb;
+  --earth-700: #8a5a2b;
+  --earth-500: #c08a4f;
+  --sand-100: #f6f0e6;
+  --sand-50:  #faf7f1;
+  --ink-900: #1a1f1b;
+  --ink-700: #3b4a40;
+  --ink-500: #6b776f;
+  --ink-300: #a8b1ab;
+  --line:    #d8ddd6;
+  --warn:    #c0392b;
+  --warn-bg: #f9e7e3;
+  --shadow:  0 6px 22px rgba(31, 59, 45, 0.08);
+  --radius:  14px;
+  --container: 1100px;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  color: var(--ink-900);
+  background: var(--sand-50);
+  line-height: 1.55;
+}
+.container {
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: 0 1.25rem;
+}
+h1, h2, h3 { color: var(--green-900); line-height: 1.2; margin: 0 0 .6em; letter-spacing: -0.01em; }
+h1 { font-size: clamp(2rem, 4vw + 1rem, 3.4rem); font-weight: 800; }
+h2 { font-size: clamp(1.5rem, 1.4vw + 1rem, 2.1rem); font-weight: 700; margin-top: 0; }
+h3 { font-size: 1.15rem; font-weight: 700; }
+p  { margin: 0 0 1em; color: var(--ink-700); }
+.lead { font-size: 1.08rem; color: var(--ink-700); max-width: 60ch; }
+.muted { color: var(--ink-500); font-size: .92rem; }
+
+/* ---------- hero ---------- */
+.hero {
+  background:
+    linear-gradient(140deg, rgba(31, 59, 45, .82), rgba(47, 107, 70, .72)),
+    radial-gradient(at top right, var(--green-500), var(--green-900));
+  color: #fff;
+  padding: 4.5rem 0 5rem;
+}
+.hero h1 { color: #fff; }
+.hero p, .hero .subtitle { color: rgba(255,255,255,.9); }
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: .15em;
+  font-size: .82rem;
+  font-weight: 600;
+  color: rgba(255,255,255,.75);
+  margin-bottom: .8em;
+}
+.subtitle { max-width: 60ch; font-size: 1.15rem; margin-bottom: 2em; }
+.cta { display: flex; gap: .8rem; flex-wrap: wrap; }
+.btn {
+  display: inline-block;
+  padding: .8rem 1.4rem;
+  border-radius: 999px;
+  font-weight: 600;
+  text-decoration: none;
+  border: 2px solid transparent;
+  transition: transform .15s ease, background .15s ease, border-color .15s ease;
+}
+.btn-primary { background: #fff; color: var(--green-900); }
+.btn-primary:hover { transform: translateY(-1px); background: var(--sand-100); }
+.btn-ghost { color: #fff; border-color: rgba(255,255,255,.5); }
+.btn-ghost:hover { border-color: #fff; background: rgba(255,255,255,.08); }
+
+/* ---------- pregled / KPI ---------- */
+.pregled { padding: 4rem 0; }
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-top: 2rem;
+}
+.kpi {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1.4rem 1.2rem;
+  box-shadow: var(--shadow);
+}
+.kpi-value {
+  font-size: 2.4rem;
+  font-weight: 800;
+  color: var(--green-700);
+  line-height: 1;
+  margin-bottom: .35rem;
+}
+.kpi-label { font-weight: 600; color: var(--ink-900); margin-bottom: .15rem; }
+.kpi-sub   { font-size: .88rem; color: var(--ink-500); }
+
+/* ---------- mapa ---------- */
+.mapa-section { padding: 3rem 0 4rem; background: #fff; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+#map {
+  height: 620px;
+  width: 100%;
+  margin: 1.5rem 0 1rem;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+.legend-note {
+  background: var(--sand-100);
+  border-radius: var(--radius);
+  padding: .9rem 1.1rem;
+  font-size: .93rem;
+  color: var(--ink-700);
+}
+.leaflet-popup-content { font-family: inherit; font-size: .95rem; }
+.leaflet-popup-content strong { color: var(--green-900); }
+.leaflet-control-layers { font-size: .92rem; }
+.leaflet-control-layers-overlays label { display: block; margin: 2px 0; }
+
+/* ---------- analiza / bars ---------- */
+.analiza { padding: 4rem 0; }
+.analiza-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.25rem;
+  margin-top: 2rem;
+}
+.card {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1.4rem 1.4rem 1.6rem;
+  box-shadow: var(--shadow);
+}
+.card-sub { font-size: .92rem; color: var(--ink-500); margin: -.4em 0 1.4em; }
+
+.bars { display: flex; flex-direction: column; gap: .9rem; }
+.bar-row {
+  display: grid;
+  grid-template-columns: 9.5em 1fr auto;
+  gap: .7rem;
+  align-items: center;
+  font-size: .94rem;
+}
+.bar-row .label { color: var(--ink-700); }
+.bar-row .track {
+  background: var(--green-100);
+  border-radius: 999px;
+  height: 12px;
+  overflow: hidden;
+}
+.bar-row .fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--green-500);
+  transition: width .6s ease;
+}
+.bar-row .fill.earth   { background: var(--earth-500); }
+.bar-row .fill.stone   { background: #9aa5a2; }
+.bar-row .fill.dark    { background: var(--ink-700); }
+.bar-row .fill.warn    { background: var(--warn); }
+.bar-row .fill.green   { background: var(--green-500); }
+.bar-row .fill.sun     { background: #d8a93a; }
+.bar-row .fill.water   { background: #4f87a5; }
+.bar-row .value { color: var(--ink-900); font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* ---------- CTA section ---------- */
+.cta-section {
+  background: var(--green-100);
+  padding: 4rem 0;
+  border-top: 1px solid var(--line);
+}
+.cta-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
+  margin-top: 2rem;
+}
+.cta-card {
+  background: #fff;
+  border-radius: var(--radius);
+  padding: 1.4rem;
+  box-shadow: var(--shadow);
+}
+.cta-card h3 { margin-bottom: .4em; }
+
+/* ---------- footer ---------- */
+footer {
+  background: var(--green-900);
+  color: rgba(255,255,255,.7);
+  padding: 2rem 0;
+  font-size: .9rem;
+}
+footer p { color: rgba(255,255,255,.7); margin: 0 0 .3em; }
+footer .muted { color: rgba(255,255,255,.45); }
+
+/* ---------- map markers ---------- */
+.dot {
+  display: block;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  box-shadow: 0 1px 3px rgba(0,0,0,.35);
+}
+.tri {
+  width: 0; height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,.45));
+}
+
+@media (max-width: 640px) {
+  .hero { padding: 3rem 0 3.5rem; }
+  #map { height: 460px; }
+  .bar-row { grid-template-columns: 8em 1fr auto; font-size: .88rem; }
+}

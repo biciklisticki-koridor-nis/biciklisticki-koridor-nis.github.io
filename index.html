@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nišavski biciklistički koridor — trenutno stanje na terenu</title>
+  <meta name="description" content="Mapiranje stanja keja Nišave kao osnova za uspostavljanje biciklističkog koridora od Medoševca do Niške Banje." />
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<header class="hero">
+  <div class="container">
+    <p class="eyebrow">Inicijativa zajednice · Niš</p>
+    <h1>Nišavski biciklistički koridor</h1>
+    <p class="subtitle">Mapiranje trenutnog stanja na terenu duž keja reke Nišave — kao osnova za budući biciklistički koridor od Medoševca do Niške Banje.</p>
+    <div class="cta">
+      <a href="#mapa" class="btn btn-primary">Pogledaj mapu</a>
+      <a href="#ukljucise" class="btn btn-ghost">Uključi se</a>
+    </div>
+  </div>
+</header>
+
+<section id="pregled" class="pregled">
+  <div class="container">
+    <h2>Trenutno stanje, u brojkama</h2>
+    <p class="lead">Sve vrednosti su izračunate iz <strong>447 mapiranih tačaka i segmenata</strong> sa terena.</p>
+    <div class="kpi-grid">
+      <div class="kpi">
+        <div class="kpi-value" id="kpi-trasa">—</div>
+        <div class="kpi-label">km ukupna dužina trase</div>
+        <div class="kpi-sub">od Medoševca do Niške Banje</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-value" id="kpi-prekidi">—</div>
+        <div class="kpi-label">prekida u kretanju</div>
+        <div class="kpi-sub"><span id="kpi-prekidi-density">—</span> m između prekida</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-value" id="kpi-osvetljenje">—</div>
+        <div class="kpi-label">uličnih svetiljki</div>
+        <div class="kpi-sub">≈ <span id="kpi-osvetljenje-density">—</span> m između svetiljki</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-value" id="kpi-klupe">—</div>
+        <div class="kpi-label">klupa</div>
+        <div class="kpi-sub">≈ <span id="kpi-klupe-density">—</span> m između klupa</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-value" id="kpi-stepenice">—</div>
+        <div class="kpi-label">stepenica</div>
+        <div class="kpi-sub">prepreka za bicikle</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-value" id="kpi-rampe">—</div>
+        <div class="kpi-label">rampe</div>
+        <div class="kpi-sub">mesta za prelaz</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="mapa" class="mapa-section">
+  <div class="container">
+    <h2>Interaktivna mapa</h2>
+    <p class="lead">Uključi/isključi slojeve sa desne strane mape da vidiš šta je gde mapirano.</p>
+  </div>
+  <div id="map" aria-label="Mapa Nišavskog biciklističkog koridora"></div>
+  <div class="container">
+    <div class="legend-note">
+      <strong>Saveti:</strong> klikni na bilo koji simbol za detalje. Slojevi sa puno tačaka (osvetljenje, vegetacija) su podrazumevano isključeni — uključi ih po potrebi.
+    </div>
+  </div>
+</section>
+
+<section id="analiza" class="analiza">
+  <div class="container">
+    <h2>Analiza po tipu</h2>
+
+    <div class="analiza-grid">
+      <div class="card">
+        <h3>Tipovi podloge</h3>
+        <p class="card-sub">Mapirano je <span id="staze-total">—</span> m segmenata staza duž trase.</p>
+        <div class="bars" id="bars-podloga"></div>
+      </div>
+
+      <div class="card">
+        <h3>Urbana oprema</h3>
+        <p class="card-sub">Šta postoji duž korisnih delova trase.</p>
+        <div class="bars" id="bars-oprema"></div>
+      </div>
+
+      <div class="card">
+        <h3>Zelena infrastruktura (linije)</h3>
+        <p class="card-sub">Deonice gde je mapirana vegetacija (kao linijski elementi).</p>
+        <div class="bars" id="bars-zelena"></div>
+      </div>
+
+      <div class="card">
+        <h3>Gustina po kilometru trase</h3>
+        <p class="card-sub">Koliko često se nešto pojavljuje na 1 km koridora.</p>
+        <div class="bars" id="bars-gustina"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="ukljucise" class="cta-section">
+  <div class="container">
+    <h2>Uključi se</h2>
+    <p class="lead">
+      Ovi podaci su prvi korak. Inicijativa traži saveznike — bicikliste, pešake, žitelje keja, urbaniste, gradske strukture — da zajedno definišemo kako koridor treba da izgleda.
+    </p>
+    <div class="cta-cards">
+      <div class="cta-card">
+        <h3>Prijavi prepreku</h3>
+        <p>Vidiš novi prekid, oštećenje ili problem? Javi nam da dopunimo mapu.</p>
+      </div>
+      <div class="cta-card">
+        <h3>Pridruži se mapiranju</h3>
+        <p>Organizujemo zajedničke obilaske i merenja terena u sezoni.</p>
+      </div>
+      <div class="cta-card">
+        <h3>Podeli inicijativu</h3>
+        <p>Što više nas se zalaže, veće su šanse da koridor postane realnost.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <p>Podaci: terensko mapiranje 2025. · Osnova: OpenStreetMap · Mapa: Leaflet.js</p>
+    <p class="muted">Nišavski biciklistički koridor — inicijativa zajednice, Niš</p>
+  </div>
+</footer>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="app.js"></script>
+
+</body>
+</html>
