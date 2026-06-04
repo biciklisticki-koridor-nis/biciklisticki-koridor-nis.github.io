@@ -257,6 +257,13 @@ async function loadMap() {
       else                layersCtrl.expand();
     }
   });
+
+  // Touch UX: tap na mapu zatvara otvoreni layer panel (Leaflet to ne radi sam).
+  // Marker click ne okida map.click (Leaflet stop-uje propagaciju), tako da
+  // toggle slojeva ne ometa interakciju sa tačkama na mapi.
+  map.on("click", () => {
+    if (window.innerWidth < 900) layersCtrl.collapse();
+  });
 }
 
 // ---------- boot ----------
