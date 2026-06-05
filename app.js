@@ -108,6 +108,12 @@ function popup(feature) {
   if (p.podloga)    extra += `<br><span class="muted">podloga: ${p.podloga}</span>`;
   if (p.duzina_m)   extra += `<br><span class="muted">dužina: ${Math.round(p.duzina_m)} m</span>`;
   if (p.stanje)     extra += `<br><span class="muted">stanje: ${p.stanje}</span>`;
+  if (Array.isArray(p.images) && p.images.length) {
+    const imgs = p.images.map(u =>
+      `<a href="${DATA}${u}" target="_blank" rel="noopener"><img src="${DATA}${u}" alt="" loading="lazy"></a>`
+    ).join("");
+    extra += `<div class="popup-images">${imgs}</div>`;
+  }
   return `<strong>${name}</strong>${extra}`;
 }
 

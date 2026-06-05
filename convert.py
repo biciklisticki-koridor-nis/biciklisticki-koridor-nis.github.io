@@ -4,16 +4,24 @@
 Reads koridor_data.kml, normalizes names (handles typos), categorizes
 placemarks into logical layers, writes GeoJSON files into data/.
 """
+import hashlib
 import json
 import math
 import os
 import re
+import urllib.error
+import urllib.request
 import xml.etree.ElementTree as ET
 
 KML_NS = "{http://www.opengis.net/kml/2.2}"
 ROOT = os.path.dirname(os.path.abspath(__file__))
 KML_FILE = os.path.join(ROOT, "koridor_data.kml")
 OUT_DIR = os.path.join(ROOT, "data")
+IMG_DIR = os.path.join(OUT_DIR, "images")
+
+IMG_SRC_RE = re.compile(r'<img[^>]+src=["\']([^"\']+)["\']', re.IGNORECASE)
+IMG_FIFE_RE = re.compile(r'\bfife=s\d+\b')
+IMG_MAX_PX = 1024  # MyMaps `fife=sNNNN` skalira max dimenziju — dovoljno za popup i lightbox
 
 
 # ---------- geometry helpers ----------
@@ -101,6 +109,43 @@ def canonical_state(n):
     return "ostalo"
 
 
+# ---------- image extraction ----------
+
+def extract_image_urls(description):
+    if not description:
+        return []
+    seen = set()
+    out = []
+    for u in IMG_SRC_RE.findall(description):
+        if u not in seen:
+            seen.add(u)
+            out.append(u)
+    return out
+
+
+def cache_image(url):
+    """Download once, cache by URL hash. Returns relative path or None on failure."""
+    h = hashlib.sha1(url.encode("utf-8")).hexdigest()[:16]
+    rel = f"images/{h}.jpg"
+    dst = os.path.join(IMG_DIR, f"{h}.jpg")
+    if os.path.exists(dst) and os.path.getsize(dst) > 0:
+        return rel
+    os.makedirs(IMG_DIR, exist_ok=True)
+    download_url = IMG_FIFE_RE.sub(f"fife=s{IMG_MAX_PX}", url) if "fife=" in url else url
+    req = urllib.request.Request(download_url, headers={"User-Agent": "koridor-konverter/1.0"})
+    try:
+        with urllib.request.urlopen(req, timeout=30) as r, open(dst, "wb") as f:
+            f.write(r.read())
+        return rel
+    except (urllib.error.URLError, urllib.error.HTTPError, OSError) as e:
+        print(f"  ! preskačem sliku ({e}): {url[:80]}...")
+        try:
+            os.path.exists(dst) and os.remove(dst)
+        except OSError:
+            pass
+        return None
+
+
 # ---------- KML iteration ----------
 
 def folder_placemarks(folder):
@@ -108,6 +153,10 @@ def folder_placemarks(folder):
     for pm in folder.findall(f"{KML_NS}Placemark"):
         nm_el = pm.find(f"{KML_NS}name")
         nm = nm_el.text if nm_el is not None else ""
+        desc_el = pm.find(f"{KML_NS}description")
+        desc = desc_el.text if desc_el is not None else ""
+        urls = extract_image_urls(desc)
+        images = [p for p in (cache_image(u) for u in urls) if p]
         pt = pm.find(f".//{KML_NS}Point/{KML_NS}coordinates")
         ls = pm.find(f".//{KML_NS}LineString/{KML_NS}coordinates")
         if pt is not None:
@@ -118,7 +167,8 @@ def folder_placemarks(folder):
             geom = {"type": "LineString", "coordinates": [list(c) for c in coords]} if coords else None
         else:
             geom = None
-        out.append({"name": nm, "norm": norm(nm), "geom": geom, "coords": coords if (pt is not None or ls is not None) else []})
+        out.append({"name": nm, "norm": norm(nm), "geom": geom, "images": images,
+                    "coords": coords if (pt is not None or ls is not None) else []})
     return out
 
 
@@ -126,6 +176,13 @@ def folder_placemarks(folder):
 
 def feature(geom, props):
     return {"type": "Feature", "geometry": geom, "properties": props}
+
+
+def feature_for(p, props):
+    """Create a Feature from placemark dict; attach images if any."""
+    if p.get("images"):
+        props = {**props, "images": p["images"]}
+    return feature(p["geom"], props)
 
 
 def fc(features):
@@ -174,7 +231,7 @@ def main():
         if "Indicaciones" in fname:
             for p in pms:
                 if p["geom"] and p["geom"]["type"] == "LineString":
-                    out["trasa"].append(feature(p["geom"], {"name": "Glavna trasa koridora"}))
+                    out["trasa"].append(feature_for(p, {"name": "Glavna trasa koridora"}))
                     stats["trasa_km"] = line_length_m(p["coords"]) / 1000.0
 
         elif "Zelena" in fname:
@@ -183,14 +240,14 @@ def main():
                     continue
                 cat = canonical_green(p["norm"])
                 props = {"name": p["name"], "kategorija": cat}
-                out["zelena"].append(feature(p["geom"], props))
+                out["zelena"].append(feature_for(p, props))
                 if p["geom"]["type"] == "LineString" and cat in ("visoka_vegetacija", "niska_vegetacija"):
                     stats["zelena_linije_m"][cat] += line_length_m(p["coords"])
 
         elif "Prekid" in fname:
             for p in pms:
                 if p["geom"]:
-                    out["prekidi"].append(feature(p["geom"], {"name": p["name"]}))
+                    out["prekidi"].append(feature_for(p, {"name": p["name"]}))
 
         elif "Stepenice i rampe" in fname:
             for p in pms:
@@ -200,24 +257,24 @@ def main():
                 if p["geom"]["type"] == "LineString":
                     surf = canonical_surface(n)
                     L = line_length_m(p["coords"])
-                    out["staze"].append(feature(p["geom"], {"name": p["name"], "podloga": surf, "duzina_m": round(L, 1)}))
+                    out["staze"].append(feature_for(p, {"name": p["name"], "podloga": surf, "duzina_m": round(L, 1)}))
                     stats["staze"][f"{surf}_m"] = stats["staze"].get(f"{surf}_m", 0.0) + L
                 else:
                     # point
                     if "stepenic" in n:
-                        out["stepenice"].append(feature(p["geom"], {"name": p["name"]}))
+                        out["stepenice"].append(feature_for(p, {"name": p["name"]}))
                     elif "rampa" in n or "rampe" in n:
-                        out["rampe"].append(feature(p["geom"], {"name": p["name"]}))
+                        out["rampe"].append(feature_for(p, {"name": p["name"]}))
                     else:
                         # uncommon (e.g. "peshachki most") — keep in stepenice bucket as misc
-                        out["stepenice"].append(feature(p["geom"], {"name": p["name"]}))
+                        out["stepenice"].append(feature_for(p, {"name": p["name"]}))
 
         elif "Urbana oprema" in fname:
             for p in pms:
                 if not p["geom"]:
                     continue
                 cat = canonical_urban(p["norm"])
-                feat = feature(p["geom"], {"name": p["name"], "kategorija": cat})
+                feat = feature_for(p, {"name": p["name"], "kategorija": cat})
                 if cat in ("osvetljenje", "klupe", "kante", "letnjikovci", "sport"):
                     out[cat].append(feat)
                 else:
@@ -231,12 +288,12 @@ def main():
                 props = {"name": p["name"], "stanje": st}
                 if p["geom"]["type"] == "LineString":
                     props["duzina_m"] = round(line_length_m(p["coords"]), 1)
-                out["stanja"].append(feature(p["geom"], props))
+                out["stanja"].append(feature_for(p, props))
 
         elif "Javni socijalni" in fname or "urbani dzepovi" in fname.lower():
             for p in pms:
                 if p["geom"]:
-                    out["socijalni"].append(feature(p["geom"], {"name": p["name"]}))
+                    out["socijalni"].append(feature_for(p, {"name": p["name"]}))
 
     # write all layers
     print("Layers written:")
