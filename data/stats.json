@@ -40,6 +40,132 @@
     "stanja": 13,
     "socijalni": 2
   },
+  "deonice": [
+    "Medoševac",
+    "Centar",
+    "Delta - Lidl",
+    "Gabrovačka Reka",
+    "Brzi Brod",
+    "Niška Banja"
+  ],
+  "by_deonica": {
+    "Medoševac": {
+      "trasa_m": 2641.3,
+      "counts": {
+        "zelena": 8,
+        "prekidi": 12,
+        "stepenice": 2,
+        "rampe": 3,
+        "osvetljenje": 8,
+        "sport": 1,
+        "stanja": 4
+      },
+      "staze_m": {
+        "asfalt": 195.7,
+        "popločana": 0.0,
+        "zemljana": 1719.4,
+        "ostalo": 0.0
+      },
+      "trasa_km": 2.64
+    },
+    "Centar": {
+      "trasa_m": 1807.7,
+      "counts": {
+        "zelena": 14,
+        "prekidi": 7,
+        "stepenice": 25,
+        "rampe": 6,
+        "osvetljenje": 18,
+        "klupe": 31,
+        "kante": 17,
+        "stanja": 4,
+        "socijalni": 2
+      },
+      "staze_m": {
+        "asfalt": 0.0,
+        "popločana": 1111.3,
+        "zemljana": 462.6,
+        "ostalo": 0.0
+      },
+      "trasa_km": 1.81
+    },
+    "Delta - Lidl": {
+      "trasa_m": 2527.5,
+      "counts": {
+        "zelena": 9,
+        "prekidi": 4,
+        "stepenice": 14,
+        "rampe": 3,
+        "osvetljenje": 60,
+        "klupe": 5,
+        "kante": 2,
+        "letnjikovci": 5,
+        "urbana_ostalo": 4,
+        "sport": 2,
+        "stanja": 5
+      },
+      "staze_m": {
+        "asfalt": 1059.8,
+        "popločana": 0.0,
+        "zemljana": 2151.0,
+        "ostalo": 0.0
+      },
+      "trasa_km": 2.53
+    },
+    "Gabrovačka Reka": {
+      "trasa_m": 0.0,
+      "counts": {
+        "zelena": 1,
+        "prekidi": 3,
+        "stepenice": 37,
+        "osvetljenje": 16
+      },
+      "staze_m": {
+        "asfalt": 243.5,
+        "popločana": 0.0,
+        "zemljana": 2416.0,
+        "ostalo": 0.0
+      },
+      "trasa_km": 0.0
+    },
+    "Brzi Brod": {
+      "trasa_m": 3544.9,
+      "counts": {
+        "zelena": 3,
+        "prekidi": 20,
+        "urbana_ostalo": 2,
+        "osvetljenje": 28,
+        "kante": 1,
+        "letnjikovci": 2,
+        "sport": 1
+      },
+      "staze_m": {
+        "asfalt": 0.0,
+        "popločana": 0.0,
+        "zemljana": 0.0,
+        "ostalo": 0.0
+      },
+      "trasa_km": 3.54
+    },
+    "Niška Banja": {
+      "trasa_m": 4149.6,
+      "counts": {
+        "zelena": 8,
+        "prekidi": 6,
+        "stepenice": 2,
+        "letnjikovci": 6,
+        "urbana_ostalo": 5,
+        "sport": 5
+      },
+      "staze_m": {
+        "asfalt": 0.0,
+        "popločana": 0.0,
+        "zemljana": 0.0,
+        "ostalo": 0.0
+      },
+      "trasa_km": 4.15
+    }
+  },
   "density": {
     "osvetljenje_per_km": 8.86,
     "klupe_per_km": 2.45,

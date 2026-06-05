@@ -9,12 +9,12 @@ KML_URL  = $(shell grep -oP '<href>\s*(<!\[CDATA\[)?\K[^]<]+' $(SOURCE))
 
 help:
 	@echo "Dostupni targeti:"
-	@echo "  make convert   - pokrece convert.py (KML -> GeoJSON + stats.json)"
+	@echo "  make convert   - KML -> GeoJSON + stats.json + skida slike u data/images/ (idempotentno)"
 	@echo "  make serve     - pokrece lokalni HTTP server na portu $(PORT)"
 	@echo "  make fetch     - preuzima sveže podatke sa Google MyMaps (-> $(KML))"
 	@echo "  make analyze   - prikazuje pregled KML strukture (analyze.py)"
 	@echo "  make all       - fetch + convert"
-	@echo "  make clean     - briše generisane GeoJSON fajlove i preuzeti KML"
+	@echo "  make clean     - briše data/ (GeoJSON + slike) i preuzeti KML"
 
 convert:
 	$(PYTHON) convert.py
