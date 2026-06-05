@@ -71,6 +71,32 @@ async function loadStats() {
     { label: "Klupe / km",     value: s.density.klupe_per_km,       display: s.density.klupe_per_km.toFixed(2),       color: "earth" },
     { label: "Prekidi / km",   value: s.density.prekidi_per_km,     display: s.density.prekidi_per_km.toFixed(2),     color: "warn" },
   ]);
+
+  renderDeoniceTable(s);
+}
+
+function renderDeoniceTable(s) {
+  const tbody = document.querySelector("#deonice-table tbody");
+  if (!tbody || !s.deonice || !s.by_deonica) return;
+  const fmtM = m => m >= 1000 ? `${(m / 1000).toFixed(2)} km` : `${Math.round(m)} m`;
+  const cell = v => (v && v !== 0) ? v : "—";
+  tbody.innerHTML = s.deonice.map(name => {
+    const d = s.by_deonica[name];
+    const c = d.counts || {};
+    return `
+      <tr>
+        <td class="deonica-name">${name}</td>
+        <td>${d.trasa_km > 0 ? d.trasa_km.toFixed(2) + " km" : "—"}</td>
+        <td>${d.staze_m.asfalt    > 0 ? fmtM(d.staze_m.asfalt)    : "—"}</td>
+        <td>${d.staze_m.popločana > 0 ? fmtM(d.staze_m.popločana) : "—"}</td>
+        <td>${d.staze_m.zemljana  > 0 ? fmtM(d.staze_m.zemljana)  : "—"}</td>
+        <td>${cell(c.klupe)}</td>
+        <td>${cell(c.osvetljenje)}</td>
+        <td>${cell(c.prekidi)}</td>
+        <td>${cell(c.stepenice)}</td>
+        <td>${cell(c.rampe)}</td>
+      </tr>`;
+  }).join("");
 }
 
 // ---------- map ----------
@@ -108,6 +134,12 @@ function popup(feature) {
   if (p.podloga)    extra += `<br><span class="muted">podloga: ${p.podloga}</span>`;
   if (p.duzina_m)   extra += `<br><span class="muted">dužina: ${Math.round(p.duzina_m)} m</span>`;
   if (p.stanje)     extra += `<br><span class="muted">stanje: ${p.stanje}</span>`;
+  if (Array.isArray(p.images) && p.images.length) {
+    const imgs = p.images.map(u =>
+      `<a href="${DATA}${u}" target="_blank" rel="noopener"><img src="${DATA}${u}" alt="" loading="lazy"></a>`
+    ).join("");
+    extra += `<div class="popup-images">${imgs}</div>`;
+  }
   return `<strong>${name}</strong>${extra}`;
 }
 
@@ -163,13 +195,14 @@ async function loadMap() {
   const [
     trasa, staze, prekidi, stepenice, rampe,
     osvetljenje, klupe, kante, letnjikovci, sport, urbanaOstalo,
-    zelena, stanja, socijalni,
+    zelena, stanja, socijalni, deonice,
   ] = await Promise.all([
     loadGeoJSON("trasa"), loadGeoJSON("staze"), loadGeoJSON("prekidi"),
     loadGeoJSON("stepenice"), loadGeoJSON("rampe"),
     loadGeoJSON("osvetljenje"), loadGeoJSON("klupe"), loadGeoJSON("kante"),
     loadGeoJSON("letnjikovci"), loadGeoJSON("sport"), loadGeoJSON("urbana_ostalo"),
     loadGeoJSON("zelena"), loadGeoJSON("stanja"), loadGeoJSON("socijalni"),
+    loadGeoJSON("deonice"),
   ]);
 
   // styled layers
@@ -212,6 +245,19 @@ async function loadMap() {
 
   const socijalniLayer = bindPopups(L.geoJSON(socijalni, { pointToLayer: circleMarker("#7d3c98", 7) }));
 
+  const DEONICA_COLORS = ["#2f6b46", "#d8a93a", "#8a5a2b", "#4f87a5"];
+  const deoniceLayer = L.geoJSON(deonice, {
+    style: (f) => {
+      const idx = (deonice.features || []).indexOf(f);
+      const col = DEONICA_COLORS[idx % DEONICA_COLORS.length];
+      return { color: col, weight: 2, opacity: 0.85, fillColor: col, fillOpacity: 0.10 };
+    },
+    onEachFeature: (f, l) => {
+      l.bindTooltip(f.properties.name, { permanent: true, direction: "center", className: "deonica-label" });
+      l.bindPopup(`<strong>Deonica:</strong> ${f.properties.name}`);
+    },
+  });
+
   // add defaults
   trasaLayer.addTo(map);
   stazeLayer.addTo(map);
@@ -226,6 +272,7 @@ async function loadMap() {
 
   // layer control
   const overlays = {
+    "Granice deonica": deoniceLayer,
     "Glavna trasa": trasaLayer,
     "Staze (po tipu podloge)": stazeLayer,
     "Prekidi u kretanju": prekidiLayer,
