@@ -72,38 +72,73 @@ async function loadStats() {
     { label: "Prekidi / km",   value: s.density.prekidi_per_km,     display: s.density.prekidi_per_km.toFixed(2),     color: "warn" },
   ]);
 
-  renderDeoniceTable(s);
+  renderDeoniceCards(s);
 }
 
-function renderDeoniceTable(s) {
-  const tbody = document.querySelector("#deonice-table tbody");
-  if (!tbody || !s.deonice || !s.by_deonica) return;
-  const fmtM = m => m >= 1000 ? `${(m / 1000).toFixed(2)} km` : `${Math.round(m)} m`;
-  const cell = v => (v && v !== 0) ? v : "—";
-  tbody.innerHTML = s.deonice.map(name => {
+function renderDeoniceCards(s) {
+  const grid = document.getElementById("deonice-grid");
+  if (!grid || !s.deonice || !s.by_deonica) return;
+  const dl = s.deonice;
+
+  // Iste skale preko svih kartica
+  const maxStaza = Math.max(1, ...dl.flatMap(n => {
+    const sm = s.by_deonica[n].staze_m;
+    return [sm.asfalt, sm.popločana, sm.zemljana];
+  }));
+  const counters = ["klupe", "osvetljenje", "prekidi", "stepenice", "rampe"];
+  const maxCount = Object.fromEntries(counters.map(k =>
+    [k, Math.max(1, ...dl.map(n => s.by_deonica[n].counts[k] || 0))]
+  ));
+
+  const row = (label, val, max, color, display) => {
+    const pct = max > 0 ? Math.max(2, (val / max) * 100) : 0;
+    return `<div class="bar-row">
+      <div class="label">${label}</div>
+      <div class="track"><div class="fill ${color}" style="width:${pct}%"></div></div>
+      <div class="value">${display ?? (val || "—")}</div>
+    </div>`;
+  };
+  const mShow = v => v > 0 ? fmtM(v) : "—";
+
+  grid.innerHTML = dl.map(name => {
     const d = s.by_deonica[name];
     const c = d.counts || {};
     return `
-      <tr>
-        <td class="deonica-name">${name}</td>
-        <td>${d.trasa_km > 0 ? d.trasa_km.toFixed(2) + " km" : "—"}</td>
-        <td>${d.staze_m.asfalt    > 0 ? fmtM(d.staze_m.asfalt)    : "—"}</td>
-        <td>${d.staze_m.popločana > 0 ? fmtM(d.staze_m.popločana) : "—"}</td>
-        <td>${d.staze_m.zemljana  > 0 ? fmtM(d.staze_m.zemljana)  : "—"}</td>
-        <td>${cell(c.klupe)}</td>
-        <td>${cell(c.osvetljenje)}</td>
-        <td>${cell(c.prekidi)}</td>
-        <td>${cell(c.stepenice)}</td>
-        <td>${cell(c.rampe)}</td>
-      </tr>`;
+      <div class="deonica-card">
+        <div class="deonica-card-head">
+          <h3>${name}</h3>
+          <div class="deonica-card-km">${d.trasa_km > 0 ? d.trasa_km.toFixed(2) + " km" : "—"}</div>
+        </div>
+        <div class="deonica-card-section">
+          <h4>Podloga staza</h4>
+          <div class="bars">
+            ${row("Asfalt",     d.staze_m.asfalt,    maxStaza, "dark",  mShow(d.staze_m.asfalt))}
+            ${row("Popločana",  d.staze_m.popločana, maxStaza, "stone", mShow(d.staze_m.popločana))}
+            ${row("Zemljana",   d.staze_m.zemljana,  maxStaza, "earth", mShow(d.staze_m.zemljana))}
+          </div>
+        </div>
+        <div class="deonica-card-section">
+          <h4>Oprema i prepreke</h4>
+          <div class="bars">
+            ${row("Sijalice",  c.osvetljenje || 0, maxCount.osvetljenje, "sun")}
+            ${row("Klupe",     c.klupe       || 0, maxCount.klupe,       "earth")}
+            ${row("Prekidi",   c.prekidi     || 0, maxCount.prekidi,     "warn")}
+            ${row("Stepenice", c.stepenice   || 0, maxCount.stepenice,   "dark")}
+            ${row("Rampe",     c.rampe       || 0, maxCount.rampe,       "water")}
+          </div>
+        </div>
+      </div>`;
   }).join("");
 }
 
 // ---------- map ----------
 
-async function loadGeoJSON(name) {
-  const r = await fetch(`${DATA}${name}.geojson`);
-  return r.json();
+const _geoCache = {};
+function loadGeoJSON(name) {
+  if (!_geoCache[name]) {
+    _geoCache[name] = fetch(`${DATA}${name}.geojson`).then(r => r.json());
+  }
+  return _geoCache[name];
 }
 
 function circleMarker(color, radius = 6) {
@@ -313,11 +348,136 @@ async function loadMap() {
   });
 }
 
+// ---------- gallery + lightbox ----------
+
+const GALLERY_CATEGORIES = [
+  { id: "prekidi",   label: "Prekidi",           layers: ["prekidi"] },
+  { id: "stepenice", label: "Stepenice i rampe", layers: ["stepenice", "rampe", "staze"] },
+  { id: "urbana",    label: "Urbana oprema",     layers: ["osvetljenje", "klupe", "kante", "letnjikovci", "sport", "urbana_ostalo"] },
+  { id: "stanja",    label: "Stanja",            layers: ["stanja"] },
+  { id: "zelena",    label: "Vegetacija",        layers: ["zelena"] },
+  { id: "socijalni", label: "Urbani džepovi",    layers: ["socijalni"] },
+];
+
+async function loadGallery() {
+  const layerToCat = {};
+  const allLayers = new Set();
+  for (const cat of GALLERY_CATEGORIES) {
+    for (const ly of cat.layers) {
+      allLayers.add(ly);
+      layerToCat[ly] = cat;
+    }
+  }
+
+  const fetched = await Promise.all([...allLayers].map(ly => loadGeoJSON(ly).then(g => [ly, g])));
+  const items = [];
+  for (const [ly, gj] of fetched) {
+    for (const f of (gj.features || [])) {
+      const imgs = f.properties && f.properties.images;
+      if (!Array.isArray(imgs) || !imgs.length) continue;
+      const cat = layerToCat[ly];
+      const name = (f.properties.name || "").trim() || "(bez imena)";
+      const deonica = f.properties.deonica || "";
+      for (const u of imgs) {
+        items.push({
+          url: DATA + u,
+          name, deonica,
+          categoryId: cat.id,
+          categoryLabel: cat.label,
+        });
+      }
+    }
+  }
+
+  const filtersEl = document.getElementById("gallery-filters");
+  const gridEl = document.getElementById("gallery-grid");
+  if (!filtersEl || !gridEl) return;
+
+  const chip = (id, label, n, active) =>
+    `<button type="button" class="chip${active ? " active" : ""}" data-cat="${id}">${label} <span class="chip-count">${n}</span></button>`;
+  filtersEl.innerHTML = chip("all", "Sve", items.length, true) +
+    GALLERY_CATEGORIES
+      .map(c => ({ c, n: items.filter(i => i.categoryId === c.id).length }))
+      .filter(x => x.n > 0)
+      .map(x => chip(x.c.id, x.c.label, x.n, false))
+      .join("");
+
+  gridEl.innerHTML = items.map((it, i) => `
+    <a href="${it.url}" class="gallery-item" data-cat="${it.categoryId}" data-idx="${i}">
+      <img src="${it.url}" alt="${it.name}" loading="lazy">
+      <div class="gallery-caption">
+        <div class="gallery-name">${it.name}</div>
+        <div class="gallery-meta">${it.categoryLabel}${it.deonica ? " · " + it.deonica : ""}</div>
+      </div>
+    </a>`).join("");
+
+  filtersEl.addEventListener("click", (e) => {
+    const btn = e.target.closest(".chip");
+    if (!btn) return;
+    filtersEl.querySelectorAll(".chip").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    const cat = btn.dataset.cat;
+    gridEl.querySelectorAll(".gallery-item").forEach(el => {
+      el.style.display = (cat === "all" || el.dataset.cat === cat) ? "" : "none";
+    });
+  });
+
+  setupLightbox(items, gridEl);
+}
+
+function setupLightbox(items, gridEl) {
+  const lb = document.getElementById("lightbox");
+  const img = document.getElementById("lightbox-img");
+  const cap = document.getElementById("lightbox-caption");
+  if (!lb || !img || !cap) return;
+
+  let visible = items.slice();
+  let idx = 0;
+
+  const refreshVisible = () => {
+    visible = [...gridEl.querySelectorAll(".gallery-item")]
+      .filter(el => el.style.display !== "none")
+      .map(el => items[+el.dataset.idx]);
+  };
+
+  const show = (i) => {
+    if (!visible.length) return;
+    idx = (i + visible.length) % visible.length;
+    const it = visible[idx];
+    img.src = it.url;
+    cap.innerHTML = `<div class="lb-name">${it.name}</div>
+      <div class="lb-meta">${it.categoryLabel}${it.deonica ? " · " + it.deonica : ""} · ${idx + 1} / ${visible.length}</div>`;
+  };
+  const open = (i) => { lb.hidden = false; document.body.style.overflow = "hidden"; show(i); };
+  const close = () => { lb.hidden = true; document.body.style.overflow = ""; img.src = ""; };
+
+  gridEl.addEventListener("click", (e) => {
+    const a = e.target.closest(".gallery-item");
+    if (!a) return;
+    e.preventDefault();
+    refreshVisible();
+    const clickedUrl = a.getAttribute("href");
+    const start = visible.findIndex(it => it.url === clickedUrl);
+    open(Math.max(0, start));
+  });
+
+  lb.querySelector(".lightbox-close").addEventListener("click", close);
+  lb.querySelector(".lightbox-prev").addEventListener("click", () => show(idx - 1));
+  lb.querySelector(".lightbox-next").addEventListener("click", () => show(idx + 1));
+  lb.addEventListener("click", (e) => { if (e.target === lb) close(); });
+  document.addEventListener("keydown", (e) => {
+    if (lb.hidden) return;
+    if (e.key === "Escape") close();
+    if (e.key === "ArrowLeft") show(idx - 1);
+    if (e.key === "ArrowRight") show(idx + 1);
+  });
+}
+
 // ---------- boot ----------
 
 (async function () {
   try {
-    await Promise.all([loadStats(), loadMap()]);
+    await Promise.all([loadStats(), loadMap(), loadGallery()]);
   } catch (e) {
     console.error(e);
     const note = document.querySelector(".legend-note");
