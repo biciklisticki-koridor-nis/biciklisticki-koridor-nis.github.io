@@ -1,0 +1,270 @@
+{
+  "total": 277,
+  "questions": [
+    {
+      "key": "frequency",
+      "title": "Koliko često koristite kej Nišave?",
+      "type": "single",
+      "answered": 277,
+      "answers": [
+        {
+          "label": "Неколико пута недељно",
+          "count": 111
+        },
+        {
+          "label": "Повремено (викендом или ретко)",
+          "count": 91
+        },
+        {
+          "label": "Свакодневно",
+          "count": 69
+        },
+        {
+          "label": "Готово никада",
+          "count": 6
+        }
+      ]
+    },
+    {
+      "key": "purposes",
+      "title": "U koje svrhe najčešće koristite kej?",
+      "type": "multi",
+      "respondents": 277,
+      "answers": [
+        {
+          "label": "Шетња (самостално, породично, кућним љубимцем)",
+          "count": 236
+        },
+        {
+          "label": "Дружење / боравак на отвореном",
+          "count": 135
+        },
+        {
+          "label": "Вожња бицикла",
+          "count": 129
+        },
+        {
+          "label": "Трчање",
+          "count": 74
+        },
+        {
+          "label": "Вежбање / рекреација",
+          "count": 65
+        },
+        {
+          "label": "Za sve gore navedeno",
+          "count": 1
+        },
+        {
+          "label": "Gledamo patke i caplje",
+          "count": 1
+        },
+        {
+          "label": "Prolazak sa Vrezine u centar",
+          "count": 1
+        },
+        {
+          "label": "Igranje sa decom",
+          "count": 1
+        },
+        {
+          "label": "I",
+          "count": 1
+        },
+        {
+          "label": "Odlazag na poso,vodim decu u školu...",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "key": "would_use_corridor",
+      "title": "Da li biste koristili kontinuiran i bezbedan biciklistički koridor?",
+      "type": "single",
+      "answered": 277,
+      "answers": [
+        {
+          "label": "Да, сигурно",
+          "count": 249
+        },
+        {
+          "label": "Повремено",
+          "count": 24
+        },
+        {
+          "label": "Нисам сигуран/на",
+          "count": 3
+        },
+        {
+          "label": "Не",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "key": "willing_to_join",
+      "title": "Da li želite da se uključite u inicijativu?",
+      "type": "single",
+      "answered": 272,
+      "answers": [
+        {
+          "label": "Да",
+          "count": 141
+        },
+        {
+          "label": "Можда (у зависности од активности)",
+          "count": 81
+        },
+        {
+          "label": "Желим само да будем информисан/а",
+          "count": 50
+        }
+      ]
+    },
+    {
+      "key": "contribution",
+      "title": "Na koji način biste želeli da doprinesete?",
+      "type": "multi",
+      "respondents": 264,
+      "answers": [
+        {
+          "label": "Потписивање и дељење петиције",
+          "count": 210
+        },
+        {
+          "label": "Учешће на догађајима / бициклистичким турама",
+          "count": 105
+        },
+        {
+          "label": "Волонтерски рад (логистика, координација)",
+          "count": 64
+        },
+        {
+          "label": "Помоћ око мапе, дизајна или текста",
+          "count": 42
+        },
+        {
+          "label": "Комуникација са медијима / организацијама",
+          "count": 14
+        },
+        {
+          "label": "Možda od svega gore navedenog po nešto. Potpisivanje i bici Ture svakako ali i za ostale logističke izazove, savetovanje u vezi komunikacije itd.",
+          "count": 1
+        },
+        {
+          "label": "Rucak i kafa samo za tebe",
+          "count": 1
+        },
+        {
+          "label": "Donacija",
+          "count": 1
+        },
+        {
+          "label": "Tu",
+          "count": 1
+        },
+        {
+          "label": "iskustvo iz prakse, arhitekta po struci",
+          "count": 1
+        },
+        {
+          "label": "Marketing - oglasavanje, podizanje svesti",
+          "count": 1
+        },
+        {
+          "label": "Podrska ovoj konstruktivnoj ideji.",
+          "count": 1
+        },
+        {
+          "label": "maksimalno podrzavam inicijativu, sve to mogu uraditi za ovo, uradicu",
+          "count": 1
+        }
+      ]
+    }
+  ],
+  "comments": [
+    "Fenomenalna inicijativa! Predlažem da se dodaju i novi sportski sadržaji gde god je to moguće u kej. Košarkašk, odbojkaški, fudbalski tereni, sprave za vežbanje i sl. .",
+    "Ideja je odlična, baš bih voleo da zaživi",
+    "Vasa ideja je genijalna, sem vizuelno, bice mi lepse i lakse da setam i vozim bicikl, takodje upotpunjuje sliku naseg grada i podize na visi nivo.❤️",
+    "To je i moja ideja dugo godina.Biciklističke staze,roler staze,šetalište,prostori za vežbanje,mini golf,poneki restoran sojenica.Naravno klupe i osvetljenje.Da se napravi mogućnost proširenja projekta.Voleo bi da vaša ideja zaživi zato što pruža neverovatnu turističku blagodet i doprineće lepoti grada.",
+    "Produžiti projekat do ušća Nišave u J\n Moravu",
+    "To je najlepši deo grada, mora da se uredi lepo, takodje bi jedan park za vezbanje na otvorenom super legao!",
+    "Mislim da zbog bezbijednosti biciklista svakako bi trebalo da se napravi jedan lijep i detaljan plan biciklisticke staze. Gradovi koji su to lijepo rijesili su Novi Sad, Podgorica takodje u Crnoj Gori gdje je to bio veliki problem.",
+    "Podržala bih i mislim da je pametno da se sredi ceo kej.",
+    "ako se napravi da se postave kamere i uuredjaj za merenje brzine jer ce verovatno neko da dodje motorom da se vozi biciklistickom stazom",
+    "Oko biciklističke i pešačke staze od Medoševca do Niške banje nemam nikakvih zamerki i podržavam ovu inicijativu u potpunosti. Ali imam još jedan predlog koji može da se osloni na ovaj vaš i da čini jednu kompleksnu celinu. Naime u Nišu naselju Broj 6 (Nikola Tesla) postoji staro korito reke Nišave (takozvani rukavac) koje je sada bara, zapušteno je i bez ikakve upotrebe. Ima takvih tri rukavca. Uz dobru volju gradskih vlasti, a na osnovu inicijative nas gradjana i vas arhitektonskih stručnjaka moglo bi da se prvo taj prostor očisti oko tih bara, da se očisti dno i naspe šljunak i napravi jedno  malo prirodno jezero i mali turistički rekreativni centar u blizini ovih biciklističkih staza i sadašnjeg korita reke Nišave. Tako bi i grad Niš dobio jedno kupalište koje bi mogla da napuni reka Nišava, a voda bi bila protočna i filtrirana kroz filere kako bi u jezeru bilo moguće kupanje. Takva kupališta imaju Beograd (Ada Ciganlija), Novi Sad (Štrand), Kragujevac (Šumarice), Subotica (Palić), Kladovo... Mogao bih vam poslati na email obeležena mesta na karti i još ideja za ovaj projekat oko jezera ako mislite da zavredjuje pažnju i da Niš zaslužuje ovakvo kupalište i sportski rekreativni centar koji bi mogao da bude oko jezera napravljen.",
+    "Svim srcem želim da vidim uradjen projekat",
+    "Bojim se da ovu lepu ideju koju sam i ja sama imala odavno nece moci da spovedu u delo zbog Srbija voda jer im nece dozvoliti zbog toga sto je to bedem za odbranu od poplava ali ne treba odustajati, treba traziti bolje gradjevisnko resenje kako iskoristiti taj potencijal",
+    "Ostaviti sto više zelenila, ne treba nam kej od betona, treba nam priroda",
+    "Super ideja, potpuna podrška!",
+    "Ideja je izuzeztna, puna podrška",
+    "Ovo je fantasticna ideja, gde god je moguce treba je prosiriti i na drugu stranu Nisave, najbolje bi bilo da koridor bude deo budiceg parka, pogotoovo u potezu od Belig mosta kod Merkatora do pesackog mosta kod Delte",
+    "Посебно обележене стазе за бициклисте и пешаке. Без мотоцикала и квадова - без буке и издувних гасова, којих има и превише у свим деловима града, дању и ноћу!",
+    "Svaka cast na ideji!!! Sa bebom nikada nisam mogla da sidjem do reke upravo zato sto nedostaje taj spust za kolica. Bilo bi predivno da se ideja i realizuje!",
+    "Свака част за идеју,све похвале",
+    "Samo dopuna svega sto je prelepo osmišljeno, niste spomenuli rasvetu, eto to je nesto sto bi bilo dobro pojačati na keju uz sve ovo što ste osmislili.",
+    "Potrebno je uraditi osvetljenje duž cele trase, obezbediti (onemogućiti) ulaz vozilima na trasu (osim jkp Medijane radi održavanja), možda video nadzor i td.",
+    "Nišu je u ovom trenutku preko potrebno rasterećenje saobraćaja, zbog čega bi bilo dobro ovom koridoru priključiti i ostale delove grada putem jasno definisanih i bezbednih biciklističkih i pešačkih staza.",
+    "Komentar, svaka čast ko je ovo pokrenuo. Imam toliko potencijala naš kej, žalosno je da ovako izgleda.",
+    "DA SE USVOJI NIŠAVSKI KORIDOR",
+    "Ideja fantastično, još samo da se realizuje!",
+    "napraviti 3d nacrt kako bi to lepo moglo da izgleda, sakupite mlade ljude da ucestvuju (studente)",
+    "Da se sa leve i desne strane nasipa na keju od Medoševca do Niške Banje zasade lipe koje neprekidnon zalivati vodom iz Nišave, a postavljeni solarni paneli da napajaju pumpe za vodu za zalivanje.",
+    "Puna podrška, svaka čast inicijatoru",
+    "Plaza na Nisavi kod pešačkog mosta i kod Đačkog ostrva poput onih u Novom sadu",
+    "Lepo zamišljen projekat. Nadam se da može da se realizuje bez da neko iz vlasti odmah počne da računa koliko može da se ugradi.",
+    "Fantasticna ideja. Dodao bih samo da bi ta staza mogla da ide skroz do Siceva i da povezuje centar grada sa Sicevackom klisurom i manastirom Bogorodice (vec postoji divlja staza koju gradjani uveliko koriste za trcanje, bicikl i sl) Na taj nacin bi se jos bolje iskoristio turisticki potencijal. Mozda da promenite naziv da ne zvuci “biciklisticki koridor) jer onda samo privlaci paznju biciklista",
+    "urediti i drugu obalu reke",
+    "Супер је идеја :)",
+    "Po meni to treba napraviti na desno obali Nišave, mnogo je manje frekventna i manje uređenija od leve, s tim što ne treba zanemariti sređivanje leve obale, kao i keja Gabrovačke reke, ali tako da sve bude uklopljeno u prirodu bez betona, stakla i gvažđa.",
+    "Postaviti kante za smeće duž staze i kontejnere gde je moguće",
+    "Sto vise drveca uz stazu, da neko ko trci ili vozi biciklu bude dobrim delom u hladovini, jer je leti pretoplo na otvorenom",
+    "Predlog da se napravi biciklisticka staza i na trotoaru ulice Bulevar dr. Zorana Djindjica kako bi se spojio deo od stop shopa do centra. S obzirom da ovom rutom saobraca najveci deo gradskog transporta smatram da bi se dosta smanjilo zagadjenje vazduha zato sto bi ljudi biciklama isli na posao.",
+    "Samo molbu da istrajete. Mnogo će da nam znači. Ja živim uz Nišavu i provodim sa porodicom puno vremena tu i baš nam nedostaje uređen prostor, da, najviše za bicikle ali i za šetnju. I ovako po gradu biciklima jedva da može da se prođe. Ovo bi bio pun pogodak.\nP.s. mala konstruktivna sugestija - ispravite upitnik tako da na pitanja može da se čekira više odgovora a ne samo jedna opcija, jer bih npr mogla da doprinesem na više načina.",
+    "Da se poprave parkovi za treniranje",
+    "Puno klupica, sadrzaja za decu, osvetljenje",
+    "Odličan predlog",
+    "Trenutni najveći problem korišćenja keja je most preko Gabrovačke reke, teško upotrebljiv za decu i bicikliste. Sledeći problem je nemogućnost da se biciklom popne sa keja na nivo pešačke zone u centru jer nema rampe - samo stepenice i samim tim odbija ljude da biciklom idu tim putem. Rešavanjem ta 2 problema dobija se mnogo, ostatak je šlag na tortu",
+    "Ideja je super ali obavezno da se stavi novi drvored da bude sto vise zelenila.",
+    "Одлична идеја , погледати променаду код BW на води .",
+    "da li se piše odvojeno; veštačka/polu-veštačka staza za kajak",
+    "Ne odustaj i ne posustaj, i nek ti daje snagu i motivaciju cinjenica da nesebicno radis nesto za zajednicu i prostor oko sebe.",
+    "Napraviti i branu na Nišavi za veštačku akumulaciju za sportove na vodi-vožnja čamca,plivanje.",
+    "Sve zavisi od plana realizacije",
+    "Jako dobra ideja.",
+    "Da se sprovede ideja odmah",
+    "I am Greek who lives at Niš for the last 8 years. Larisa is a similar size city like Niš and since they also have a river inside city, I think you can take a look how they organized the city to make it more pedestrian friendly and to take some ideas to improve our city.",
+    "Da uprkos izgradnji staza za pešake i bicikliste duž keja između Rode i Delte tereni za sve sportove ostanu netaknuti (u smislu eventualnog rušenja) jer oni služe za rekreaciju građana i da se na tom putu koji navodite postave česme za vodu i klupice. Puna podrška za formiranje biciklističke staze!",
+    "Rampe za invalidska kolica , za decija kolica.",
+    "Svaka čast za inovacijativu",
+    "Pokrenuti slicne inicijative i u drugim delovima grada.",
+    "Ideja je nesto najbolje za ovaj grad! Bilo bi dobro da na par mesta bude i prostor za rekreaciju, česme, kante za djubre itd... 😃",
+    "Sjajna je ideja, idealno bi bilo da se poveže skroz do Vrežanskog bazena",
+    "Odlična ideja potpuno podržavam",
+    "Ideja već postoji, odlična je, ne treba čekati  već delati.",
+    "Trenutno ne.Svosja mi se i podrzavam sve sto je u planu",
+    "Odličan predlog, ovo je ono što nam treba, ali mislim da nije neophodno ići sa idejom betoniranja svega odjednom. Za sada je bitno obezbediti pristojne prilaze kod Rode/ Delte, kao i prilazi mostovima. Staze ne mora da budu betonirane, niti specijane staze za trčanje, mada je to idealno. Ja bih bio zadovoljan i kada bi postojala izravnjana staza, sređena za vožnju i šetnju. Dodati mladice koje bi se obezbedile dok ne porastu i to je dovoljno, ostali detalji mogu i kasnije doći.\nTakođe, može i desna obala Nišave da se uredi jednostavnom biciklističkom stazom, u dužini koliko je moguće.",
+    "Osmisliti do kraja zagovaračku kampanju, što pre. Inicijativa ka donosiocima odluka.",
+    "Osvetljenje duž celog koridora kako bih i u noćnim satima moglo da se šeta,trči ili vozi bicikl",
+    "Ukljuciti pejzazne arhitekte da bi oplemenili prostor",
+    "Ideja je sjajna, Svakako da mostić preko gabrovačke reke treba da se zameni i proširi da bi i osobe u kolicima  samostalno mogle da prelaze sa 1 na 2 stranu, potencijal keja bi bio znacajno unapredjen i ljudi bi vise vremena provodili na njemu, a moguce je vezbanje i trcanje posle kiše bez razmisljanja o blatu. Samo napred pozdrav",
+    "Ostaviti malo prirode u svemu, da ne postane sve asfalt ili popločana staza, ipak je to obala reke",
+    "Ideja je odlicna!",
+    "Hvala za inicijativu. Radujem se upoznavanju, druženju i zajedničkoj borbi za biciklističke staze u Nišu.",
+    "Morao bi da se reši problem pasa lutalica i vlasničkih pasa koji iz pojedinih imanja (kojih još uvek ima duž celom rekom) izleću iz ne obezbeđenih dvorišta i često napadnu bicikliste, šetače, džogere. Osvetljenje radi bezbednosti, a ne bi bilo loše i možda neka policijska ispostava duž budućeg koridora.\nNije zgoreg naći neko rešenje i za kej gabrovačke reke.",
+    "Odlicna inicijativa, voljan sam da podrzim i pomognem u skladu sa svojim obavezama",
+    "Sto manje betona sto vise stabala pored. Primar treba imati pesacka staza a sekundar je biciklisticka",
+    "Sve je super zamiljeno ,samo realizovati!",
+    "Biciklisticka staza moze da bude i duza, mozda i do Siceva. Mislim da bi je mnogi kotistili.",
+    "Iskreno bih voleo da se ova zamislio ostvari zbog rekreacije,pa cak i u samom ulepsavanju grad.",
+    "Postavljanje klupa  za odmor periodično duž tih staza, da se posade drveća zbog letnje hladovine....",
+    "Svaka cast, redovno vozim biciklu, uzivam u prirodi i znacilo bi mi dosta da imam sve lepo sredjeno, a i privuklo bi ostale ljude sigurno",
+    "Voleo bih da napravite sto vise kvalitetnih sprava za vezbanje kako bi se ljudi pokrenuli i motivisali na trening kako za fizicko tako i za mentalno zdravlje.",
+    "Ne bih nista dodao na vec postojecu inicijativu,zadovoljan sam onim sto je predlozeno",
+    "Ubaciti i neke sadžaje usput, pored naravno klupica, možda još neki amfiteatar za organizaciju događaja i slično",
+    "Tu sam da podrzim sve ideje Vas kojima je struka da sacuvate prirodu ,a date joj novo ruho.",
+    "Da se osvetli solarnim lampionima",
+    "Moj predlog je da se u sklopu projekta naprave što više kvalitetnih sprava za vežbanje (teretana na otvorenom sa pravim dizajnom i pravilnim debljinama šipke tj konstrukcije) kako bi se ljudi što više motivisali i krenuli da vežbaju radi očuvanja fizičkog i mentalnog zdravlja.",
+    "Da se staza produži od mosta koji spaja Popovac i naselje Deveti Maj do mesta ukrštanja nišavskog keja sa Carigradskom ulicom (neposredno pre Proseka) i da se sredi i desna strana nišava da se raskrči da bude makar prohodna, ne mora da se sredjuje da bude uredjena kao što se ovde planira za levu stranu Nišave, neka bude prirodnija staza ali dase omogući progodnost i stepenište na desnoj obali"
+  ]
+}

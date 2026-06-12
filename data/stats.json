@@ -140,15 +140,12 @@
       "trasa_km": 0.0
     },
     "Brzi Brod": {
-      "trasa_m": 3544.9,
+      "trasa_m": 3069.5,
       "counts": {
         "zelena": 3,
-        "prekidi": 20,
-        "urbana_ostalo": 2,
-        "osvetljenje": 28,
-        "kante": 1,
-        "letnjikovci": 2,
-        "sport": 1
+        "prekidi": 17,
+        "urbana_ostalo": 1,
+        "osvetljenje": 14
       },
       "staze_m": {
         "asfalt": 0.0,
@@ -156,10 +153,10 @@
         "zemljana": 0.0,
         "ostalo": 0.0
       },
-      "trasa_km": 3.54
+      "trasa_km": 3.07
     },
     "Niška Banja": {
-      "trasa_m": 4149.6,
+      "trasa_m": 3998.0,
       "counts": {
         "zelena": 8,
         "prekidi": 6,
@@ -174,7 +171,7 @@
         "zemljana": 0.0,
         "ostalo": 0.0
       },
-      "trasa_km": 4.15
+      "trasa_km": 4.0
     }
   },
   "density": {

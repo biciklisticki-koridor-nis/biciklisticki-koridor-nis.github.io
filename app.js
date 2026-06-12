@@ -765,6 +765,157 @@ async function loadMap() {
   });
 }
 
+// ---------- anketa (donut + bar) ----------
+
+const ANKETA_PALETTE = ["#2f6b46", "#4a9367", "#d8a93a", "#c08a4f", "#4f87a5", "#9aa5a2", "#c0392b"];
+
+function anketaColor(label, idx) {
+  const l = (label || "").toLowerCase();
+  // pozitivno (zeleno)
+  if (l.includes("сигурно") || l === "да" || l.includes("свакодневно")) return "#2f6b46";
+  if (l.includes("неколико пута")) return "#4a9367";
+  // umereno (žuto)
+  if (l.includes("повремено") || l.includes("можда") || l.includes("викенд")) return "#d8a93a";
+  // pasivno (siva)
+  if (l.includes("информи") || l.includes("нисам сигуран")) return "#9aa5a2";
+  // negativno (crveno)
+  if (l === "не" || l.includes("никад")) return "#c0392b";
+  return ANKETA_PALETTE[idx % ANKETA_PALETTE.length];
+}
+
+function anketaGroupSmall(answers, maxItems = 7, threshold = 5) {
+  const sorted = [...answers].sort((a, b) => b.count - a.count);
+  const main = [];
+  let other = 0;
+  let otherN = 0;
+  for (const a of sorted) {
+    if (main.length < maxItems && a.count >= threshold) main.push(a);
+    else { other += a.count; otherN += 1; }
+  }
+  if (other > 0) main.push({ label: `Ostali odgovori (${otherN})`, count: other, _other: true });
+  return main;
+}
+
+function donutSVG(answers, total) {
+  const cx = 110, cy = 110, r = 80, sw = 28;
+  const C = 2 * Math.PI * r;
+  let offset = 0;
+  const slices = answers.map((a, i) => {
+    const frac = total > 0 ? a.count / total : 0;
+    const len = frac * C;
+    const color = anketaColor(a.label, i);
+    const slice = `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${color}" stroke-width="${sw}" stroke-dasharray="${len.toFixed(2)} ${(C - len).toFixed(2)}" stroke-dashoffset="${(-offset).toFixed(2)}" transform="rotate(-90 ${cx} ${cy})"><title>${a.label}: ${a.count} (${Math.round(100 * frac)}%)</title></circle>`;
+    offset += len;
+    return slice;
+  }).join("");
+  return `<svg class="donut-svg" viewBox="0 0 220 220">
+    ${slices}
+    <text class="donut-center" x="${cx}" y="${cy - 4}">${total}</text>
+    <text class="donut-center-sub" x="${cx}" y="${cy + 16}">odgovora</text>
+  </svg>`;
+}
+
+function donutLegend(answers, total) {
+  return answers.map((a, i) => {
+    const pct = total > 0 ? Math.round(100 * a.count / total) : 0;
+    const color = anketaColor(a.label, i);
+    return `<div class="donut-legend-item">
+      <span class="donut-legend-swatch" style="background:${color}"></span>
+      <span class="donut-legend-label">${a.label}</span>
+      <span class="donut-legend-val">${a.count} · ${pct}%</span>
+    </div>`;
+  }).join("");
+}
+
+function multiBars(answers, total) {
+  const top = anketaGroupSmall(answers);
+  const maxCount = Math.max(...top.map(a => a.count), 1);
+  return top.map(a => {
+    const pct = total > 0 ? Math.round(100 * a.count / total) : 0;
+    const w = Math.max(2, 100 * a.count / maxCount);
+    return `<div class="anketa-bar-row">
+      <div class="label">${a.label}</div>
+      <div class="value">${a.count} · ${pct}%</div>
+      <div class="track"><div class="fill" style="width:${w}%"></div></div>
+    </div>`;
+  }).join("");
+}
+
+async function loadAnketa() {
+  let d;
+  try {
+    const r = await fetch(DATA + "anketa.json");
+    if (!r.ok) return;
+    d = await r.json();
+  } catch (e) { return; }
+  if (!d || !Array.isArray(d.questions)) return;
+  const totalEl = document.getElementById("anketa-total");
+  if (totalEl) totalEl.textContent = `${d.total}`;
+  const grid = document.getElementById("anketa-grid");
+  if (!grid) return;
+  grid.innerHTML = d.questions.map(q => {
+    if (q.type === "single") {
+      return `<div class="anketa-card">
+        <h3>${q.title}</h3>
+        <div class="donut-wrap">
+          ${donutSVG(q.answers, q.answered)}
+          <div class="donut-legend">${donutLegend(q.answers, q.answered)}</div>
+        </div>
+      </div>`;
+    }
+    return `<div class="anketa-card">
+      <h3>${q.title}</h3>
+      <div class="anketa-card-meta">${q.respondents} ispitanika · više od jedne opcije po osobi (zbir &gt; 100%)</div>
+      ${multiBars(q.answers, q.respondents)}
+    </div>`;
+  }).join("");
+
+  setupQuotesCarousel(d.comments || []);
+}
+
+function setupQuotesCarousel(comments) {
+  const wrap = document.getElementById("anketa-quotes");
+  if (!wrap || !comments.length) return;
+  const text = document.getElementById("quote-text");
+  const idxEl = document.getElementById("quote-idx");
+  const totalEl = document.getElementById("quote-total");
+  if (!text || !idxEl || !totalEl) return;
+
+  wrap.hidden = false;
+  totalEl.textContent = comments.length;
+
+  let idx = 0;
+  let timer = null;
+  const ADVANCE_MS = 8000;
+  const FADE_MS = 250;
+
+  function show(i) {
+    idx = (i + comments.length) % comments.length;
+    text.classList.add("fade");
+    setTimeout(() => {
+      text.textContent = comments[idx];
+      idxEl.textContent = idx + 1;
+      text.classList.remove("fade");
+    }, FADE_MS);
+  }
+
+  function play() {
+    stop();
+    timer = setInterval(() => show(idx + 1), ADVANCE_MS);
+  }
+  function stop() {
+    if (timer) { clearInterval(timer); timer = null; }
+  }
+
+  wrap.querySelector(".quote-prev").addEventListener("click", () => { show(idx - 1); play(); });
+  wrap.querySelector(".quote-next").addEventListener("click", () => { show(idx + 1); play(); });
+  wrap.addEventListener("mouseenter", stop);
+  wrap.addEventListener("mouseleave", play);
+
+  show(0);
+  play();
+}
+
 // ---------- gallery + lightbox ----------
 
 const GALLERY_CATEGORIES = [
@@ -894,7 +1045,7 @@ function setupLightbox(items, gridEl) {
 
 (async function () {
   try {
-    await Promise.all([loadStats(), loadMap(), loadGallery(), loadElevation()]);
+    await Promise.all([loadStats(), loadMap(), loadGallery(), loadElevation(), loadAnketa()]);
   } catch (e) {
     console.error(e);
     const note = document.querySelector(".legend-note");

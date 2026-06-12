@@ -6,16 +6,17 @@ KML     := koridor_data.kml
 # Ekstraktuje href iz NetworkLink-a u $(SOURCE) (radi i sa CDATA wrapperom).
 KML_URL  = $(shell grep -oP '<href>\s*(<!\[CDATA\[)?\K[^]<]+' $(SOURCE))
 
-.PHONY: help convert serve fetch analyze clean all venv
+.PHONY: help convert serve fetch analyze clean all venv anketa
 
 help:
 	@echo "Dostupni targeti:"
 	@echo "  make venv      - kreira .venv/ i instalira Python zavisnosti (Pillow)"
 	@echo "  make convert   - KML -> GeoJSON + stats.json + slike + visine + land cover (idempotentno)"
+	@echo "  make anketa    - anonimizuje anketa.csv -> data/anketa.json (samo agregati)"
 	@echo "  make serve     - pokrece lokalni HTTP server na portu $(PORT)"
 	@echo "  make fetch     - preuzima sveže podatke sa Google MyMaps (-> $(KML))"
 	@echo "  make analyze   - prikazuje pregled KML strukture (analyze.py)"
-	@echo "  make all       - fetch + convert"
+	@echo "  make all       - fetch + convert + anketa"
 	@echo "  make clean     - briše data/ (GeoJSON + slike) i preuzeti KML"
 
 venv:
@@ -26,6 +27,9 @@ venv:
 
 convert:
 	$(PYTHON) convert.py
+
+anketa:
+	$(PYTHON) anketa.py
 
 serve:
 	@echo "Otvori http://localhost:$(PORT) u browseru (Ctrl+C za stop)"
@@ -41,7 +45,7 @@ fetch:
 analyze:
 	$(PYTHON) analyze.py
 
-all: fetch convert
+all: fetch convert anketa
 
 clean:
 	rm -rf data/

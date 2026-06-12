@@ -23,6 +23,23 @@
   </div>
 </header>
 
+<section id="glas" class="glas-section">
+  <div class="container">
+    <p class="glas-intro">Šta građani Niša kažu o ideji koridora — iz <a href="#anketa">ankete sa 277 odgovora</a>:</p>
+    <div class="anketa-quotes" id="anketa-quotes" hidden>
+      <button class="quote-nav quote-prev" type="button" aria-label="Prethodni komentar">‹</button>
+      <div class="quote-card">
+        <span class="quote-mark" aria-hidden="true">&ldquo;</span>
+        <p class="quote-text" id="quote-text">—</p>
+        <div class="quote-meta">
+          <span id="quote-idx">1</span> / <span id="quote-total">—</span> · anoniman komentar iz ankete
+        </div>
+      </div>
+      <button class="quote-nav quote-next" type="button" aria-label="Sledeći komentar">›</button>
+    </div>
+  </div>
+</section>
+
 <section id="pregled" class="pregled">
   <div class="container">
     <h2>Trenutno stanje, u brojkama</h2>
@@ -153,7 +170,7 @@
     <p class="muted" style="margin-top: 1.5rem;">Klikni „<span style="color:#d8a93a;font-weight:700">☀</span>" gore-levo na mapi da otvoriš shadeMap.app i interaktivno proveriš senku za bilo koji datum i sat (uzima u obzir i zgrade i teren).</p>
 
     <h3 style="margin-top: 2.5rem;">Kontekst: pokrivenost zemljišta</h3>
-    <p class="muted">Šta okruženje trase —  drveće, trava, zemljište, izgrađeno ili voda. Pomaže da razumemo zašto je neka deonica bez senke (npr. obradivo polje) ili dominantno u senci (npr. šuma).</p>
+    <p class="muted">Šta okruženje trase — drveće, trava, zemljište, izgrađeno ili voda. Pomaže da razumemo zašto je neka deonica bez senke (npr. obradivo polje) ili dominantno u senci (npr. šuma).</p>
 
     <div class="lc-legend" id="lc-legend"></div>
 
@@ -175,6 +192,15 @@
     <p class="lead">Koridor je podeljen na 6 deonica. Sva mapiranja unutar svake deonice — broj klupa, osvetljenja, prekida — pomažu da vidimo stanje <em>tog</em> dela trase. Sve trake koriste iste skale, pa direktno poredimo deonice međusobno.</p>
     <div class="deonice-grid" id="deonice-grid"></div>
     <p class="muted" style="margin-top: 1.5rem;">Granice deonica su prikazane na <a href="#mapa">mapi</a> kao sloj „Granice deonica".</p>
+  </div>
+</section>
+
+<section id="anketa" class="anketa-section">
+  <div class="container">
+    <h2>Šta građani misle</h2>
+    <p class="lead">Rezultati ankete sprovedene u aprilu 2026. — <strong id="anketa-total">—</strong> odgovora građana Niša o tome kako koriste kej i koliko žele da podrže ideju biciklističkog koridora.</p>
+    <div class="anketa-grid" id="anketa-grid"></div>
+    <p class="muted" style="margin-top: 1.5rem;">Lični podaci ispitanika nisu deo ovog prikaza. Prikazani su samo anonimni agregati i slobodni komentari sa uklonjenim eventualnim mejlovima i telefonima. Karusel sa komentarima je <a href="#glas">na vrhu strane</a>.</p>
   </div>
 </section>
 
@@ -224,6 +250,13 @@
   <div class="container">
     <p>Podaci: terensko mapiranje 2026. · Osnova: OpenStreetMap · Mapa: Leaflet.js</p>
     <p class="muted">Nišavski biciklistički koridor — inicijativa zajednice, Niš</p>
+    <p class="muted footer-meta">
+      <a href="dnevnik.html">Tehnički dnevnik</a>
+      <span class="footer-sep">·</span>
+      Otvoreni kod pod <a href="LICENSE" target="_blank" rel="noopener">GPL 3.0</a> licencom
+      <span class="footer-sep">·</span>
+      <a href="https://github.com/biciklisticki-koridor-nis/biciklisticki-koridor-nis.github.io" target="_blank" rel="noopener">GitHub</a>
+    </p>
   </div>
 </footer>
 

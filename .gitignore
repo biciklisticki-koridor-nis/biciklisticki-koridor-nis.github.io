@@ -4,6 +4,9 @@ koridor_data.kml
 # Build cache za konverter (WorldCover tile PNG-ovi; sajt ih ne učitava)
 data/.cache/
 
+# Anketa sa ličnim podacima (sajt koristi samo anonimne agregate u data/anketa.json)
+anketa.csv
+
 # Python
 __pycache__/
 *.pyc
