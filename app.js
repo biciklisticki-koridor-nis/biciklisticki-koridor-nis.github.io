@@ -104,7 +104,92 @@ async function loadStats() {
 
   renderTipoviPrekida(s);
   renderDeoniceCards(s);
+  renderShade(s);
   renderLandcover(s);
+}
+
+function renderShade(s) {
+  const sh = s.shade;
+  if (!sh) return;
+  renderShadeStrip("shade-strip-total", sh.strip, s.trasa_km);
+  renderShadeAxis("shade-strip-axis", s.trasa_km);
+  renderShadeStats(sh.totals);
+  renderShadeByDeonica(s);
+}
+
+function renderShadeStrip(elId, strip, totalKm) {
+  const el = document.getElementById(elId);
+  if (!el || !Array.isArray(strip)) return;
+  const totalM = totalKm * 1000;
+  el.innerHTML = strip.map(iv => {
+    const w = totalM > 0 ? (iv.length_m / totalM) * 100 : 0;
+    const cls = iv.shade ? "shade" : "sun";
+    const dn = iv.deonica ? `${iv.deonica}: ` : "";
+    const title = `${dn}km ${iv.km_start.toFixed(2)}–${iv.km_end.toFixed(2)} (${iv.length_m} m) — ${iv.shade ? "u senci drveća" : "na suncu"}`;
+    return `<div class="strip-seg ${cls}" style="width:${w}%" title="${title}"></div>`;
+  }).join("");
+}
+
+function renderShadeAxis(elId, totalKm) {
+  const el = document.getElementById(elId);
+  if (!el) return;
+  const step = totalKm > 10 ? 2 : 1;
+  const ticks = [];
+  for (let k = 0; k <= totalKm + 0.01; k += step) ticks.push(Math.min(k, totalKm));
+  el.innerHTML = ticks.map(k => `<span>${k.toFixed(0)} km</span>`).join("");
+}
+
+function renderShadeStats(totals) {
+  const el = document.getElementById("shade-stats-total");
+  if (!el || !totals || !totals.shade) return;
+  const sh = totals.shade;
+  const gr = totals.green || { pct: 0 };
+  const openGreen = Math.max(0, Math.round((gr.pct - sh.pct) * 10) / 10);
+  const tiles = [
+    { val: sh.pct,           unit: "%",  label: "U senci drveća",                  sub: "jedino drveće daje stalnu senku" },
+    { val: openGreen,        unit: "%",  label: "Otvoreno zelenilo",               sub: "trava, polja, obradivo — zeleno, ali bez senke" },
+    { val: sh.longest_m,     unit: " m", label: "Najduži deo u senci",             sub: "neprekinut interval drveća" },
+    { val: sh.longest_gap_m, unit: " m", label: "Najduža rupa u senci",            sub: "kritična zona izloženosti suncu", warn: sh.longest_gap_m >= 1000 },
+  ];
+  el.innerHTML = tiles.map(t => `
+    <div class="shade-stat">
+      <div class="shade-stat-value ${t.warn ? "warn" : ""}">${t.val}<span class="unit">${t.unit}</span></div>
+      <div class="shade-stat-label">${t.label}</div>
+      <div class="shade-stat-sub">${t.sub}</div>
+    </div>
+  `).join("");
+}
+
+function renderShadeByDeonica(s) {
+  const el = document.getElementById("shade-by-deonica");
+  if (!el) return;
+  const sh = s.shade;
+  el.innerHTML = (s.deonice || []).map(name => {
+    const m = sh.by_deonica[name];
+    const trasaKm = (s.by_deonica[name] && s.by_deonica[name].trasa_km) || 0;
+    if (!m || trasaKm <= 0) return "";
+    const dnStrip = sh.strip.filter(iv => iv.deonica === name);
+    const dnLenM = dnStrip.reduce((acc, iv) => acc + iv.length_m, 0);
+    const segs = dnStrip.map(iv => {
+      const w = dnLenM > 0 ? (iv.length_m / dnLenM) * 100 : 0;
+      return `<div class="strip-seg ${iv.shade ? "shade" : "sun"}" style="width:${w}%" title="km ${iv.km_start.toFixed(2)}–${iv.km_end.toFixed(2)} (${iv.length_m} m) ${iv.shade ? "— senka" : "— sunce"}"></div>`;
+    }).join("");
+    const lowShade = m.shade.pct < 10;
+    const openGreen = Math.max(0, Math.round((m.green.pct - m.shade.pct) * 10) / 10);
+    return `
+      <div class="shade-deonica-card">
+        <h4>
+          <span>${name}</span>
+          <span class="pct ${lowShade ? "low" : ""}">${m.shade.pct}%</span>
+        </h4>
+        <div class="mini-strip">${segs}</div>
+        <div class="shade-deonica-row"><span class="label">🌳 Drveće (daje senku)</span><span class="value">${m.shade.pct}%</span></div>
+        <div class="shade-deonica-row"><span class="label">🌾 Otvoreno zelenilo</span><span class="value">${openGreen}%</span></div>
+        <div class="shade-deonica-row"><span class="label">Najduži deo u senci</span><span class="value">${m.shade.longest_m} m</span></div>
+        <div class="shade-deonica-row"><span class="label">Najduža rupa bez senke</span><span class="value">${m.shade.longest_gap_m} m</span></div>
+        <div class="shade-deonica-row"><span class="label">Prelaza senka ↔ sunce</span><span class="value">${m.shade.transitions}</span></div>
+      </div>`;
+  }).join("");
 }
 
 function lcStackedSegments(dist, order, labels, minPctForLabel) {

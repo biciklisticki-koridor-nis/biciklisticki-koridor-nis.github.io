@@ -292,5 +292,537 @@
       "mangroves": "Mangrove",
       "moss_lichen": "Mahovina/lišaj"
     }
+  },
+  "shade": {
+    "step_m": 50,
+    "totals": {
+      "shade": {
+        "pct": 23.1,
+        "longest_m": 600,
+        "longest_gap_m": 2950,
+        "transitions": 58
+      },
+      "green": {
+        "pct": 85.1,
+        "longest_m": 4400,
+        "longest_gap_m": 700,
+        "transitions": 26
+      }
+    },
+    "by_deonica": {
+      "Medoševac": {
+        "shade": {
+          "pct": 1.9,
+          "longest_m": 50,
+          "longest_gap_m": 1300,
+          "transitions": 2
+        },
+        "green": {
+          "pct": 56.6,
+          "longest_m": 1500,
+          "longest_gap_m": 650,
+          "transitions": 2
+        }
+      },
+      "Centar": {
+        "shade": {
+          "pct": 40.5,
+          "longest_m": 150,
+          "longest_gap_m": 750,
+          "transitions": 12
+        },
+        "green": {
+          "pct": 67.6,
+          "longest_m": 350,
+          "longest_gap_m": 150,
+          "transitions": 15
+        }
+      },
+      "Delta - Lidl": {
+        "shade": {
+          "pct": 2.0,
+          "longest_m": 50,
+          "longest_gap_m": 2200,
+          "transitions": 2
+        },
+        "green": {
+          "pct": 98.0,
+          "longest_m": 2450,
+          "longest_gap_m": 50,
+          "transitions": 1
+        }
+      },
+      "Brzi Brod": {
+        "shade": {
+          "pct": 13.9,
+          "longest_m": 100,
+          "longest_gap_m": 1600,
+          "transitions": 14
+        },
+        "green": {
+          "pct": 100.0,
+          "longest_m": 3600,
+          "longest_gap_m": 0,
+          "transitions": 0
+        }
+      },
+      "Niška Banja": {
+        "shade": {
+          "pct": 49.4,
+          "longest_m": 600,
+          "longest_gap_m": 500,
+          "transitions": 28
+        },
+        "green": {
+          "pct": 90.4,
+          "longest_m": 2850,
+          "longest_gap_m": 150,
+          "transitions": 7
+        }
+      }
+    },
+    "strip": [
+      {
+        "km_start": 0.0,
+        "km_end": 1.3,
+        "length_m": 1300,
+        "shade": false,
+        "deonica": "Medoševac"
+      },
+      {
+        "km_start": 1.3,
+        "km_end": 1.35,
+        "length_m": 50,
+        "shade": true,
+        "deonica": "Medoševac"
+      },
+      {
+        "km_start": 1.35,
+        "km_end": 2.65,
+        "length_m": 1300,
+        "shade": false,
+        "deonica": "Medoševac"
+      },
+      {
+        "km_start": 2.65,
+        "km_end": 2.7,
+        "length_m": 50,
+        "shade": false,
+        "deonica": "Centar"
+      },
+      {
+        "km_start": 2.7,
+        "km_end": 2.85,
+        "length_m": 150,
+        "shade": true,
+        "deonica": "Centar"
+      },
+      {
+        "km_start": 2.85,
+        "km_end": 2.9,
+        "length_m": 50,
+        "shade": false,
+        "deonica": "Centar"
+      },
+      {
+        "km_start": 2.9,
+        "km_end": 3.05,
+        "length_m": 150,
+        "shade": true,
+        "deonica": "Centar"
+      },
+      {
+        "km_start": 3.05,
+        "km_end": 3.1,
+        "length_m": 50,
+        "shade": false,
+        "deonica": "Centar"
+      },
+      {
+        "km_start": 3.1,
+        "km_end": 3.2,
+        "length_m": 100,
+        "shade": true,
+        "deonica": "Centar"
+      },
+      {
+        "km_start": 3.2,
+        "km_end": 3.3,
+        "length_m": 100,
+        "shade": false,
+        "deonica": "Centar"
+      },
+      {
+        "km_start": 3.3,
+        "km_end": 3.45,
+        "length_m": 150,
+        "shade": true,
+        "deonica": "Centar"
+      },
+      {
+        "km_start": 3.45,
+        "km_end": 3.5,
+        "length_m": 50,
+        "shade": false,
+        "deonica": "Centar"
+      },
+      {
+        "km_start": 3.5,
+        "km_end": 3.55,
+        "length_m": 50,
+        "shade": true,
+        "deonica": "Centar"
+      },
+      {
+        "km_start": 3.55,
+        "km_end": 3.6,
+        "length_m": 50,
+        "shade": false,
+        "deonica": "Centar"
+      },
+      {
+        "km_start": 3.6,
+        "km_end": 3.75,
+        "length_m": 150,
+        "shade": true,
+        "deonica": "Centar"
+      },
+      {
+        "km_start": 3.75,
+        "km_end": 4.5,
+        "length_m": 750,
+        "shade": false,
+        "deonica": "Centar"
+      },
+      {
+        "km_start": 4.5,
+        "km_end": 6.7,
+        "length_m": 2200,
+        "shade": false,
+        "deonica": "Delta - Lidl"
+      },
+      {
+        "km_start": 6.7,
+        "km_end": 6.75,
+        "length_m": 50,
+        "shade": true,
+        "deonica": "Delta - Lidl"
+      },
+      {
+        "km_start": 6.75,
+        "km_end": 7.0,
+        "length_m": 250,
+        "shade": false,
+        "deonica": "Delta - Lidl"
+      },
+      {
+        "km_start": 7.0,
+        "km_end": 7.2,
+        "length_m": 200,
+        "shade": false,
+        "deonica": "Brzi Brod"
+      },
+      {
+        "km_start": 7.2,
+        "km_end": 7.3,
+        "length_m": 100,
+        "shade": true,
+        "deonica": "Brzi Brod"
+      },
+      {
+        "km_start": 7.3,
+        "km_end": 7.4,
+        "length_m": 100,
+        "shade": false,
+        "deonica": "Brzi Brod"
+      },
+      {
+        "km_start": 7.4,
+        "km_end": 7.45,
+        "length_m": 50,
+        "shade": true,
+        "deonica": "Brzi Brod"
+      },
+      {
+        "km_start": 7.45,
+        "km_end": 7.5,
+        "length_m": 50,
+        "shade": false,
+        "deonica": "Brzi Brod"
+      },
+      {
+        "km_start": 7.5,
+        "km_end": 7.55,
+        "length_m": 50,
+        "shade": true,
+        "deonica": "Brzi Brod"
+      },
+      {
+        "km_start": 7.55,
+        "km_end": 7.6,
+        "length_m": 50,
+        "shade": false,
+        "deonica": "Brzi Brod"
+      },
+      {
+        "km_start": 7.6,
+        "km_end": 7.65,
+        "length_m": 50,
+        "shade": true,
+        "deonica": "Brzi Brod"
+      },
+      {
+        "km_start": 7.65,
+        "km_end": 7.8,
+        "length_m": 150,
+        "shade": false,
+        "deonica": "Brzi Brod"
+      },
+      {
+        "km_start": 7.8,
+        "km_end": 7.85,
+        "length_m": 50,
+        "shade": true,
+        "deonica": "Brzi Brod"
+      },
+      {
+        "km_start": 7.85,
+        "km_end": 9.45,
+        "length_m": 1600,
+        "shade": false,
+        "deonica": "Brzi Brod"
+      },
+      {
+        "km_start": 9.45,
+        "km_end": 9.55,
+        "length_m": 100,
+        "shade": true,
+        "deonica": "Brzi Brod"
+      },
+      {
+        "km_start": 9.55,
+        "km_end": 10.15,
+        "length_m": 600,
+        "shade": false,
+        "deonica": "Brzi Brod"
+      },
+      {
+        "km_start": 10.15,
+        "km_end": 10.25,
+        "length_m": 100,
+        "shade": true,
+        "deonica": "Brzi Brod"
+      },
+      {
+        "km_start": 10.25,
+        "km_end": 10.6,
+        "length_m": 350,
+        "shade": false,
+        "deonica": "Brzi Brod"
+      },
+      {
+        "km_start": 10.6,
+        "km_end": 10.75,
+        "length_m": 150,
+        "shade": false,
+        "deonica": "Niška Banja"
+      },
+      {
+        "km_start": 10.75,
+        "km_end": 10.8,
+        "length_m": 50,
+        "shade": true,
+        "deonica": "Niška Banja"
+      },
+      {
+        "km_start": 10.8,
+        "km_end": 10.85,
+        "length_m": 50,
+        "shade": false,
+        "deonica": "Niška Banja"
+      },
+      {
+        "km_start": 10.85,
+        "km_end": 10.9,
+        "length_m": 50,
+        "shade": true,
+        "deonica": "Niška Banja"
+      },
+      {
+        "km_start": 10.9,
+        "km_end": 10.95,
+        "length_m": 50,
+        "shade": false,
+        "deonica": "Niška Banja"
+      },
+      {
+        "km_start": 10.95,
+        "km_end": 11.05,
+        "length_m": 100,
+        "shade": true,
+        "deonica": "Niška Banja"
+      },
+      {
+        "km_start": 11.05,
+        "km_end": 11.1,
+        "length_m": 50,
+        "shade": false,
+        "deonica": "Niška Banja"
+      },
+      {
+        "km_start": 11.1,
+        "km_end": 11.15,
+        "length_m": 50,
+        "shade": true,
+        "deonica": "Niška Banja"
+      },
+      {
+        "km_start": 11.15,
+        "km_end": 11.25,
+        "length_m": 100,
+        "shade": false,
+        "deonica": "Niška Banja"
+      },
+      {
+        "km_start": 11.25,
+        "km_end": 11.3,
+        "length_m": 50,
+        "shade": true,
+        "deonica": "Niška Banja"
+      },
+      {
+        "km_start": 11.3,
+        "km_end": 11.8,
+        "length_m": 500,
+        "shade": false,
+        "deonica": "Niška Banja"
+      },
+      {
+        "km_start": 11.8,
+        "km_end": 11.85,
+        "length_m": 50,
+        "shade": true,
+        "deonica": "Niška Banja"
+      },
+      {
+        "km_start": 11.85,
+        "km_end": 12.05,
+        "length_m": 200,
+        "shade": false,
+        "deonica": "Niška Banja"
+      },
+      {
+        "km_start": 12.05,
+        "km_end": 12.3,
+        "length_m": 250,
+        "shade": true,
+        "deonica": "Niška Banja"
+      },
+      {
+        "km_start": 12.3,
+        "km_end": 12.65,
+        "length_m": 350,
+        "shade": false,
+        "deonica": "Niška Banja"
+      },
+      {
+        "km_start": 12.65,
+        "km_end": 12.75,
+        "length_m": 100,
+        "shade": true,
+        "deonica": "Niška Banja"
+      },
+      {
+        "km_start": 12.75,
+        "km_end": 12.85,
+        "length_m": 100,
+        "shade": false,
+        "deonica": "Niška Banja"
+      },
+      {
+        "km_start": 12.85,
+        "km_end": 13.0,
+        "length_m": 150,
+        "shade": true,
+        "deonica": "Niška Banja"
+      },
+      {
+        "km_start": 13.0,
+        "km_end": 13.2,
+        "length_m": 200,
+        "shade": false,
+        "deonica": "Niška Banja"
+      },
+      {
+        "km_start": 13.2,
+        "km_end": 13.3,
+        "length_m": 100,
+        "shade": true,
+        "deonica": "Niška Banja"
+      },
+      {
+        "km_start": 13.3,
+        "km_end": 13.35,
+        "length_m": 50,
+        "shade": false,
+        "deonica": "Niška Banja"
+      },
+      {
+        "km_start": 13.35,
+        "km_end": 13.7,
+        "length_m": 350,
+        "shade": true,
+        "deonica": "Niška Banja"
+      },
+      {
+        "km_start": 13.7,
+        "km_end": 13.75,
+        "length_m": 50,
+        "shade": false,
+        "deonica": "Niška Banja"
+      },
+      {
+        "km_start": 13.75,
+        "km_end": 13.85,
+        "length_m": 100,
+        "shade": true,
+        "deonica": "Niška Banja"
+      },
+      {
+        "km_start": 13.85,
+        "km_end": 13.95,
+        "length_m": 100,
+        "shade": false,
+        "deonica": "Niška Banja"
+      },
+      {
+        "km_start": 13.95,
+        "km_end": 14.55,
+        "length_m": 600,
+        "shade": true,
+        "deonica": "Niška Banja"
+      },
+      {
+        "km_start": 14.55,
+        "km_end": 14.6,
+        "length_m": 50,
+        "shade": false,
+        "deonica": "Niška Banja"
+      },
+      {
+        "km_start": 14.6,
+        "km_end": 14.65,
+        "length_m": 50,
+        "shade": true,
+        "deonica": "Niška Banja"
+      },
+      {
+        "km_start": 14.65,
+        "km_end": 14.75,
+        "length_m": 100,
+        "shade": false,
+        "deonica": "Niška Banja"
+      }
+    ]
   }
 }

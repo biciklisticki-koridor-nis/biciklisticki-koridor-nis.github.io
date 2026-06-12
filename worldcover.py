@@ -24,7 +24,10 @@ WMTS_TIME = "2021-01-01"          # jedina podržana vrednost za ovaj layer
 WMTS_TILE_SET = "EPSG:3857"
 WMTS_ZOOM = 14                    # ~9.5 m/pix na lat 43.3 — bliske 10 m source rezoluciji
 WC_KERNEL_HALF = 1                # 3×3 majority (≈30×30 m) — gladi mixed-pixel artefakte
-WC_SCHEMA = 3                     # bump pri promeni logike
+WC_SCHEMA = 5                     # bump pri promeni logike
+
+SHADE_CLASSES = {"tree_cover"}                                # daje senku tokom celog dana
+GREEN_CLASSES = {"tree_cover", "shrubland", "grassland", "cropland", "wetland"}
 
 # ESA WorldCover klase ↔ RGB paleta (iz tehničke specifikacije)
 RGB_TO_CLASS = {
@@ -157,9 +160,112 @@ def latlon_to_pixel(lat, lon, bbox, W, H):
     return x, y
 
 
+# ---------- shade / green metrics ----------
+
+def _run_stats(seq_of_bools, step_m):
+    """Iz niza True/False vrati (pct_true, longest_true_m, longest_false_m, transitions)."""
+    n = len(seq_of_bools)
+    if n == 0:
+        return 0.0, 0, 0, 0
+    n_true = sum(1 for v in seq_of_bools if v)
+    pct_true = round(100.0 * n_true / n, 1)
+    longest_t = longest_f = 0
+    transitions = 0
+    cur_state = seq_of_bools[0]
+    cur_len = 1
+    for v in seq_of_bools[1:]:
+        if v == cur_state:
+            cur_len += 1
+        else:
+            seg_m = cur_len * step_m
+            if cur_state:
+                longest_t = max(longest_t, seg_m)
+            else:
+                longest_f = max(longest_f, seg_m)
+            transitions += 1
+            cur_state = v
+            cur_len = 1
+    seg_m = cur_len * step_m
+    if cur_state:
+        longest_t = max(longest_t, seg_m)
+    else:
+        longest_f = max(longest_f, seg_m)
+    return pct_true, longest_t, longest_f, transitions
+
+
+def compute_shade(profile, step_m):
+    """Izračunaj senku i zelenu pokrivenost po deonici + ukupno + strip intervals."""
+    valid = [p for p in profile if p.get("klasa")]
+    if not valid:
+        return None
+
+    def metrics_for(pts, classes):
+        seq = [p["klasa"] in classes for p in pts]
+        pct, lt, lf, tr = _run_stats(seq, step_m)
+        return {"pct": pct, "longest_m": lt, "longest_gap_m": lf, "transitions": tr}
+
+    totals = {
+        "shade":  metrics_for(valid, SHADE_CLASSES),
+        "green":  metrics_for(valid, GREEN_CLASSES),
+    }
+
+    by_deonica = {}
+    groups = {}
+    for p in valid:
+        dn = p.get("deonica")
+        if dn:
+            groups.setdefault(dn, []).append(p)
+    for dn, pts in groups.items():
+        by_deonica[dn] = {
+            "shade": metrics_for(pts, SHADE_CLASSES),
+            "green": metrics_for(pts, GREEN_CLASSES),
+        }
+
+    # Strip: kontinuirani intervali shade ↔ sun, takođe prekida i na granici deonice
+    # da bi se uredno mapiralo u per-deonica mini stripove.
+    # Dužina svakog intervala = broj sample-a × step_m (sample je 50 m, ne 0 m).
+    step_km = step_m / 1000.0
+    strip = []
+    cur_shade = valid[0]["klasa"] in SHADE_CLASSES
+    cur_deonica = valid[0].get("deonica")
+    cur_start_idx = 0
+    for i in range(1, len(valid)):
+        s  = valid[i]["klasa"] in SHADE_CLASSES
+        dn = valid[i].get("deonica")
+        if s != cur_shade or dn != cur_deonica:
+            n = i - cur_start_idx
+            km_start = valid[cur_start_idx]["km"]
+            strip.append({
+                "km_start": round(km_start, 3),
+                "km_end":   round(km_start + n * step_km, 3),
+                "length_m": n * step_m,
+                "shade":    cur_shade,
+                "deonica":  cur_deonica,
+            })
+            cur_shade = s
+            cur_deonica = dn
+            cur_start_idx = i
+    n = len(valid) - cur_start_idx
+    km_start = valid[cur_start_idx]["km"]
+    strip.append({
+        "km_start": round(km_start, 3),
+        "km_end":   round(km_start + n * step_km, 3),
+        "length_m": n * step_m,
+        "shade":    cur_shade,
+        "deonica":  cur_deonica,
+    })
+
+    return {
+        "step_m": step_m,
+        "totals": totals,
+        "by_deonica": by_deonica,
+        "strip": strip,
+    }
+
+
 # ---------- glavni ulaz ----------
 
-def compute_or_load(sample_points, out_file, cache_dir, pad_deg=0.005):
+def compute_or_load(sample_points, out_file, cache_dir, step_m, pad_deg=0.005):
     """sample_points: lista dictova {'lon','lat','km','deonica'}.
 
     Generiše/učita data/landcover.json sa:
@@ -228,15 +334,17 @@ def compute_or_load(sample_points, out_file, cache_dir, pad_deg=0.005):
     by_deonica_pct = {dn: pct(c) for dn, c in by_deonica_cnt.items()}
     totals_pct = pct(total_cnt)
 
+    shade = compute_shade(profile, step_m)
     data = {
         "schema": WC_SCHEMA,
         "zoom": WMTS_ZOOM,
         "time": WMTS_TIME,
-        "step_m": None,           # set by caller for traceability
+        "step_m": step_m,
         "samples_hash": samples_hash,
         "profile": profile,
         "totals_pct": totals_pct,
         "by_deonica_pct": by_deonica_pct,
+        "shade": shade,
         "labels": CLASS_LABELS,
     }
     with open(out_file, "w", encoding="utf-8") as f:

@@ -134,31 +134,45 @@
   </div>
 </section>
 
-<section id="zemljiste" class="zemljiste-section">
+<section id="zelenilo" class="zelenilo-section">
   <div class="container">
-    <h2>Pokrivenost zemljišta uz trasu</h2>
-    <p class="lead">Klasifikacija iz ESA WorldCover 2021 (satelit, 10 m rezolucija) — objektivan satelitski sloj o tome kroz kakvu sredinu trasa fizički prolazi: drveće, izgrađene zone, otvorena polja, voda. Uzorkovano na svakih 50 m.</p>
+    <h2>Pokrivenost zelenila i diskontinuitet senke</h2>
+    <p class="lead">Drveće je jedini pouzdan izvor senke duž trase tokom dana — trava, polja i obradiva zemlja ne štite biciklistu od sunca. „Diskontinuitet" su rupe u senčenju gde se trasa duže izlaže suncu. Podaci iz ESA WorldCover 2021 (satelit, 10 m), uzorkovano na svakih 50 m i grupisano u 3×3 majority kernel.</p>
+
+    <h3 style="margin-top: 1.5rem;">Senka duž cele trase</h3>
+    <div class="shade-strip-wrap">
+      <div class="shade-strip" id="shade-strip-total"></div>
+      <div class="shade-strip-axis" id="shade-strip-axis"></div>
+    </div>
+
+    <div class="shade-stats" id="shade-stats-total"></div>
+
+    <h3 style="margin-top: 2rem;">Po deonicama</h3>
+    <div class="shade-by-deonica" id="shade-by-deonica"></div>
+
+    <p class="muted" style="margin-top: 1.5rem;">Klikni „<span style="color:#d8a93a;font-weight:700">☀</span>" gore-levo na mapi da otvoriš shadeMap.app i interaktivno proveriš senku za bilo koji datum i sat (uzima u obzir i zgrade i teren).</p>
+
+    <h3 style="margin-top: 2.5rem;">Kontekst: pokrivenost zemljišta</h3>
+    <p class="muted">Šta okruženje trase —  drveće, trava, zemljište, izgrađeno ili voda. Pomaže da razumemo zašto je neka deonica bez senke (npr. obradivo polje) ili dominantno u senci (npr. šuma).</p>
 
     <div class="lc-legend" id="lc-legend"></div>
 
-    <h3 style="margin-top: 1.5rem;">Ukupno duž cele trase</h3>
+    <h4 style="margin-top: 1rem;">Ukupno duž cele trase</h4>
     <div class="lc-bar-row">
       <div class="label">Cela trasa</div>
       <div class="lc-bar" id="lc-totals-bar"></div>
       <div class="km" id="lc-totals-km">—</div>
     </div>
 
-    <h3 style="margin-top: 2rem;">Po deonicama</h3>
+    <h4 style="margin-top: 1.5rem;">Po deonicama</h4>
     <div class="lc-by-deonica" id="lc-by-deonica"></div>
-
-    <p class="muted" style="margin-top: 1.5rem;">Trake pokazuju procentualni udeo svake klase u delu trase koji prolazi kroz tu deonicu. Klikni „<span style="color:#d8a93a;font-weight:700">☀</span>" gore-levo na mapi da otvoriš shadeMap.app i interaktivno proveriš senku duž trase u bilo koje doba godine i sata.</p>
   </div>
 </section>
 
 <section id="deonice" class="deonice-section">
   <div class="container">
     <h2>Po deonicama</h2>
-    <p class="lead">Koridor je podeljen na 6 deonica. Sva mapiranja unutar svake deonice — broj klupa, osvetljenja, prekida — pomažu da vidiš stanje <em>tvog</em> dela trase. Sve trake koriste iste skale, pa direktno porediš deonice međusobno.</p>
+    <p class="lead">Koridor je podeljen na 6 deonica. Sva mapiranja unutar svake deonice — broj klupa, osvetljenja, prekida — pomažu da vidimo stanje <em>tog</em> dela trase. Sve trake koriste iste skale, pa direktno poredimo deonice međusobno.</p>
     <div class="deonice-grid" id="deonice-grid"></div>
     <p class="muted" style="margin-top: 1.5rem;">Granice deonica su prikazane na <a href="#mapa">mapi</a> kao sloj „Granice deonica".</p>
   </div>

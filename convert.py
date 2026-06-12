@@ -733,15 +733,16 @@ def main():
             sample_points,
             os.path.join(OUT_DIR, "landcover.json"),
             os.path.join(OUT_DIR, ".cache", "worldcover"),
+            step_m=ELEV_STEP_M,
         )
         if lc:
-            lc["step_m"] = ELEV_STEP_M
             stats["landcover"] = {
                 "zoom": lc.get("zoom"),
                 "totals_pct": lc.get("totals_pct", {}),
                 "by_deonica_pct": lc.get("by_deonica_pct", {}),
                 "labels": lc.get("labels", {}),
             }
+            stats["shade"] = lc.get("shade")
 
     with open(os.path.join(OUT_DIR, "stats.json"), "w", encoding="utf-8") as f:
         json.dump(stats, f, ensure_ascii=False, indent=2)
