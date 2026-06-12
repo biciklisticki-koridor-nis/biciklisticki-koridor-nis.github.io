@@ -75,6 +75,16 @@ p  { margin: 0 0 1em; color: var(--ink-700); }
 .btn-primary:hover { transform: translateY(-1px); background: var(--sand-100); }
 .btn-ghost { color: #fff; border-color: rgba(255,255,255,.5); }
 .btn-ghost:hover { border-color: #fff; background: rgba(255,255,255,.08); }
+.btn-ig {
+  background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+  color: #fff;
+  border-color: transparent;
+  display: inline-flex;
+  align-items: center;
+  gap: .55rem;
+}
+.btn-ig:hover { transform: translateY(-1px); filter: brightness(1.08); }
+.btn-ig svg { flex-shrink: 0; }
 
 /* ---------- pregled / KPI ---------- */
 .pregled { padding: 4rem 0; }
@@ -839,6 +849,31 @@ p  { margin: 0 0 1em; color: var(--ink-700); }
   box-shadow: var(--shadow);
 }
 .cta-card h3 { margin-bottom: .4em; }
+
+.cta-card-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.cta-card-link:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 26px rgba(31, 59, 45, 0.14);
+}
+.cta-card-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  margin-bottom: .8rem;
+  color: #fff;
+  background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+  box-shadow: 0 4px 12px rgba(220, 39, 67, 0.25);
+}
+.cta-card-ig h3 { color: var(--green-900); }
+.cta-card-ig strong { color: #cc2366; font-weight: 700; }
 
 /* ---------- dnevnik (poseban article layout) ---------- */
 .dnevnik-body { background: var(--sand-50); }
