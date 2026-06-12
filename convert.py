@@ -9,6 +9,7 @@ import json
 import math
 import os
 import re
+import time
 import urllib.error
 import urllib.request
 import xml.etree.ElementTree as ET
@@ -22,6 +23,14 @@ IMG_DIR = os.path.join(OUT_DIR, "images")
 IMG_SRC_RE = re.compile(r'<img[^>]+src=["\']([^"\']+)["\']', re.IGNORECASE)
 IMG_FIFE_RE = re.compile(r'\bfife=s\d+\b')
 IMG_MAX_PX = 1024  # MyMaps `fife=sNNNN` skalira max dimenziju — dovoljno za popup i lightbox
+
+# elevation: Open-Topo-Data SRTM 30m (free, javni, ~1 req/sec, 1000/day)
+ELEV_API = "https://api.opentopodata.org/v1/srtm30m"
+ELEV_STEP_M = 50
+ELEV_BATCH = 100
+ELEV_SMOOTH_WINDOW = 5  # centralni moving average — SRTM ima 1–2 m šuma
+ELEV_SCHEMA = 2  # bump na promenu post-processing logike (deonica smoothing)
+ELEV_FILE = os.path.join(OUT_DIR, "elevation.json")
 
 
 # ---------- geometry helpers ----------
@@ -151,6 +160,246 @@ def canonical_state(n):
     if "deponij" in n:
         return "deponija"
     return "ostalo"
+
+
+PREKID_LABELS = {
+    "dalekovod":             "Dalekovod",
+    "privatno_zemljiste":    "Privatno zemljište",
+    "most_prelaz":           "Most / prelaz",
+    "bedem":                 "Bedem (gornji/donji)",
+    "pritoka":               "Pritoka / vodotok",
+    "nedostatak_rampe":      "Nedostatak rampe",
+    "nedostatak_stepenista": "Nedostatak stepeništa",
+    "objekat":               "Objekat / ograda",
+    "promena_puta":          "Promena karaktera puta",
+    "ostalo":                "Neoznačeno",
+}
+
+
+def canonical_prekid(n):
+    if "dalekovod" in n:
+        return "dalekovod"
+    if "njiv" in n or "privatn" in n:
+        return "privatno_zemljiste"
+    if "most" in n:
+        return "most_prelaz"
+    if "bedem" in n:
+        return "bedem"
+    if "kutinsk" in n or "reka" in n or "potok" in n or "pritok" in n:
+        return "pritoka"
+    # specifični tipovi nedostataka — pre generičkih "stepenic"/"rampa"
+    if "nedostatak" in n and ("ramp" in n):
+        return "nedostatak_rampe"
+    if "nedostatak" in n and ("stepenist" in n or "stepenic" in n):
+        return "nedostatak_stepenista"
+    if "objekat" in n or "objekt" in n or "ograd" in n:
+        return "objekat"
+    if "zemljen" in n or "zemljan" in n:
+        return "promena_puta"
+    return "ostalo"
+
+
+# ---------- elevation profile ----------
+
+def sample_line(coords, step_m):
+    """Resample LineString uniformly. Returns [(lon, lat, cum_m), ...]."""
+    if not coords or len(coords) < 2:
+        return []
+    samples = [(coords[0][0], coords[0][1], 0.0)]
+    cum = 0.0
+    next_at = step_m
+    for i in range(len(coords) - 1):
+        a, b = coords[i], coords[i + 1]
+        seg = haversine_m(a, b)
+        if seg == 0:
+            continue
+        seg_start = cum
+        while next_at <= cum + seg:
+            t = (next_at - seg_start) / seg
+            samples.append((a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, next_at))
+            next_at += step_m
+        cum += seg
+    if samples[-1][2] < cum - 1.0:
+        samples.append((coords[-1][0], coords[-1][1], cum))
+    return samples
+
+
+def moving_average(vals, window):
+    """Centralni MA; preskače None vrednosti u prozoru."""
+    n = len(vals)
+    out = [None] * n
+    half = window // 2
+    for i in range(n):
+        acc, cnt = 0.0, 0
+        for j in range(max(0, i - half), min(n, i + half + 1)):
+            if vals[j] is not None:
+                acc += vals[j]
+                cnt += 1
+        out[i] = acc / cnt if cnt else None
+    return out
+
+
+def trasa_hash(coords):
+    h = hashlib.sha1()
+    for lon, lat in coords:
+        h.update(f"{lon:.6f},{lat:.6f};".encode())
+    return h.hexdigest()
+
+
+def fetch_elevations(latlons, batch=ELEV_BATCH):
+    """POST batch-ovi na opentopodata; vraća listu visina (m) iste dužine, None na grešku."""
+    out = []
+    for i in range(0, len(latlons), batch):
+        chunk = latlons[i:i + batch]
+        locs = "|".join(f"{lat:.6f},{lon:.6f}" for lon, lat in chunk)
+        url = f"{ELEV_API}?locations={locs}"
+        req = urllib.request.Request(url, headers={"User-Agent": "koridor-konverter/1.0"})
+        try:
+            with urllib.request.urlopen(req, timeout=30) as r:
+                data = json.loads(r.read())
+            for p in data.get("results", []):
+                e = p.get("elevation")
+                out.append(float(e) if e is not None else None)
+        except (urllib.error.URLError, urllib.error.HTTPError, json.JSONDecodeError) as e:
+            print(f"  ! elevation batch {i // batch + 1}: {e}")
+            out.extend([None] * len(chunk))
+        # opentopodata rate limit: 1 req/sec — pauziraj posle svakog osim poslednjeg
+        if i + batch < len(latlons):
+            time.sleep(1.05)
+    return out
+
+
+def smooth_profile_deonica(profile):
+    """Popuni izolovane None deonica tačke iz okolnih.
+
+    Trasa može na nekoliko mesta da pređe granicu meta_deonice poligona;
+    tačke koje su sa obe strane okružene istom deonicom dobijaju tu deonicu.
+    Tačke na ivici (samo jedna strana ima vrednost) nasleđuju je.
+    """
+    n = len(profile)
+    if n == 0:
+        return
+    # Najpre razveži runs of None
+    i = 0
+    while i < n:
+        if profile[i]["deonica"] is None:
+            j = i
+            while j < n and profile[j]["deonica"] is None:
+                j += 1
+            left  = profile[i - 1]["deonica"] if i > 0 else None
+            right = profile[j]["deonica"]     if j < n else None
+            fill = None
+            if left and right and left == right:
+                fill = left
+            elif left and not right:
+                fill = left
+            elif right and not left:
+                fill = right
+            if fill:
+                for k in range(i, j):
+                    profile[k]["deonica"] = fill
+            i = j
+        else:
+            i += 1
+
+
+def compute_elevation_stats(profile):
+    """profile: list of dicts with elev_smooth (m) and deonica."""
+    valid = [p for p in profile if p["elev_smooth"] is not None]
+    if not valid:
+        return {"totals": {}, "by_deonica": {}}
+
+    def asc_desc_grad(points):
+        asc = desc = 0.0
+        max_grad = 0.0
+        for i in range(1, len(points)):
+            de = points[i]["elev_smooth"] - points[i - 1]["elev_smooth"]
+            dx = (points[i]["km"] - points[i - 1]["km"]) * 1000.0
+            if de > 0:
+                asc += de
+            else:
+                desc += -de
+            if dx > 0:
+                g = abs(de / dx) * 100.0
+                if g > max_grad:
+                    max_grad = g
+        return asc, desc, max_grad
+
+    elev = [p["elev_smooth"] for p in valid]
+    asc, desc, max_grad = asc_desc_grad(valid)
+    totals = {
+        "min_m": round(min(elev), 1),
+        "max_m": round(max(elev), 1),
+        "raspon_m": round(max(elev) - min(elev), 1),
+        "ascent_m": round(asc),
+        "descent_m": round(desc),
+        "max_gradient_pct": round(max_grad, 1),
+    }
+
+    by_deonica = {}
+    seen_order = []
+    for p in valid:
+        dn = p.get("deonica")
+        if dn and dn not in seen_order:
+            seen_order.append(dn)
+    for dn in seen_order:
+        pts = [p for p in valid if p.get("deonica") == dn]
+        if len(pts) < 2:
+            continue
+        el = [p["elev_smooth"] for p in pts]
+        a, d, mg = asc_desc_grad(pts)
+        by_deonica[dn] = {
+            "min_m": round(min(el), 1),
+            "max_m": round(max(el), 1),
+            "raspon_m": round(max(el) - min(el), 1),
+            "ascent_m": round(a),
+            "descent_m": round(d),
+            "max_gradient_pct": round(mg, 1),
+        }
+    return {"totals": totals, "by_deonica": by_deonica}
+
+
+def compute_or_load_elevation(trasa_coords, deonice):
+    """Učitaj cache ako trasa nije menjana; inače fetch + cache."""
+    samples = sample_line(trasa_coords, ELEV_STEP_M)
+    cur_hash = trasa_hash(trasa_coords)
+    if os.path.exists(ELEV_FILE):
+        try:
+            with open(ELEV_FILE) as f:
+                old = json.load(f)
+            if (old.get("trasa_hash") == cur_hash
+                    and old.get("step_m") == ELEV_STEP_M
+                    and old.get("schema") == ELEV_SCHEMA):
+                print(f"Elevation cache hit ({len(old.get('profile', []))} tačaka)")
+                return old
+        except (OSError, json.JSONDecodeError):
+            pass
+
+    print(f"Preuzimam elevation za {len(samples)} tačaka (~{ELEV_STEP_M} m, ~{(len(samples) // ELEV_BATCH + 1)} batch-ova)...")
+    raw = fetch_elevations([(lon, lat) for lon, lat, _ in samples])
+    smooth = moving_average(raw, ELEV_SMOOTH_WINDOW)
+    profile = []
+    for (lon, lat, m), e, es in zip(samples, raw, smooth):
+        profile.append({
+            "km": round(m / 1000.0, 3),
+            "elev": round(e, 1) if e is not None else None,
+            "elev_smooth": round(es, 1) if es is not None else None,
+            "deonica": classify_deonica("Point", [(lon, lat)], deonice),
+        })
+    smooth_profile_deonica(profile)
+    stats = compute_elevation_stats(profile)
+    data = {
+        "trasa_hash": cur_hash,
+        "step_m": ELEV_STEP_M,
+        "schema": ELEV_SCHEMA,
+        "profile": profile,
+        "totals": stats["totals"],
+        "by_deonica": stats["by_deonica"],
+    }
+    with open(ELEV_FILE, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, separators=(",", ":"))
+    print(f"  -> elevation.json ({len(profile)} tačaka)")
+    return data
 
 
 # ---------- image extraction ----------
@@ -290,6 +539,7 @@ def main():
         "staze": {"asfalt_m": 0.0, "popločana_m": 0.0, "zemljana_m": 0.0, "ostalo_m": 0.0},
         "zelena_linije_m": {"visoka_vegetacija": 0.0, "niska_vegetacija": 0.0},
         "counts": {},
+        "prekidi_po_tipu": {},
         "deonice": DEONICA_NAMES,
         "by_deonica": {n: {
             "trasa_m": 0.0,
@@ -297,6 +547,7 @@ def main():
             "staze_m": {"asfalt": 0.0, "popločana": 0.0, "zemljana": 0.0, "ostalo": 0.0},
         } for n in DEONICA_NAMES},
     }
+    trasa_coords = None
 
     def add_count(deonica, key):
         if not deonica:
@@ -318,6 +569,7 @@ def main():
                 if p["geom"] and p["geom"]["type"] == "LineString":
                     out["trasa"].append(feature_for(p, {"name": "Glavna trasa koridora"}))
                     stats["trasa_km"] = line_length_m(p["coords"]) / 1000.0
+                    trasa_coords = p["coords"]
                     for dn, ln in line_length_by_deonica(p["coords"], deonice).items():
                         stats["by_deonica"][dn]["trasa_m"] += ln
 
@@ -335,7 +587,9 @@ def main():
         elif "Prekid" in fname:
             for p in pms:
                 if p["geom"]:
-                    out["prekidi"].append(feature_for(p, {"name": p["name"]}))
+                    tip = canonical_prekid(p["norm"])
+                    out["prekidi"].append(feature_for(p, {"name": p["name"], "tip": tip}))
+                    stats["prekidi_po_tipu"][tip] = stats["prekidi_po_tipu"].get(tip, 0) + 1
                     add_count(p.get("deonica"), "prekidi")
 
         elif "Stepenice i rampe" in fname:
@@ -453,6 +707,15 @@ def main():
     }
 
     stats["trasa_km"] = round(stats["trasa_km"], 2)
+
+    # elevation profile (cache aware)
+    if trasa_coords:
+        elev = compute_or_load_elevation(trasa_coords, deonice)
+        stats["elevation"] = {
+            "step_m": elev.get("step_m"),
+            "totals": elev.get("totals", {}),
+            "by_deonica": elev.get("by_deonica", {}),
+        }
 
     with open(os.path.join(OUT_DIR, "stats.json"), "w", encoding="utf-8") as f:
         json.dump(stats, f, ensure_ascii=False, indent=2)

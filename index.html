@@ -103,7 +103,34 @@
         <p class="card-sub">Koliko često se nešto pojavljuje na 1 km koridora.</p>
         <div class="bars" id="bars-gustina"></div>
       </div>
+
+      <div class="card">
+        <h3>Tipovi prekida</h3>
+        <p class="card-sub">Konkretni razlozi prekida u kretanju duž trase.</p>
+        <div class="bars" id="bars-prekidi-tipovi"></div>
+      </div>
     </div>
+  </div>
+</section>
+
+<section id="visina" class="visina-section">
+  <div class="container">
+    <h2>Visinski profil trase</h2>
+    <p class="lead">Promena nadmorske visine duž koridora. Visine su uzorkovane na svakih 50 m iz SRTM 30 m digitalnog modela terena.</p>
+
+    <div class="profile-stats" id="profile-stats"></div>
+
+    <div class="profile-chart-wrap" id="profile-chart-wrap">
+      <svg id="profile-svg" class="profile-svg" aria-label="Visinski profil duž trase koridora"></svg>
+      <div class="profile-tooltip" id="profile-tooltip" hidden>
+        <div class="tt-elev"></div>
+        <div class="tt-meta"></div>
+      </div>
+    </div>
+
+    <h3 style="margin-top: 1.5rem;">Po deonicama</h3>
+    <p class="muted" style="margin-bottom: 1rem;">Kumulativan uspon i pad unutar svake deonice, sa rasponom visina i najvećim lokalnim nagibom.</p>
+    <div class="profile-deonice" id="profile-deonice"></div>
   </div>
 </section>
 
@@ -160,7 +187,7 @@
 
 <footer>
   <div class="container">
-    <p>Podaci: terensko mapiranje 2025. · Osnova: OpenStreetMap · Mapa: Leaflet.js</p>
+    <p>Podaci: terensko mapiranje 2026. · Osnova: OpenStreetMap · Mapa: Leaflet.js</p>
     <p class="muted">Nišavski biciklistički koridor — inicijativa zajednice, Niš</p>
   </div>
 </footer>

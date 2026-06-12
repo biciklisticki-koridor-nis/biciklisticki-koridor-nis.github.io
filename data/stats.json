@@ -40,6 +40,17 @@
     "stanja": 13,
     "socijalni": 2
   },
+  "prekidi_po_tipu": {
+    "objekat": 1,
+    "promena_puta": 3,
+    "most_prelaz": 2,
+    "bedem": 7,
+    "ostalo": 31,
+    "nedostatak_rampe": 1,
+    "pritoka": 1,
+    "privatno_zemljiste": 3,
+    "dalekovod": 3
+  },
   "deonice": [
     "Medoševac",
     "Centar",
@@ -50,23 +61,23 @@
   ],
   "by_deonica": {
     "Medoševac": {
-      "trasa_m": 2641.3,
+      "trasa_m": 2182.9,
       "counts": {
-        "zelena": 8,
-        "prekidi": 12,
-        "stepenice": 2,
-        "rampe": 3,
-        "osvetljenje": 8,
+        "zelena": 6,
+        "prekidi": 9,
+        "stepenice": 1,
+        "rampe": 2,
+        "osvetljenje": 6,
         "sport": 1,
-        "stanja": 4
+        "stanja": 2
       },
       "staze_m": {
-        "asfalt": 195.7,
+        "asfalt": 137.3,
         "popločana": 0.0,
-        "zemljana": 1719.4,
+        "zemljana": 1523.6,
         "ostalo": 0.0
       },
-      "trasa_km": 2.64
+      "trasa_km": 2.18
     },
     "Centar": {
       "trasa_m": 1807.7,
@@ -92,9 +103,9 @@
     "Delta - Lidl": {
       "trasa_m": 2527.5,
       "counts": {
-        "zelena": 9,
+        "zelena": 7,
         "prekidi": 4,
-        "stepenice": 14,
+        "stepenice": 15,
         "rampe": 3,
         "osvetljenje": 60,
         "klupe": 5,
@@ -107,7 +118,7 @@
       "staze_m": {
         "asfalt": 1059.8,
         "popločana": 0.0,
-        "zemljana": 2151.0,
+        "zemljana": 2226.8,
         "ostalo": 0.0
       },
       "trasa_km": 2.53
@@ -117,13 +128,13 @@
       "counts": {
         "zelena": 1,
         "prekidi": 3,
-        "stepenice": 37,
+        "stepenice": 35,
         "osvetljenje": 16
       },
       "staze_m": {
         "asfalt": 243.5,
         "popločana": 0.0,
-        "zemljana": 2416.0,
+        "zemljana": 2340.2,
         "ostalo": 0.0
       },
       "trasa_km": 0.0
@@ -173,5 +184,58 @@
     "osvetljenje_m_per_lamp": 113.0,
     "klupe_m_per_klupa": 408.0,
     "prekidi_m_per_prekid": 282.0
+  },
+  "elevation": {
+    "step_m": 50,
+    "totals": {
+      "min_m": 187.2,
+      "max_m": 210.0,
+      "raspon_m": 22.8,
+      "ascent_m": 67,
+      "descent_m": 50,
+      "max_gradient_pct": 3.2
+    },
+    "by_deonica": {
+      "Medoševac": {
+        "min_m": 187.2,
+        "max_m": 192.2,
+        "raspon_m": 5.0,
+        "ascent_m": 9,
+        "descent_m": 9,
+        "max_gradient_pct": 2.4
+      },
+      "Centar": {
+        "min_m": 191.0,
+        "max_m": 195.4,
+        "raspon_m": 4.4,
+        "ascent_m": 9,
+        "descent_m": 9,
+        "max_gradient_pct": 2.4
+      },
+      "Delta - Lidl": {
+        "min_m": 192.0,
+        "max_m": 198.0,
+        "raspon_m": 6.0,
+        "ascent_m": 10,
+        "descent_m": 7,
+        "max_gradient_pct": 2.8
+      },
+      "Brzi Brod": {
+        "min_m": 195.4,
+        "max_m": 205.2,
+        "raspon_m": 9.8,
+        "ascent_m": 22,
+        "descent_m": 16,
+        "max_gradient_pct": 3.2
+      },
+      "Niška Banja": {
+        "min_m": 201.4,
+        "max_m": 210.0,
+        "raspon_m": 8.6,
+        "ascent_m": 15,
+        "descent_m": 9,
+        "max_gradient_pct": 2.0
+      }
+    }
   }
 }

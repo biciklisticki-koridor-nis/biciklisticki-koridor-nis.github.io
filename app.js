@@ -4,6 +4,21 @@
 
 const DATA = "data/";
 
+const DEONICA_COLORS = ["#2f6b46", "#d8a93a", "#8a5a2b", "#4f87a5"];
+
+const PREKID_TIP_LABELS = {
+  dalekovod:             "Dalekovod",
+  privatno_zemljiste:    "Privatno zemljište",
+  most_prelaz:           "Most / prelaz",
+  bedem:                 "Bedem",
+  pritoka:               "Pritoka / vodotok",
+  nedostatak_rampe:      "Nedostatak rampe",
+  nedostatak_stepenista: "Nedostatak stepeništa",
+  objekat:               "Objekat / ograda",
+  promena_puta:          "Promena karaktera puta",
+  ostalo:                "Neoznačeno",
+};
+
 // ---------- KPI + bar chart rendering ----------
 
 function setText(id, value) {
@@ -72,7 +87,25 @@ async function loadStats() {
     { label: "Prekidi / km",   value: s.density.prekidi_per_km,     display: s.density.prekidi_per_km.toFixed(2),     color: "warn" },
   ]);
 
+  renderTipoviPrekida(s);
   renderDeoniceCards(s);
+}
+
+function renderTipoviPrekida(s) {
+  const tipovi = s.prekidi_po_tipu || {};
+  const entries = Object.entries(tipovi)
+    .filter(([k]) => k !== "ostalo")
+    .sort((a, b) => b[1] - a[1]);
+  if (tipovi.ostalo) entries.push(["ostalo", tipovi.ostalo]);
+  const total = Object.values(tipovi).reduce((a, b) => a + b, 0);
+  bars("bars-prekidi-tipovi",
+    entries.map(([k, v]) => ({
+      label: PREKID_TIP_LABELS[k] || k,
+      value: v,
+      display: total > 0 ? `${v} · ${Math.round(100 * v / total)}%` : String(v),
+      color: k === "ostalo" ? "stone" : "warn",
+    })),
+  );
 }
 
 function renderDeoniceCards(s) {
@@ -127,6 +160,212 @@ function renderDeoniceCards(s) {
             ${row("Rampe",     c.rampe       || 0, maxCount.rampe,       "water")}
           </div>
         </div>
+      </div>`;
+  }).join("");
+}
+
+// ---------- visinski profil (SVG handroll) ----------
+
+const SVG_NS = "http://www.w3.org/2000/svg";
+
+function svgEl(name, attrs = {}) {
+  const el = document.createElementNS(SVG_NS, name);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+async function loadElevation() {
+  let elev;
+  try {
+    const r = await fetch(DATA + "elevation.json");
+    if (!r.ok) return;
+    elev = await r.json();
+  } catch (e) { return; }
+  if (!elev || !Array.isArray(elev.profile) || elev.profile.length < 2) return;
+  renderProfileStats(elev);
+  renderProfileSvg(elev);
+  renderProfileDeonice(elev);
+}
+
+function renderProfileStats(elev) {
+  const el = document.getElementById("profile-stats");
+  const t = elev.totals || {};
+  if (!el) return;
+  const tiles = [
+    { val: t.ascent_m,         unit: "m", label: "Ukupan uspon",  sub: "kumulativan duž trase", arrow: "up"   },
+    { val: t.descent_m,        unit: "m", label: "Ukupan pad",    sub: "kumulativan duž trase", arrow: "down" },
+    { val: t.raspon_m,         unit: "m", label: "Raspon visina", sub: `${t.min_m}–${t.max_m} m n.v.` },
+    { val: t.max_gradient_pct, unit: "%", label: "Maks. nagib",   sub: "najveći lokalni nagib"   },
+  ];
+  el.innerHTML = tiles.map(s => `
+    <div class="profile-stat">
+      <div class="profile-stat-value">
+        ${s.arrow ? `<span class="arrow ${s.arrow}">${s.arrow === "up" ? "↑" : "↓"}</span>` : ""}${s.val}<span class="unit">${s.unit}</span>
+      </div>
+      <div class="profile-stat-label">${s.label}</div>
+      <div class="profile-stat-sub">${s.sub}</div>
+    </div>
+  `).join("");
+}
+
+function renderProfileSvg(elev) {
+  const svg = document.getElementById("profile-svg");
+  if (!svg) return;
+  svg.innerHTML = "";
+
+  const profile = elev.profile;
+  const totals = elev.totals;
+  const W = 1000, H = 280;
+  const M = { top: 28, right: 24, bottom: 24, left: 42 };
+  const innerW = W - M.left - M.right;
+  const innerH = H - M.top - M.bottom;
+
+  svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+  svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
+
+  const totalKm = profile[profile.length - 1].km || 1;
+  const minE = Math.floor((totals.min_m - 1) / 5) * 5;
+  const maxE = Math.ceil((totals.max_m + 1) / 5) * 5;
+  const xOf = km => M.left + (km / totalKm) * innerW;
+  const yOf = e  => M.top + (1 - (e - minE) / (maxE - minE)) * innerH;
+
+  // 1) Background bands po deonicama
+  const bandRanges = [];
+  let cur = null;
+  for (const p of profile) {
+    if (!p.deonica) { cur = null; continue; }
+    if (!cur || cur.name !== p.deonica) {
+      cur = { name: p.deonica, kmStart: p.km, kmEnd: p.km };
+      bandRanges.push(cur);
+    } else {
+      cur.kmEnd = p.km;
+    }
+  }
+  bandRanges.forEach((b, i) => {
+    const color = DEONICA_COLORS[i % DEONICA_COLORS.length];
+    const x = xOf(b.kmStart), w = Math.max(2, xOf(b.kmEnd) - x);
+    svg.appendChild(svgEl("rect", {
+      class: "band", x, y: M.top, width: w, height: innerH, fill: color,
+    }));
+    // band label iznad chart area da ne preklapa Y-tick brojeve
+    svg.appendChild(svgEl("text", {
+      class: "band-label", x: x + w / 2, y: M.top - 8, "text-anchor": "middle",
+    })).textContent = b.name;
+  });
+
+  // 2) Horizontalne grid linije + Y axis tick-ovi (5m intervali)
+  for (let e = minE; e <= maxE; e += 5) {
+    const y = yOf(e);
+    svg.appendChild(svgEl("line", {
+      class: "grid-line", x1: M.left, y1: y, x2: W - M.right, y2: y,
+    }));
+    svg.appendChild(svgEl("text", {
+      class: "axis-tick", x: M.left - 8, y: y + 3, "text-anchor": "end",
+    })).textContent = e;
+  }
+
+  // 3) Vertikalne tick-ovi (2km koraci) — poslednji tick nosi i jedinicu "km"
+  const xStep = totalKm > 8 ? 2 : 1;
+  const lastKm = Math.floor(totalKm / xStep) * xStep;
+  for (let km = 0; km <= totalKm + 0.001; km += xStep) {
+    const isLast = km === lastKm;
+    const x = xOf(Math.min(km, totalKm));
+    svg.appendChild(svgEl("line", {
+      class: "grid-line", x1: x, y1: M.top + innerH, x2: x, y2: M.top + innerH + 4,
+    }));
+    svg.appendChild(svgEl("text", {
+      class: "axis-tick", x, y: M.top + innerH + 16, "text-anchor": "middle",
+    })).textContent = isLast ? `${km} km` : `${km}`;
+  }
+
+  // 4) Area + line path (koristi elev_smooth)
+  const valid = profile.filter(p => p.elev_smooth != null);
+  if (valid.length >= 2) {
+    let areaD = `M ${xOf(valid[0].km)} ${M.top + innerH}`;
+    let lineD = "";
+    valid.forEach((p, i) => {
+      const x = xOf(p.km), y = yOf(p.elev_smooth);
+      areaD += ` L ${x.toFixed(1)} ${y.toFixed(1)}`;
+      lineD += (i === 0 ? "M " : " L ") + `${x.toFixed(1)} ${y.toFixed(1)}`;
+    });
+    areaD += ` L ${xOf(valid[valid.length - 1].km)} ${M.top + innerH} Z`;
+    svg.appendChild(svgEl("path", { class: "area", d: areaD }));
+    svg.appendChild(svgEl("path", { class: "line", d: lineD }));
+  }
+
+  // 5) Hover line + dot + capture rect
+  const hoverLine = svgEl("line", {
+    class: "hover-line", x1: 0, y1: M.top, x2: 0, y2: M.top + innerH,
+  });
+  const hoverDot = svgEl("circle", { class: "hover-dot", cx: 0, cy: 0 });
+  svg.appendChild(hoverLine);
+  svg.appendChild(hoverDot);
+
+  const capture = svgEl("rect", {
+    x: M.left, y: M.top, width: innerW, height: innerH,
+    fill: "transparent",
+  });
+  svg.appendChild(capture);
+
+  const wrap = document.getElementById("profile-chart-wrap");
+  const tt = document.getElementById("profile-tooltip");
+  const ttElev = tt.querySelector(".tt-elev");
+  const ttMeta = tt.querySelector(".tt-meta");
+
+  function onMove(evt) {
+    const rect = svg.getBoundingClientRect();
+    // SVG je preserveAspectRatio="xMidYMid meet"; mapiraj client→viewbox koristeći stvarni scale
+    const scale = rect.width / W;
+    const localX = (evt.clientX - rect.left) / scale;
+    if (localX < M.left || localX > W - M.right) { hideTooltip(); return; }
+    const km = ((localX - M.left) / innerW) * totalKm;
+    // Find nearest sample
+    let lo = 0, hi = profile.length - 1;
+    while (hi - lo > 1) {
+      const mid = (lo + hi) >> 1;
+      if (profile[mid].km < km) lo = mid; else hi = mid;
+    }
+    const p = (Math.abs(profile[lo].km - km) < Math.abs(profile[hi].km - km)) ? profile[lo] : profile[hi];
+    if (p.elev_smooth == null) { hideTooltip(); return; }
+    const cx = xOf(p.km), cy = yOf(p.elev_smooth);
+    hoverLine.setAttribute("x1", cx); hoverLine.setAttribute("x2", cx);
+    hoverLine.style.opacity = "1";
+    hoverDot.setAttribute("cx", cx); hoverDot.setAttribute("cy", cy);
+    hoverDot.style.opacity = "1";
+    ttElev.textContent = `${p.elev_smooth} m n.v.`;
+    ttMeta.textContent = `${p.km.toFixed(2)} km · ${p.deonica || "—"}`;
+    const wrapRect = wrap.getBoundingClientRect();
+    tt.style.left = `${(evt.clientX - wrapRect.left)}px`;
+    tt.style.top  = `${(cy * scale)}px`;
+    tt.hidden = false;
+    tt.style.opacity = "1";
+  }
+  function hideTooltip() {
+    hoverLine.style.opacity = "0";
+    hoverDot.style.opacity = "0";
+    tt.style.opacity = "0";
+  }
+  capture.addEventListener("mousemove", onMove);
+  capture.addEventListener("mouseleave", hideTooltip);
+  capture.addEventListener("touchmove", e => {
+    if (e.touches[0]) onMove(e.touches[0]);
+  }, { passive: true });
+  capture.addEventListener("touchend", hideTooltip);
+}
+
+function renderProfileDeonice(elev) {
+  const el = document.getElementById("profile-deonice");
+  if (!el || !elev.by_deonica) return;
+  const entries = Object.entries(elev.by_deonica);
+  el.innerHTML = entries.map(([name, d], i) => {
+    const color = DEONICA_COLORS[i % DEONICA_COLORS.length];
+    return `
+      <div class="profile-deonica-card" style="border-top: 3px solid ${color};">
+        <h4>${name}</h4>
+        <div class="profile-deonica-row"><span class="label">Uspon</span><span class="value up">↑ ${d.ascent_m} m</span></div>
+        <div class="profile-deonica-row"><span class="label">Pad</span><span class="value down">↓ ${d.descent_m} m</span></div>
+        <div class="profile-deonica-row"><span class="label">Raspon</span><span class="value">${d.raspon_m} m (${d.min_m}–${d.max_m})</span></div>
+        <div class="profile-deonica-row"><span class="label">Maks. nagib</span><span class="value">${d.max_gradient_pct}%</span></div>
       </div>`;
   }).join("");
 }
@@ -280,7 +519,6 @@ async function loadMap() {
 
   const socijalniLayer = bindPopups(L.geoJSON(socijalni, { pointToLayer: circleMarker("#7d3c98", 7) }));
 
-  const DEONICA_COLORS = ["#2f6b46", "#d8a93a", "#8a5a2b", "#4f87a5"];
   const deoniceLayer = L.geoJSON(deonice, {
     style: (f) => {
       const idx = (deonice.features || []).indexOf(f);
@@ -477,7 +715,7 @@ function setupLightbox(items, gridEl) {
 
 (async function () {
   try {
-    await Promise.all([loadStats(), loadMap(), loadGallery()]);
+    await Promise.all([loadStats(), loadMap(), loadGallery(), loadElevation()]);
   } catch (e) {
     console.error(e);
     const note = document.querySelector(".legend-note");
