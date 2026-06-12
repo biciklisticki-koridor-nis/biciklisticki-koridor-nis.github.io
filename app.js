@@ -6,6 +6,21 @@ const DATA = "data/";
 
 const DEONICA_COLORS = ["#2f6b46", "#d8a93a", "#8a5a2b", "#4f87a5"];
 
+const LC_COLORS = {
+  tree_cover:  "#2f6b46",
+  shrubland:   "#7fb88f",
+  grassland:   "#a4c054",
+  cropland:    "#e29b3e",
+  built_up:    "#9aa5a2",
+  bare:        "#d3d8d3",
+  water:       "#4f87a5",
+  wetland:     "#7da9ad",
+  snow_ice:    "#eef0f3",
+  mangroves:   "#3a9d6b",
+  moss_lichen: "#b9a76b",
+};
+const LC_LIGHT_TEXT = new Set(["bare", "snow_ice", "shrubland"]);
+
 const PREKID_TIP_LABELS = {
   dalekovod:             "Dalekovod",
   privatno_zemljiste:    "Privatno zemljište",
@@ -89,6 +104,61 @@ async function loadStats() {
 
   renderTipoviPrekida(s);
   renderDeoniceCards(s);
+  renderLandcover(s);
+}
+
+function lcStackedSegments(dist, order, labels, minPctForLabel) {
+  return order
+    .filter(k => (dist[k] || 0) > 0)
+    .map(k => {
+      const pct = dist[k];
+      const txt = pct >= minPctForLabel ? `${Math.round(pct)}%` : "";
+      const cls = LC_LIGHT_TEXT.has(k) ? "ink-dark" : "";
+      const lab = labels[k] || k;
+      const title = `${lab}: ${pct.toFixed(1)}%`;
+      return `<div class="${cls}" style="background:${LC_COLORS[k] || "#999"}; width:${pct}%" title="${title}">${txt}</div>`;
+    }).join("");
+}
+
+function renderLandcover(s) {
+  const lc = s.landcover;
+  if (!lc) return;
+  const labels = lc.labels || {};
+  const totals = lc.totals_pct || {};
+  const seen = new Set(Object.keys(totals));
+  for (const dn in (lc.by_deonica_pct || {})) {
+    Object.keys(lc.by_deonica_pct[dn]).forEach(k => seen.add(k));
+  }
+  const order = [...seen].sort((a, b) => (totals[b] || 0) - (totals[a] || 0));
+
+  const leg = document.getElementById("lc-legend");
+  if (leg) {
+    leg.innerHTML = order.map(k => `
+      <span class="lc-legend-item">
+        <span class="lc-legend-swatch" style="background:${LC_COLORS[k] || "#999"}"></span>
+        ${labels[k] || k}
+      </span>`).join("");
+  }
+
+  const totalsBar = document.getElementById("lc-totals-bar");
+  if (totalsBar) totalsBar.innerHTML = lcStackedSegments(totals, order, labels, 4);
+  const totalsKm = document.getElementById("lc-totals-km");
+  if (totalsKm) totalsKm.textContent = `${s.trasa_km.toFixed(2)} km`;
+
+  const byEl = document.getElementById("lc-by-deonica");
+  if (byEl) {
+    byEl.innerHTML = (s.deonice || []).map(name => {
+      const dist = (lc.by_deonica_pct || {})[name];
+      const km = (s.by_deonica[name] && s.by_deonica[name].trasa_km) || 0;
+      if (!dist || km <= 0) return "";
+      return `
+        <div class="lc-bar-row">
+          <div class="label">${name}</div>
+          <div class="lc-bar">${lcStackedSegments(dist, order, labels, 6)}</div>
+          <div class="km">${km.toFixed(2)} km</div>
+        </div>`;
+    }).join("");
+  }
 }
 
 function renderTipoviPrekida(s) {
@@ -518,6 +588,30 @@ async function loadMap() {
   }));
 
   const socijalniLayer = bindPopups(L.geoJSON(socijalni, { pointToLayer: circleMarker("#7d3c98", 7) }));
+
+  // shadeMap link — daje stvarne senke iz DSM-a za trenutnu poziciju i bilo koji datum/sat
+  const ShadeMapCtrl = L.Control.extend({
+    options: { position: "topleft" },
+    onAdd: function () {
+      const btn = L.DomUtil.create("a", "leaflet-bar leaflet-control shademap-btn");
+      btn.href = "#";
+      btn.title = "Otvori shadeMap — interaktivno proveri senku za trenutnu poziciju, datum i čas";
+      btn.setAttribute("role", "button");
+      btn.setAttribute("aria-label", "Otvori shadeMap u novom tabu");
+      btn.textContent = "☀";
+      L.DomEvent.on(btn, "click", L.DomEvent.preventDefault);
+      L.DomEvent.on(btn, "click", () => {
+        const c = map.getCenter();
+        const z = Math.round(map.getZoom());
+        const t = Date.now();
+        const url = `https://shademap.app/@${c.lat.toFixed(5)},${c.lng.toFixed(5)},${z}z,${t}t,0b,0p,1m`;
+        window.open(url, "_blank", "noopener");
+      });
+      L.DomEvent.disableClickPropagation(btn);
+      return btn;
+    },
+  });
+  new ShadeMapCtrl().addTo(map);
 
   const deoniceLayer = L.geoJSON(deonice, {
     style: (f) => {

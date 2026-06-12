@@ -1,6 +1,9 @@
 # Preuzeti KML (regeneriše se sa `make fetch`)
 koridor_data.kml
 
+# Build cache za konverter (WorldCover tile PNG-ovi; sajt ih ne učitava)
+data/.cache/
+
 # Python
 __pycache__/
 *.pyc

@@ -237,5 +237,60 @@
         "max_gradient_pct": 2.0
       }
     }
+  },
+  "landcover": {
+    "zoom": 14,
+    "totals_pct": {
+      "built_up": 13.2,
+      "cropland": 5.4,
+      "grassland": 56.6,
+      "tree_cover": 23.1,
+      "bare": 0.7,
+      "water": 1.0
+    },
+    "by_deonica_pct": {
+      "Medoševac": {
+        "built_up": 43.4,
+        "cropland": 26.4,
+        "grassland": 28.3,
+        "tree_cover": 1.9
+      },
+      "Centar": {
+        "built_up": 21.6,
+        "tree_cover": 40.5,
+        "grassland": 27.0,
+        "bare": 2.7,
+        "water": 8.1
+      },
+      "Delta - Lidl": {
+        "grassland": 96.0,
+        "tree_cover": 2.0,
+        "built_up": 2.0
+      },
+      "Brzi Brod": {
+        "grassland": 83.3,
+        "tree_cover": 13.9,
+        "cropland": 2.8
+      },
+      "Niška Banja": {
+        "grassland": 41.0,
+        "tree_cover": 49.4,
+        "built_up": 8.4,
+        "bare": 1.2
+      }
+    },
+    "labels": {
+      "tree_cover": "Drveće",
+      "shrubland": "Žbunje",
+      "grassland": "Travna površina",
+      "cropland": "Obradivo",
+      "built_up": "Izgrađeno (asfalt/beton/zgrade)",
+      "bare": "Golo/peskovito",
+      "water": "Voda",
+      "wetland": "Močvarno",
+      "snow_ice": "Sneg/led",
+      "mangroves": "Mangrove",
+      "moss_lichen": "Mahovina/lišaj"
+    }
   }
 }

@@ -14,6 +14,8 @@ import urllib.error
 import urllib.request
 import xml.etree.ElementTree as ET
 
+import worldcover
+
 KML_NS = "{http://www.opengis.net/kml/2.2}"
 ROOT = os.path.dirname(os.path.abspath(__file__))
 KML_FILE = os.path.join(ROOT, "koridor_data.kml")
@@ -716,6 +718,30 @@ def main():
             "totals": elev.get("totals", {}),
             "by_deonica": elev.get("by_deonica", {}),
         }
+
+        # land cover (ESA WorldCover 2021) na istom 50m sampling-u kao elevation
+        samples = sample_line(trasa_coords, ELEV_STEP_M)
+        elev_profile = elev.get("profile", [])
+        sample_points = []
+        for (lon, lat, m), ep in zip(samples, elev_profile):
+            sample_points.append({
+                "lon": lon, "lat": lat,
+                "km": ep["km"],
+                "deonica": ep.get("deonica"),
+            })
+        lc = worldcover.compute_or_load(
+            sample_points,
+            os.path.join(OUT_DIR, "landcover.json"),
+            os.path.join(OUT_DIR, ".cache", "worldcover"),
+        )
+        if lc:
+            lc["step_m"] = ELEV_STEP_M
+            stats["landcover"] = {
+                "zoom": lc.get("zoom"),
+                "totals_pct": lc.get("totals_pct", {}),
+                "by_deonica_pct": lc.get("by_deonica_pct", {}),
+                "labels": lc.get("labels", {}),
+            }
 
     with open(os.path.join(OUT_DIR, "stats.json"), "w", encoding="utf-8") as f:
         json.dump(stats, f, ensure_ascii=False, indent=2)
