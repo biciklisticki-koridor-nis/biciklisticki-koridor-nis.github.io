@@ -1,43 +1,43 @@
 {
-  "total_placemarks": 447,
+  "total_placemarks": 507,
   "by_layer": {
-    "Zelena infrastruktura": 43,
+    "Zelena infrastruktura": 92,
     "Indicaciones de Medoševac a Коњички клуб \"ЧЕГАР\", Niška Banja": 5,
     "Prekid u kretanju": 52,
-    "Stepenice i rampe": 113,
-    "Urbana oprema i infrastruktura": 219,
-    "Stanja očuvanosti (stepenice, rampe, staze i mostove": 13,
+    "Stepenice i rampe": 121,
+    "Urbana oprema i infrastruktura": 221,
+    "Stanja očuvanosti (stepenice, rampe, staze i mostove": 14,
     "Javni socijalni sodrzini (urbani dzepovi)": 2
   },
   "trasa_km": 14.67,
   "staze": {
-    "asfalt_m": 1499.0,
+    "asfalt_m": 2535.8,
     "popločana_m": 1111.3,
-    "zemljana_m": 6749.0,
+    "zemljana_m": 15512.0,
     "ostalo_m": 0.0,
-    "total_m": 9359.4,
-    "asfalt_pct": 16.0,
-    "zemljana_pct": 72.1,
-    "popločana_pct": 11.9
+    "total_m": 19159.1,
+    "asfalt_pct": 13.2,
+    "zemljana_pct": 81.0,
+    "popločana_pct": 5.8
   },
   "zelena_linije_m": {
-    "visoka_vegetacija": 9623.1,
-    "niska_vegetacija": 1615.6
+    "visoka_vegetacija": 10420.9,
+    "niska_vegetacija": 11924.7
   },
   "counts": {
     "trasa": 1,
-    "zelena": 43,
+    "zelena": 92,
     "prekidi": 52,
-    "stepenice": 80,
-    "rampe": 12,
-    "staze": 21,
+    "stepenice": 81,
+    "rampe": 13,
+    "staze": 27,
     "osvetljenje": 130,
     "klupe": 36,
-    "kante": 20,
+    "kante": 22,
     "letnjikovci": 13,
     "sport": 9,
     "urbana_ostalo": 11,
-    "stanja": 13,
+    "stanja": 14,
     "socijalni": 2
   },
   "prekidi_po_tipu": {
@@ -61,30 +61,31 @@
   ],
   "by_deonica": {
     "Medoševac": {
-      "trasa_m": 2182.9,
+      "trasa_m": 2318.1,
       "counts": {
-        "zelena": 6,
+        "zelena": 9,
         "prekidi": 9,
         "stepenice": 1,
-        "rampe": 2,
-        "osvetljenje": 6,
+        "rampe": 3,
+        "osvetljenje": 8,
+        "kante": 2,
         "sport": 1,
         "stanja": 2
       },
       "staze_m": {
-        "asfalt": 137.3,
+        "asfalt": 195.7,
         "popločana": 0.0,
         "zemljana": 1523.6,
         "ostalo": 0.0
       },
-      "trasa_km": 2.18
+      "trasa_km": 2.32
     },
     "Centar": {
       "trasa_m": 1807.7,
       "counts": {
-        "zelena": 14,
+        "zelena": 34,
         "prekidi": 7,
-        "stepenice": 25,
+        "stepenice": 26,
         "rampe": 6,
         "osvetljenje": 18,
         "klupe": 31,
@@ -103,7 +104,7 @@
     "Delta - Lidl": {
       "trasa_m": 2527.5,
       "counts": {
-        "zelena": 7,
+        "zelena": 16,
         "prekidi": 4,
         "stepenice": 15,
         "rampe": 3,
@@ -118,7 +119,7 @@
       "staze_m": {
         "asfalt": 1059.8,
         "popločana": 0.0,
-        "zemljana": 2226.8,
+        "zemljana": 3623.7,
         "ostalo": 0.0
       },
       "trasa_km": 2.53
@@ -126,7 +127,7 @@
     "Gabrovačka Reka": {
       "trasa_m": 0.0,
       "counts": {
-        "zelena": 1,
+        "zelena": 12,
         "prekidi": 3,
         "stepenice": 35,
         "osvetljenje": 16
@@ -140,25 +141,27 @@
       "trasa_km": 0.0
     },
     "Brzi Brod": {
-      "trasa_m": 3069.5,
+      "trasa_m": 3544.9,
       "counts": {
-        "zelena": 3,
-        "prekidi": 17,
-        "urbana_ostalo": 1,
-        "osvetljenje": 14
+        "zelena": 5,
+        "prekidi": 20,
+        "urbana_ostalo": 2,
+        "osvetljenje": 28,
+        "kante": 1,
+        "sport": 1
       },
       "staze_m": {
-        "asfalt": 0.0,
+        "asfalt": 770.6,
         "popločana": 0.0,
-        "zemljana": 0.0,
+        "zemljana": 3591.7,
         "ostalo": 0.0
       },
-      "trasa_km": 3.07
+      "trasa_km": 3.54
     },
     "Niška Banja": {
-      "trasa_m": 3998.0,
+      "trasa_m": 4149.6,
       "counts": {
-        "zelena": 8,
+        "zelena": 12,
         "prekidi": 6,
         "stepenice": 2,
         "letnjikovci": 6,
@@ -168,10 +171,10 @@
       "staze_m": {
         "asfalt": 0.0,
         "popločana": 0.0,
-        "zemljana": 0.0,
+        "zemljana": 3759.7,
         "ostalo": 0.0
       },
-      "trasa_km": 4.0
+      "trasa_km": 4.15
     }
   },
   "density": {
