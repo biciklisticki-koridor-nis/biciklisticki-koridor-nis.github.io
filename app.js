@@ -347,8 +347,8 @@ function renderProfileStats(elev) {
   const t = elev.totals || {};
   if (!el) return;
   const tiles = [
-    { val: t.ascent_m,         unit: "m", label: "Ukupan uspon",  sub: "kumulativan duž trase", arrow: "up"   },
-    { val: t.descent_m,        unit: "m", label: "Ukupan pad",    sub: "kumulativan duž trase", arrow: "down" },
+    { val: t.ascent_m,         unit: "m", label: "Ukupan uspon",  sub: "kumulativan, prag 1 m", arrow: "up",   tip: DEADBAND_TIP },
+    { val: t.descent_m,        unit: "m", label: "Ukupan pad",    sub: "kumulativan, prag 1 m", arrow: "down", tip: DEADBAND_TIP },
     { val: t.raspon_m,         unit: "m", label: "Raspon visina", sub: `${t.min_m}–${t.max_m} m n.v.` },
     { val: t.max_gradient_pct, unit: "%", label: "Maks. nagib",   sub: "najveći lokalni nagib"   },
   ];
@@ -357,10 +357,40 @@ function renderProfileStats(elev) {
       <div class="profile-stat-value">
         ${s.arrow ? `<span class="arrow ${s.arrow}">${s.arrow === "up" ? "↑" : "↓"}</span>` : ""}${s.val}<span class="unit">${s.unit}</span>
       </div>
-      <div class="profile-stat-label">${s.label}</div>
+      <div class="profile-stat-label">${s.label}${s.tip ? infoMark(s.tip) : ""}</div>
       <div class="profile-stat-sub">${s.sub}</div>
     </div>
   `).join("");
+}
+
+const DEADBAND_TIP = "Zbir svih uzbrdica (ili nizbrdica) duž trase. Sitne neravnine manje od 1 m se ne računaju — one obično dolaze od šuma u satelitskim podacima o visini, a ne od stvarnog terena. Zato uspon može biti veći od raspona min–max: trasa može više puta da se popne i spusti.";
+
+function infoMark(tip) {
+  return ` <span class="info-mark" data-tip="${tip.replace(/"/g, "&quot;")}" tabindex="0" role="button" aria-label="Više informacija">ⓘ</span>`;
+}
+
+// Uniform Catmull-Rom → cubic Bezier konverzija. Kriva prolazi kroz sve
+// kontrolne tačke (line dot-ovi i tooltip vrednosti ostaju tačni) ali se
+// rendrira kao glatka cubic Bezier umesto polyline.
+function catmullRomPath(pts) {
+  const n = pts.length;
+  if (n === 0) return "";
+  if (n === 1) return `M ${pts[0].x.toFixed(1)} ${pts[0].y.toFixed(1)}`;
+  let d = `M ${pts[0].x.toFixed(1)} ${pts[0].y.toFixed(1)}`;
+  for (let i = 0; i < n - 1; i++) {
+    const p0 = pts[i - 1] || pts[i];
+    const p1 = pts[i];
+    const p2 = pts[i + 1];
+    const p3 = pts[i + 2] || pts[i + 1];
+    const c1x = p1.x + (p2.x - p0.x) / 6;
+    const c1y = p1.y + (p2.y - p0.y) / 6;
+    const c2x = p2.x - (p3.x - p1.x) / 6;
+    const c2y = p2.y - (p3.y - p1.y) / 6;
+    d += ` C ${c1x.toFixed(1)} ${c1y.toFixed(1)}`
+       + ` ${c2x.toFixed(1)} ${c2y.toFixed(1)}`
+       + ` ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}`;
+  }
+  return d;
 }
 
 function renderProfileSvg(elev) {
@@ -433,17 +463,15 @@ function renderProfileSvg(elev) {
     })).textContent = isLast ? `${km} km` : `${km}`;
   }
 
-  // 4) Area + line path (koristi elev_smooth)
+  // 4) Area + line path (Catmull-Rom spline kroz elev_smooth tačke —
+  //    isti podaci, samo glatka SVG kriva umesto polyline cik-cak)
   const valid = profile.filter(p => p.elev_smooth != null);
   if (valid.length >= 2) {
-    let areaD = `M ${xOf(valid[0].km)} ${M.top + innerH}`;
-    let lineD = "";
-    valid.forEach((p, i) => {
-      const x = xOf(p.km), y = yOf(p.elev_smooth);
-      areaD += ` L ${x.toFixed(1)} ${y.toFixed(1)}`;
-      lineD += (i === 0 ? "M " : " L ") + `${x.toFixed(1)} ${y.toFixed(1)}`;
-    });
-    areaD += ` L ${xOf(valid[valid.length - 1].km)} ${M.top + innerH} Z`;
+    const pts = valid.map(p => ({ x: xOf(p.km), y: yOf(p.elev_smooth) }));
+    const lineD = catmullRomPath(pts);
+    const baseY = (M.top + innerH).toFixed(1);
+    const areaD = `${lineD} L ${pts[pts.length - 1].x.toFixed(1)} ${baseY}`
+                + ` L ${pts[0].x.toFixed(1)} ${baseY} Z`;
     svg.appendChild(svgEl("path", { class: "area", d: areaD }));
     svg.appendChild(svgEl("path", { class: "line", d: lineD }));
   }
@@ -517,8 +545,8 @@ function renderProfileDeonice(elev) {
     return `
       <div class="profile-deonica-card" style="border-top: 3px solid ${color};">
         <h4>${name}</h4>
-        <div class="profile-deonica-row"><span class="label">Uspon</span><span class="value up">↑ ${d.ascent_m} m</span></div>
-        <div class="profile-deonica-row"><span class="label">Pad</span><span class="value down">↓ ${d.descent_m} m</span></div>
+        <div class="profile-deonica-row"><span class="label">Uspon${infoMark(DEADBAND_TIP)}</span><span class="value up">↑ ${d.ascent_m} m</span></div>
+        <div class="profile-deonica-row"><span class="label">Pad${infoMark(DEADBAND_TIP)}</span><span class="value down">↓ ${d.descent_m} m</span></div>
         <div class="profile-deonica-row"><span class="label">Raspon</span><span class="value">${d.raspon_m} m (${d.min_m}–${d.max_m})</span></div>
         <div class="profile-deonica-row"><span class="label">Maks. nagib</span><span class="value">${d.max_gradient_pct}%</span></div>
       </div>`;

@@ -28,10 +28,11 @@ IMG_MAX_PX = 1024  # MyMaps `fife=sNNNN` skalira max dimenziju — dovoljno za p
 
 # elevation: Open-Topo-Data SRTM 30m (free, javni, ~1 req/sec, 1000/day)
 ELEV_API = "https://api.opentopodata.org/v1/srtm30m"
-ELEV_STEP_M = 50
+ELEV_STEP_M = 30  # match SRTM 30 m nativnoj rezoluciji — gušće je oversample
 ELEV_BATCH = 100
-ELEV_SMOOTH_WINDOW = 5  # centralni moving average — SRTM ima 1–2 m šuma
-ELEV_SCHEMA = 2  # bump na promenu post-processing logike (deonica smoothing)
+ELEV_SMOOTH_WINDOW = 9  # ~270 m fizički prozor (9 × 30 m); ranije 5 × 50 m
+ELEV_DEADBAND_M = 1.0   # ignoriši uspon/pad < 1 m između susednih uzoraka (rezidualni SRTM šum)
+ELEV_SCHEMA = 5  # bump kad god se menja post-processing ili sampling
 ELEV_FILE = os.path.join(OUT_DIR, "elevation.json")
 
 
@@ -311,20 +312,62 @@ def compute_elevation_stats(profile):
     if not valid:
         return {"totals": {}, "by_deonica": {}}
 
-    def asc_desc_grad(points):
-        asc = desc = 0.0
+    def asc_desc_grad(points, deadband=ELEV_DEADBAND_M):
+        """Uspon/pad sa histerezisom — male oscilacije (< deadband) se ignorišu.
+        SRTM 30m ima 1–2 m vertikalnog šuma; bez ovog filtera ravna deonica
+        akumulira lažne metre uspona."""
+        if len(points) < 2:
+            return 0.0, 0.0, 0.0
+
         max_grad = 0.0
+        min_dx = ELEV_STEP_M * 0.5  # filter krajnjeg fragmenta resampling-a
         for i in range(1, len(points)):
             de = points[i]["elev_smooth"] - points[i - 1]["elev_smooth"]
             dx = (points[i]["km"] - points[i - 1]["km"]) * 1000.0
-            if de > 0:
-                asc += de
-            else:
-                desc += -de
-            if dx > 0:
+            if dx >= min_dx:
                 g = abs(de / dx) * 100.0
                 if g > max_grad:
                     max_grad = g
+
+        asc = desc = 0.0
+        anchor = points[0]["elev_smooth"]   # poslednja potvrđena tačka prelaska
+        pending = anchor                     # tekući kandidat ekstrema (vrh ili dno)
+        direction = 0                        # 0 = neutralno, +1 = uzbrdo, -1 = nizbrdo
+
+        for i in range(1, len(points)):
+            e = points[i]["elev_smooth"]
+            if direction == 0:
+                if e > pending:
+                    pending = e
+                    if e - anchor >= deadband:
+                        direction = +1
+                elif e < pending:
+                    pending = e
+                    if anchor - e >= deadband:
+                        direction = -1
+            elif direction == +1:
+                if e > pending:
+                    pending = e
+                elif pending - e >= deadband:
+                    asc += pending - anchor
+                    anchor = pending
+                    pending = e
+                    direction = -1
+            else:  # direction == -1
+                if e < pending:
+                    pending = e
+                elif e - pending >= deadband:
+                    desc += anchor - pending
+                    anchor = pending
+                    pending = e
+                    direction = +1
+
+        # commit nezavršenu ivicu
+        if direction == +1:
+            asc += pending - anchor
+        elif direction == -1:
+            desc += anchor - pending
+
         return asc, desc, max_grad
 
     elev = [p["elev_smooth"] for p in valid]

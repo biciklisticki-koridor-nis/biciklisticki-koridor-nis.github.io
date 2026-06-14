@@ -22,6 +22,64 @@
 
     <article class="post">
       <header class="post-head">
+        <time datetime="2026-06-14">14. jun 2026.</time>
+        <h2>Glatka kriva i gušće uzorkovanje (30 m + Catmull-Rom)</h2>
+      </header>
+      <p class="post-summary">Visinski profil se sada uzorkuje na svakih 30 m (umesto 50 m) — match nativnoj rezoluciji SRTM-a — i renderuje kao Catmull-Rom spline kriva umesto polyline-a. Vizuelno glađe bez izmišljanja podataka: kriva i dalje prolazi kroz iste tačke, samo se segmenti između njih iscrtavaju glatko.</p>
+      <div class="post-body">
+        <h3>Gušće uzorkovanje (30 m korak)</h3>
+        <p>SRTM 30 m je nativno na rezoluciji od 30 m po pikselu. Sa 50 m korakom smo praktično preskakali svaki šesti piksel; gušće uzorkovanje od 30 m match-uje izvor — više od toga je oversample (Open-Topo-Data samo bilinearno interpolira između istih piksela, ne dobija nove informacije).</p>
+        <ul class="tech-list">
+          <li>Broj uzoraka: 293 → <strong>491</strong> (14.67 km)</li>
+          <li>Smoothing prozor: 5 → <strong>9 tačaka</strong> (≈ 270 m fizički, isto kao ranije)</li>
+          <li>API vreme: 3 → 5 batch-ova (~5 s, jednom)</li>
+        </ul>
+        <h3>Catmull-Rom spline</h3>
+        <p>Ranije: SVG path je bio polyline (<code>M ... L ... L ...</code>), pa je linija bila „zubčasta" zbog rezidualnog šuma od ~0.5–1 m između susednih tačaka. Sada: <strong>uniform Catmull-Rom</strong> kriva konvertovana u cubic Bezier segmente. Kriva <em>prolazi kroz</em> sve tačke (hover dot i tooltip i dalje pogađaju realne km vrednosti) ali se segmenti između njih iscrtavaju glatko.</p>
+        <p>Matematika je trivijalna: za 4 susedne kontrolne tačke P₀–P₃, Bezier-ovi kontrolni vektori za segment P₁ → P₂ su P₁ + (P₂−P₀)/6 i P₂ − (P₃−P₁)/6. Bez D3 ili drugih biblioteka.</p>
+        <h3>Sitni edge-case</h3>
+        <p>Kad se trasa resampuje na 30 m korake, krajnji „rep" trase može biti samo 1 m. To je 1/30 deo punog koraka, pa svaka delta visine od 0.1 m daje fiktivnih 10 % nagiba. Filter dodat u <code>asc_desc_grad()</code>: segmenti kraći od pola koraka (15 m) se preskaču u računu max gradienta.</p>
+        <h3>Rezultat (totals)</h3>
+        <ul class="tech-list">
+          <li>Ukupan uspon: 59 → <strong>55 m</strong></li>
+          <li>Ukupan pad: 42 → <strong>38 m</strong></li>
+          <li>Centar: 8 → <strong>6 m</strong> (preciznije lokalizovani mostovi/rampe)</li>
+          <li>Max nagib: 3.2 % → <strong>3.7 %</strong> (Brzi Brod, realan — bolje uhvaćen kratak uspon)</li>
+        </ul>
+      </div>
+    </article>
+
+    <article class="post">
+      <header class="post-head">
+        <time datetime="2026-06-14">14. jun 2026.</time>
+        <h2>Realističniji uspon i pad (deadband filter)</h2>
+      </header>
+      <p class="post-summary">Brojke za ukupan uspon i pad su delovale nelogično — npr. deonica „Centar" je pokazivala uspon od 9 m iako se cela visina kreće u rasponu od svega 4.4 m. Razlog je dvostruki: jedan koncepcijski (kumulativno ≠ raspon) i jedan tehnički (šum u SRTM 30 m podacima).</p>
+      <div class="post-body">
+        <h3>Zašto uspon može biti veći od raspona</h3>
+        <p><strong>Raspon</strong> je razlika najviše i najniže tačke trase — jedan broj. <strong>Ukupan uspon</strong> je suma <em>svih</em> sitnih pozitivnih promena visine duž 14.67 km. Ako trasa nekoliko puta talasa između dve visine, raspon ostaje mali ali uspon raste. Ovo je standardna konvencija u biciklističkim sportovima (isti princip koriste Strava, Garmin, Komoot).</p>
+        <h3>Problem: SRTM šum</h3>
+        <p>SRTM 30 m podaci imaju oko 1–2 m vertikalnog šuma. Posle 5-tačkastog moving average-a ostaje ~1 m rezidualni šum. Na ravnoj deonici (npr. kej u Centru) sa 80 uzoraka, taj šum sabira nekoliko metara lažnog uspona — što je dovoljno da broj deluje sumnjivo.</p>
+        <h3>Rešenje: histerezisni deadband 1 m</h3>
+        <p>Umesto da sabira <em>svaku</em> pozitivnu promenu (kao naivni algoritam), <code>asc_desc_grad()</code> sada koristi <strong>histerezisni filter</strong>:</p>
+        <ul class="tech-list">
+          <li>Algoritam prati trenutnu „sidrišnu" tačku i tekući lokalni ekstrem.</li>
+          <li>Promena pravca se „potvrđuje" tek kad oscilacija pređe 1 m.</li>
+          <li>Manja talasanja (šum) se ignorišu; veće uzbrdice se kompletno registruju u jednoj transakciji od dna do vrha.</li>
+          <li>Ovo je isti pristup koji koriste Strava i Garmin za „elevation gain".</li>
+        </ul>
+        <p><strong>Rezultat</strong> na trasi (ukupno za 14.67 km):</p>
+        <ul class="tech-list">
+          <li>Ukupan uspon: 79 m → <strong>59 m</strong></li>
+          <li>Ukupan pad: 65 m → <strong>42 m</strong></li>
+          <li>Centar: 9 m → <strong>8 m</strong> (preostalih 8 m je realno — prilazi mostovima i rampe)</li>
+        </ul>
+        <p>UI: u karticama „Ukupan uspon" / „Ukupan pad" i u svakoj per-deonica kartici, pored vrednosti stoji ⓘ ikonica sa kratkim objašnjenjem zašto uspon može biti veći od raspona (CSS tooltip preko <code>::after</code> pseudo-elementa, sa fokus podrškom za touch uređaje).</p>
+      </div>
+    </article>
+
+    <article class="post">
+      <header class="post-head">
         <time datetime="2026-06-12">12. jun 2026.</time>
         <h2>Anketa: glas građana</h2>
       </header>
