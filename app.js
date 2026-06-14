@@ -347,26 +347,16 @@ function renderProfileStats(elev) {
   const t = elev.totals || {};
   if (!el) return;
   const tiles = [
-    { val: t.ascent_m,         unit: "m", label: "Ukupan uspon",  sub: "kumulativan, prag 1 m", arrow: "up",   tip: DEADBAND_TIP },
-    { val: t.descent_m,        unit: "m", label: "Ukupan pad",    sub: "kumulativan, prag 1 m", arrow: "down", tip: DEADBAND_TIP },
     { val: t.raspon_m,         unit: "m", label: "Raspon visina", sub: `${t.min_m}–${t.max_m} m n.v.` },
     { val: t.max_gradient_pct, unit: "%", label: "Maks. nagib",   sub: "najveći lokalni nagib"   },
   ];
   el.innerHTML = tiles.map(s => `
     <div class="profile-stat">
-      <div class="profile-stat-value">
-        ${s.arrow ? `<span class="arrow ${s.arrow}">${s.arrow === "up" ? "↑" : "↓"}</span>` : ""}${s.val}<span class="unit">${s.unit}</span>
-      </div>
-      <div class="profile-stat-label">${s.label}${s.tip ? infoMark(s.tip) : ""}</div>
+      <div class="profile-stat-value">${s.val}<span class="unit">${s.unit}</span></div>
+      <div class="profile-stat-label">${s.label}</div>
       <div class="profile-stat-sub">${s.sub}</div>
     </div>
   `).join("");
-}
-
-const DEADBAND_TIP = "Zbir svih uzbrdica (ili nizbrdica) duž trase. Sitne neravnine manje od 1 m se ne računaju — one obično dolaze od šuma u satelitskim podacima o visini, a ne od stvarnog terena. Zato uspon može biti veći od raspona min–max: trasa može više puta da se popne i spusti.";
-
-function infoMark(tip) {
-  return ` <span class="info-mark" data-tip="${tip.replace(/"/g, "&quot;")}" tabindex="0" role="button" aria-label="Više informacija">ⓘ</span>`;
 }
 
 // Uniform Catmull-Rom → cubic Bezier konverzija. Kriva prolazi kroz sve
@@ -545,8 +535,6 @@ function renderProfileDeonice(elev) {
     return `
       <div class="profile-deonica-card" style="border-top: 3px solid ${color};">
         <h4>${name}</h4>
-        <div class="profile-deonica-row"><span class="label">Uspon${infoMark(DEADBAND_TIP)}</span><span class="value up">↑ ${d.ascent_m} m</span></div>
-        <div class="profile-deonica-row"><span class="label">Pad${infoMark(DEADBAND_TIP)}</span><span class="value down">↓ ${d.descent_m} m</span></div>
         <div class="profile-deonica-row"><span class="label">Raspon</span><span class="value">${d.raspon_m} m (${d.min_m}–${d.max_m})</span></div>
         <div class="profile-deonica-row"><span class="label">Maks. nagib</span><span class="value">${d.max_gradient_pct}%</span></div>
       </div>`;

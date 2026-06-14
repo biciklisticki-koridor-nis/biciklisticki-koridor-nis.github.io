@@ -7,6 +7,37 @@ Format prati [Keep a Changelog](https://keepachangelog.com/sr/1.1.0/).
 
 ## [2026-06-14]
 
+### Uklonjeno
+- **Kartice „Ukupan uspon" i „Ukupan pad"** iz visinskog profila — ne
+  odgovaraju ni na jedno pitanje koje obični biciklista postavlja o
+  ravnom urbanom keju (22.8 m raspona na 14.67 km, max 3.7 % nagib).
+  Metrika je centralna u Strava / Garmin svetu za brdovite treninge;
+  za našu publiku je informaciona buka. Ostaju: <strong>Raspon visina</strong>
+  i <strong>Maks. nagib</strong> u totals i per-deonica karticama; profil grafik.
+- `compute_elevation_stats()` u `convert.py` više ne vraća `ascent_m` /
+  `descent_m`; histerezisni deadband filter (`asc_desc_grad()`) obrisan.
+- `.info-mark` custom tooltip implementacija u `style.css` (više nema
+  šta da objašnjava). `ELEV_SCHEMA` 6 → 7.
+
+### Eksperimentisali (ne objavljeno)
+- **shadeMap pre-compute pipeline** — pokušaj zamene tree-cover proksija sa
+  stvarnim ray-tracing izračunom senke. Puppeteer + headless Chrome +
+  leaflet-shadow-simulator, 491 sample tačaka × 4 referentna dana.
+  Pipeline radi, ali rezultat (2–6 % senke svuda, gotovo bez varijacije
+  između sezona) je neinformativan: SDK je samo engine, ne dolazi sa
+  podacima o drveću i zgradama — bez `canopySource` / `getFeatures` /
+  `dsmSource` izračun je samo bare-earth DEM. Niška dolina sa terenom
+  samim ne pravi mnogo senke. Sekcija nije objavljena; postojeća
+  tree-cover analiza ostaje glavni indikator senke od drveća; interaktivni
+  ☀ dugme na mapi otvara shadeMap.app gde su drveće i zgrade serverski
+  integrisani.
+  - Pipeline (`shade_real.py`, `shade_compute.js`, `package.json`, Makefile
+    `shade` + `node-deps` targeti) ostaje u repo-u, _uspavan_. Aktivacija
+    je trivijalna ako se pojavi slobodno dostupan canopy/DSM tile source
+    ili paid shadeMap tier.
+  - Output (`data/shade_real.json`) je u `.gitignore`-u.
+  - Detalji u `dnevnik.html` (post-mortem od 14. jun 2026.)
+
 ### Izmenjeno
 - **Gušće uzorkovanje visine** — `ELEV_STEP_M` 50 → **30** (match nativnoj
   rezoluciji SRTM-a). Smoothing prozor 5 → **9** tačaka (ekvivalent fizičkog

@@ -23,6 +23,77 @@
     <article class="post">
       <header class="post-head">
         <time datetime="2026-06-14">14. jun 2026.</time>
+        <h2>Sklonjen kumulativan uspon i pad iz visinskog profila</h2>
+      </header>
+      <p class="post-summary">Posle iteracija (deadband filter, gušće uzorkovanje, tooltip objašnjenje) prepoznali smo da kumulativni uspon i pad <em>ne odgovaraju ni na jedno pitanje koje obični biciklista postavlja</em> o našoj trasi. Kej je ravan (~22 m raspona na 14.67 km, max 3.7 % nagib); razlika između „55 m kumulativnog uspona" i „30 m" ne menja ničiju odluku. Brojevi su sklonjeni iz UI-ja.</p>
+      <div class="post-body">
+        <h3>Za koga je metrika korisna</h3>
+        <p>Kumulativni uspon je centralna metrika u Strava / Garmin svetu jer korelira sa naporom na brdovitim treninzima i koristi se za poređenje različitih ruta. Za sportistu koji vozi 80 km kroz Vlasinu sa 1500 m kumulativnog uspona — ima smisla.</p>
+        <h3>Za našu publiku — ne</h3>
+        <p>Naš sajt je za zajednicu Niša koja procenjuje koridor kao gradsku infrastrukturu: <em>„da li je trasa bezbedna, pristupačna, prijatna?"</em> Pitanja koja stvarno imaju veze sa visinom:</p>
+        <ul class="tech-list">
+          <li>„Ide li uzbrdo?" → <strong>Raspon visina</strong> (22.8 m ukupno — neprimetno)</li>
+          <li>„Ima li strmih delova gde treba pripaziti?" → <strong>Max nagib</strong> (3.7 % — vozljivo i bez prebacivanja u nižu brzinu)</li>
+          <li>„Gde su uzbrdice tačno?" → <strong>Profil grafik</strong> (vizualno, sa hover-om i pozadinskim trakama po deonici)</li>
+        </ul>
+        <p>Kumulativni uspon na ovu pitanja ne odgovara. A i kad smo ga doterali (histerezisni filter sa pragom 1 m da eliminiše SRTM šum), korisnik bi i dalje morao da pročita tooltip da razume zašto je „uspon" veći od „raspona min–max" — što sugeriše da metrika nije intuitivna za publiku koja nije već navikla na nju.</p>
+        <h3>Šta je promenjeno</h3>
+        <ul class="tech-list">
+          <li>U UI-ju: kartice „Ukupan uspon" i „Ukupan pad" sklonjene iz totals tabele; redovi „Uspon" / „Pad" sklonjeni iz svake per-deonica kartice. Ostaju: <strong>Raspon visina</strong>, <strong>Maks. nagib</strong>, profil grafik.</li>
+          <li>U kodu: <code>asc_desc_grad()</code> sa histerezisnim deadband-om obrisan; <code>compute_elevation_stats()</code> sada vraća samo raspon i max nagib. Polja <code>ascent_m</code>/<code>descent_m</code> nestaju iz <code>data/elevation.json</code>.</li>
+          <li>U CSS-u: <code>.info-mark</code> tooltip implementacija obrisana (više se nigde ne koristi).</li>
+          <li><code>ELEV_SCHEMA</code> 6 → 7.</li>
+        </ul>
+        <p>Konzervativan princip: <em>ne dodavati metrike za koje treba tooltip da budu razumljive — radije skinuti.</em> Sajt postaje čistiji bez gubitka informacije za publiku.</p>
+      </div>
+    </article>
+
+    <article class="post">
+      <header class="post-head">
+        <time datetime="2026-06-14">14. jun 2026.</time>
+        <h2>shadeMap pre-compute: pokušano i (za sada) odustalo</h2>
+      </header>
+      <p class="post-summary">Eksperiment: zameniti grubu „prisutnost drveća → senka" proksi metodu sa pravim ray-tracing izračunom senke preko <a href="https://shademap.app" target="_blank" rel="noopener">shadeMap.app</a> SDK-a, za 4 referentna dana. Pipeline radi, infrastruktura ostaje u repo-u, ali sekciju trenutno ne objavljujemo. Razlog: SDK ne dolazi sa podacima o drveću i zgradama, a bez njih su brojke neinformativne za naš slučaj.</p>
+      <div class="post-body">
+        <h3>Šta je izgrađeno</h3>
+        <ul class="tech-list">
+          <li><strong>shade_real.py</strong> — Python orchestrator. Učitava sample tačke iz <code>elevation.json</code>, sprema input za Node, agregira rezultat po deonicama.</li>
+          <li><strong>shade_compute.js</strong> — Node skripta. Puppeteer pokreće headless Chrome (sa SwiftShader WebGL fallback-om) i Leaflet mapom (1600×1000 viewport) na koju se dodaje <a href="https://www.npmjs.com/package/leaflet-shadow-simulator" target="_blank" rel="noopener">leaflet-shadow-simulator</a> overlay sa <code>sunExposure</code> modom. Za 491 tačaka × 4 datuma poziva <code>shade.getHoursOfSun(x, y)</code> (latLng → containerPoint).</li>
+          <li>Output: <code>data/shade_real.json</code> sa per-sample sun hours i agregatima po deonici. Cache invalidacija preko hash-a tačaka + datuma + schema verzije.</li>
+          <li>4 referentna dana sa eksplicitnim CET/CEST offset-om: 21. mart, 21. jun, 21. septembar, 21. decembar.</li>
+        </ul>
+        <h3>Šta je proizvelo</h3>
+        <p>Posle uspešnog rana: <strong>~2–6 % senke duž cele trase, skoro identično za sve deonice i sva 4 dana</strong>. Decembar (kratak dan, niski ugao sunca, normalno bi imao dugo zatamnjene delove) pokazuje manje senke nego mart. Brojke nemaju varijacije koju bismo očekivali — što je trebalo da pokrene alarm.</p>
+        <h3>Zašto su brojke besmislene</h3>
+        <p>SDK je čist <em>engine</em>, ne sadrži podatke o drveću i zgradama. Jedini izvori URL-ova u library-ju: AWS Terrarium (bare-earth DEM) i shademap.app/sdk/load (autorizacija — ne data). Za realnu senku, korisnik mora sam dostaviti:</p>
+        <ul class="tech-list">
+          <li><code>terrainSource</code> — bare DEM (mi smo dali Terrarium, ima)</li>
+          <li><code>getFeatures</code> — GeoJSON zgrada sa visinama (nismo dali)</li>
+          <li><code>canopySource</code> / <code>dsmSource</code> — canopy/DSM tile-ovi sa visinama drveća (nismo dali — undocumented API; shadeMap.app web sajt to servira sa svoje strane)</li>
+        </ul>
+        <p>Niš je u dolini Nišave, kej je u dnu doline — sam teren ne baca senku. Niška Banja je u kanjonu ali kej je sredinom, planinski profili su simetrični. Realno, drveće na samom keju je glavni izvor senke za bicikliste, a upravo to ne ulazi u izračun bez canopy podataka.</p>
+        <h3>Šta smo razmotrili kao spas</h3>
+        <ul class="tech-list">
+          <li><strong>Dodati OSM zgrade preko Overpass-a</strong> — daje senku od urbane okoline. Problem: zgrade su 30–100 m od trase, senke padaju pored puta većinu dana. Procena: +2–5 % apsolutno samo za Centar, ništa za ostatak.</li>
+          <li><strong>„Virtuelni canopy" iz WorldCover-a</strong> — za svaki tree_cover piksel generisati polygon visine ~10 m. Hiljade features → spor render; visine su pogađanje.</li>
+          <li><strong>Reframe-ovati postojeći output</strong> — pošteno reći da je „samo teren, ne drveće". Ali tada brojke prestaju da budu informativne čitaocu.</li>
+        </ul>
+        <h3>Šta smo odlučili</h3>
+        <p>Sekciju trenutno ne objavljujemo. Kao indikator senke od drveća ostaje postojeća tree-cover analiza (ESA WorldCover) iznad — gruba ali poštena. Za precizno proveravanje senke u određeno doba dana, korisnik ima interaktivni ☀ dugme gore-levo na mapi koji otvara shadeMap.app sa pravim drvećima i zgradama jer su tamo serverski integrisani.</p>
+        <h3>Šta ostaje za budućnost</h3>
+        <p>Pipeline (<code>shade_compute.js</code>, <code>shade_real.py</code>, <code>package.json</code>, Makefile <code>shade</code>/<code>node-deps</code> targeti) ostaje u repo-u, <em>uspavan</em>. Aktivacija je trivijalna ako se pojavi neka od sledećih situacija:</p>
+        <ul class="tech-list">
+          <li>Slobodno dostupan GEDI / ETH Global Canopy Height tile servis za regiju Niša → konfiguriši kao <code>canopySource</code></li>
+          <li>Paid shadeMap tier sa pristupom njihovim DSM tile-ovima → konfiguriši kao <code>dsmSource</code></li>
+          <li>Tačan OSM polygon za centralne ulice sa visinama zgrada → konfiguriši <code>getFeatures</code></li>
+        </ul>
+        <p>U bilo kojem slučaju, jedna izmena <code>shade_compute.js</code>-a i ponovni run vraćaju sekciju. Naučili smo dosta o ograničenjima open-source ray-tracing engine-a za senku — i bolje pošteno ne objaviti loše brojke nego da čitalac dobije pogrešnu sliku.</p>
+      </div>
+    </article>
+
+    <article class="post">
+      <header class="post-head">
+        <time datetime="2026-06-14">14. jun 2026.</time>
         <h2>Glatka kriva i gušće uzorkovanje (30 m + Catmull-Rom)</h2>
       </header>
       <p class="post-summary">Visinski profil se sada uzorkuje na svakih 30 m (umesto 50 m) — match nativnoj rezoluciji SRTM-a — i renderuje kao Catmull-Rom spline kriva umesto polyline-a. Vizuelno glađe bez izmišljanja podataka: kriva i dalje prolazi kroz iste tačke, samo se segmenti između njih iscrtavaju glatko.</p>

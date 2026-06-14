@@ -442,83 +442,8 @@ p  { margin: 0 0 1em; color: var(--ink-700); }
   font-variant-numeric: tabular-nums;
 }
 .profile-stat-value .unit { font-size: 1rem; color: var(--ink-500); font-weight: 600; margin-left: .2em; }
-.profile-stat-value .arrow { font-size: 1.3rem; margin-right: .15em; }
-.profile-stat-value .arrow.up   { color: var(--earth-500); }
-.profile-stat-value .arrow.down { color: var(--green-500); }
 .profile-stat-label { font-weight: 600; color: var(--ink-900); font-size: .92rem; }
 .profile-stat-sub   { font-size: .82rem; color: var(--ink-500); margin-top: .15em; }
-
-/* ---------- info ⓘ + custom tooltip ---------- */
-.info-mark {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--ink-500);
-  font-weight: 400;
-  cursor: help;
-  font-size: .85em;
-  margin-left: .15em;
-  position: relative;
-  outline: none;
-  user-select: none;
-}
-.info-mark:hover,
-.info-mark:focus { color: var(--green-600, var(--ink-900)); }
-
-.info-mark[data-tip]::after {
-  content: attr(data-tip);
-  position: absolute;
-  bottom: calc(100% + 10px);
-  left: 50%;
-  transform: translateX(-50%) translateY(4px);
-  background: #1a1f1a;
-  color: #fff;
-  padding: .6rem .8rem;
-  border-radius: 8px;
-  font-size: .78rem;
-  font-weight: 400;
-  line-height: 1.45;
-  width: max-content;
-  max-width: 280px;
-  white-space: normal;
-  text-align: left;
-  z-index: 9999;
-  pointer-events: none;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity .15s, transform .15s, visibility .15s;
-  box-shadow: 0 8px 24px rgba(0,0,0,.25);
-}
-.info-mark[data-tip]::before {
-  content: "";
-  position: absolute;
-  bottom: calc(100% + 4px);
-  left: 50%;
-  transform: translateX(-50%) translateY(4px);
-  border: 6px solid transparent;
-  border-top-color: #1a1f1a;
-  z-index: 9999;
-  pointer-events: none;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity .15s, transform .15s, visibility .15s;
-}
-.info-mark:hover::after,
-.info-mark:focus::after,
-.info-mark:hover::before,
-.info-mark:focus::before {
-  opacity: 1;
-  visibility: visible;
-  transform: translateX(-50%) translateY(0);
-}
-
-/* tooltip se sidruje na .info-mark; roditelji ne smeju seći prikaz */
-.profile-deonica-card,
-.profile-deonice,
-.profile-stats,
-.profile-stat,
-.profile-deonica-row,
-.profile-stat-label { overflow: visible; }
 
 .profile-chart-wrap {
   background: var(--sand-50);
@@ -580,8 +505,6 @@ p  { margin: 0 0 1em; color: var(--ink-700); }
 }
 .profile-deonica-row .label { color: var(--ink-500); }
 .profile-deonica-row .value { font-variant-numeric: tabular-nums; font-weight: 600; color: var(--ink-900); }
-.profile-deonica-row .value.up   { color: var(--earth-700); }
-.profile-deonica-row .value.down { color: var(--green-700); }
 
 @media (max-width: 640px) {
   .profile-stat-value { font-size: 1.5rem; }
@@ -591,6 +514,7 @@ p  { margin: 0 0 1em; color: var(--ink-700); }
 
 /* ---------- senka i zelenilo ---------- */
 .zelenilo-section { padding: 4rem 0; background: var(--sand-50); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+
 
 .shade-strip-wrap {
   margin: 1.2rem 0 1.4rem;
