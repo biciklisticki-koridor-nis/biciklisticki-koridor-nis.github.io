@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tehnički dnevnik — Nišavski biciklistički koridor</title>
+  <meta name="description" content="Kako je sajt građen i odakle dolaze podaci — kratak hronološki pregled tehničkih odluka i izvora." />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="dnevnik-body">
+
+<header class="dnevnik-hero">
+  <div class="container">
+    <p class="eyebrow"><a href="index.html" class="back-link">← Nazad na sajt</a></p>
+    <h1>Tehnički dnevnik</h1>
+    <p class="subtitle">Kratak hronološki pregled odluka, izvora podataka i tehnika koje stoje iza grafika i mape. Najnovije prvo.</p>
+  </div>
+</header>
+
+<main class="dnevnik-main">
+  <div class="container-narrow">
+
+    <article class="post">
+      <header class="post-head">
+        <time datetime="2026-06-14">14. jun 2026.</time>
+        <h2>Sklonjen kumulativan uspon i pad iz visinskog profila</h2>
+      </header>
+      <p class="post-summary">Posle iteracija (deadband filter, gušće uzorkovanje, tooltip objašnjenje) prepoznali smo da kumulativni uspon i pad <em>ne odgovaraju ni na jedno pitanje koje obični biciklista postavlja</em> o našoj trasi. Kej je ravan (~22 m raspona na 14.67 km, max 3.7 % nagib); razlika između „55 m kumulativnog uspona" i „30 m" ne menja ničiju odluku. Brojevi su sklonjeni iz UI-ja.</p>
+      <div class="post-body">
+        <h3>Za koga je metrika korisna</h3>
+        <p>Kumulativni uspon je centralna metrika u Strava / Garmin svetu jer korelira sa naporom na brdovitim treninzima i koristi se za poređenje različitih ruta. Za sportistu koji vozi 80 km kroz Vlasinu sa 1500 m kumulativnog uspona — ima smisla.</p>
+        <h3>Za našu publiku — ne</h3>
+        <p>Naš sajt je za zajednicu Niša koja procenjuje koridor kao gradsku infrastrukturu: <em>„da li je trasa bezbedna, pristupačna, prijatna?"</em> Pitanja koja stvarno imaju veze sa visinom:</p>
+        <ul class="tech-list">
+          <li>„Ide li uzbrdo?" → <strong>Raspon visina</strong> (22.8 m ukupno — neprimetno)</li>
+          <li>„Ima li strmih delova gde treba pripaziti?" → <strong>Max nagib</strong> (3.7 % — vozljivo i bez prebacivanja u nižu brzinu)</li>
+          <li>„Gde su uzbrdice tačno?" → <strong>Profil grafik</strong> (vizualno, sa hover-om i pozadinskim trakama po deonici)</li>
+        </ul>
+        <p>Kumulativni uspon na ovu pitanja ne odgovara. A i kad smo ga doterali (histerezisni filter sa pragom 1 m da eliminiše SRTM šum), korisnik bi i dalje morao da pročita tooltip da razume zašto je „uspon" veći od „raspona min–max" — što sugeriše da metrika nije intuitivna za publiku koja nije već navikla na nju.</p>
+        <h3>Šta je promenjeno</h3>
+        <ul class="tech-list">
+          <li>U UI-ju: kartice „Ukupan uspon" i „Ukupan pad" sklonjene iz totals tabele; redovi „Uspon" / „Pad" sklonjeni iz svake per-deonica kartice. Ostaju: <strong>Raspon visina</strong>, <strong>Maks. nagib</strong>, profil grafik.</li>
+          <li>U kodu: <code>asc_desc_grad()</code> sa histerezisnim deadband-om obrisan; <code>compute_elevation_stats()</code> sada vraća samo raspon i max nagib. Polja <code>ascent_m</code>/<code>descent_m</code> nestaju iz <code>data/elevation.json</code>.</li>
+          <li>U CSS-u: <code>.info-mark</code> tooltip implementacija obrisana (više se nigde ne koristi).</li>
+          <li><code>ELEV_SCHEMA</code> 6 → 7.</li>
+        </ul>
+        <p>Konzervativan princip: <em>ne dodavati metrike za koje treba tooltip da budu razumljive — radije skinuti.</em> Sajt postaje čistiji bez gubitka informacije za publiku.</p>
+      </div>
+    </article>
+
+    <article class="post">
+      <header class="post-head">
+        <time datetime="2026-06-14">14. jun 2026.</time>
+        <h2>shadeMap pre-compute: pokušano i (za sada) odustalo</h2>
+      </header>
+      <p class="post-summary">Eksperiment: zameniti grubu „prisutnost drveća → senka" proksi metodu sa pravim ray-tracing izračunom senke preko <a href="https://shademap.app" target="_blank" rel="noopener">shadeMap.app</a> SDK-a, za 4 referentna dana. Pipeline radi, infrastruktura ostaje u repo-u, ali sekciju trenutno ne objavljujemo. Razlog: SDK ne dolazi sa podacima o drveću i zgradama, a bez njih su brojke neinformativne za naš slučaj.</p>
+      <div class="post-body">
+        <h3>Šta je izgrađeno</h3>
+        <ul class="tech-list">
+          <li><strong>shade_real.py</strong> — Python orchestrator. Učitava sample tačke iz <code>elevation.json</code>, sprema input za Node, agregira rezultat po deonicama.</li>
+          <li><strong>shade_compute.js</strong> — Node skripta. Puppeteer pokreće headless Chrome (sa SwiftShader WebGL fallback-om) i Leaflet mapom (1600×1000 viewport) na koju se dodaje <a href="https://www.npmjs.com/package/leaflet-shadow-simulator" target="_blank" rel="noopener">leaflet-shadow-simulator</a> overlay sa <code>sunExposure</code> modom. Za 491 tačaka × 4 datuma poziva <code>shade.getHoursOfSun(x, y)</code> (latLng → containerPoint).</li>
+          <li>Output: <code>data/shade_real.json</code> sa per-sample sun hours i agregatima po deonici. Cache invalidacija preko hash-a tačaka + datuma + schema verzije.</li>
+          <li>4 referentna dana sa eksplicitnim CET/CEST offset-om: 21. mart, 21. jun, 21. septembar, 21. decembar.</li>
+        </ul>
+        <h3>Šta je proizvelo</h3>
+        <p>Posle uspešnog rana: <strong>~2–6 % senke duž cele trase, skoro identično za sve deonice i sva 4 dana</strong>. Decembar (kratak dan, niski ugao sunca, normalno bi imao dugo zatamnjene delove) pokazuje manje senke nego mart. Brojke nemaju varijacije koju bismo očekivali — što je trebalo da pokrene alarm.</p>
+        <h3>Zašto su brojke besmislene</h3>
+        <p>SDK je čist <em>engine</em>, ne sadrži podatke o drveću i zgradama. Jedini izvori URL-ova u library-ju: AWS Terrarium (bare-earth DEM) i shademap.app/sdk/load (autorizacija — ne data). Za realnu senku, korisnik mora sam dostaviti:</p>
+        <ul class="tech-list">
+          <li><code>terrainSource</code> — bare DEM (mi smo dali Terrarium, ima)</li>
+          <li><code>getFeatures</code> — GeoJSON zgrada sa visinama (nismo dali)</li>
+          <li><code>canopySource</code> / <code>dsmSource</code> — canopy/DSM tile-ovi sa visinama drveća (nismo dali — undocumented API; shadeMap.app web sajt to servira sa svoje strane)</li>
+        </ul>
+        <p>Niš je u dolini Nišave, kej je u dnu doline — sam teren ne baca senku. Niška Banja je u kanjonu ali kej je sredinom, planinski profili su simetrični. Realno, drveće na samom keju je glavni izvor senke za bicikliste, a upravo to ne ulazi u izračun bez canopy podataka.</p>
+        <h3>Šta smo razmotrili kao spas</h3>
+        <ul class="tech-list">
+          <li><strong>Dodati OSM zgrade preko Overpass-a</strong> — daje senku od urbane okoline. Problem: zgrade su 30–100 m od trase, senke padaju pored puta većinu dana. Procena: +2–5 % apsolutno samo za Centar, ništa za ostatak.</li>
+          <li><strong>„Virtuelni canopy" iz WorldCover-a</strong> — za svaki tree_cover piksel generisati polygon visine ~10 m. Hiljade features → spor render; visine su pogađanje.</li>
+          <li><strong>Reframe-ovati postojeći output</strong> — pošteno reći da je „samo teren, ne drveće". Ali tada brojke prestaju da budu informativne čitaocu.</li>
+        </ul>
+        <h3>Šta smo odlučili</h3>
+        <p>Sekciju trenutno ne objavljujemo. Kao indikator senke od drveća ostaje postojeća tree-cover analiza (ESA WorldCover) iznad — gruba ali poštena. Za precizno proveravanje senke u određeno doba dana, korisnik ima interaktivni ☀ dugme gore-levo na mapi koji otvara shadeMap.app sa pravim drvećima i zgradama jer su tamo serverski integrisani.</p>
+        <h3>Šta ostaje za budućnost</h3>
+        <p>Pipeline (<code>shade_compute.js</code>, <code>shade_real.py</code>, <code>package.json</code>, Makefile <code>shade</code>/<code>node-deps</code> targeti) ostaje u repo-u, <em>uspavan</em>. Aktivacija je trivijalna ako se pojavi neka od sledećih situacija:</p>
+        <ul class="tech-list">
+          <li>Slobodno dostupan GEDI / ETH Global Canopy Height tile servis za regiju Niša → konfiguriši kao <code>canopySource</code></li>
+          <li>Paid shadeMap tier sa pristupom njihovim DSM tile-ovima → konfiguriši kao <code>dsmSource</code></li>
+          <li>Tačan OSM polygon za centralne ulice sa visinama zgrada → konfiguriši <code>getFeatures</code></li>
+        </ul>
+        <p>U bilo kojem slučaju, jedna izmena <code>shade_compute.js</code>-a i ponovni run vraćaju sekciju. Naučili smo dosta o ograničenjima open-source ray-tracing engine-a za senku — i bolje pošteno ne objaviti loše brojke nego da čitalac dobije pogrešnu sliku.</p>
+      </div>
+    </article>
+
+    <article class="post">
+      <header class="post-head">
+        <time datetime="2026-06-14">14. jun 2026.</time>
+        <h2>Glatka kriva i gušće uzorkovanje (30 m + Catmull-Rom)</h2>
+      </header>
+      <p class="post-summary">Visinski profil se sada uzorkuje na svakih 30 m (umesto 50 m) — match nativnoj rezoluciji SRTM-a — i renderuje kao Catmull-Rom spline kriva umesto polyline-a. Vizuelno glađe bez izmišljanja podataka: kriva i dalje prolazi kroz iste tačke, samo se segmenti između njih iscrtavaju glatko.</p>
+      <div class="post-body">
+        <h3>Gušće uzorkovanje (30 m korak)</h3>
+        <p>SRTM 30 m je nativno na rezoluciji od 30 m po pikselu. Sa 50 m korakom smo praktično preskakali svaki šesti piksel; gušće uzorkovanje od 30 m match-uje izvor — više od toga je oversample (Open-Topo-Data samo bilinearno interpolira između istih piksela, ne dobija nove informacije).</p>
+        <ul class="tech-list">
+          <li>Broj uzoraka: 293 → <strong>491</strong> (14.67 km)</li>
+          <li>Smoothing prozor: 5 → <strong>9 tačaka</strong> (≈ 270 m fizički, isto kao ranije)</li>
+          <li>API vreme: 3 → 5 batch-ova (~5 s, jednom)</li>
+        </ul>
+        <h3>Catmull-Rom spline</h3>
+        <p>Ranije: SVG path je bio polyline (<code>M ... L ... L ...</code>), pa je linija bila „zubčasta" zbog rezidualnog šuma od ~0.5–1 m između susednih tačaka. Sada: <strong>uniform Catmull-Rom</strong> kriva konvertovana u cubic Bezier segmente. Kriva <em>prolazi kroz</em> sve tačke (hover dot i tooltip i dalje pogađaju realne km vrednosti) ali se segmenti između njih iscrtavaju glatko.</p>
+        <p>Matematika je trivijalna: za 4 susedne kontrolne tačke P₀–P₃, Bezier-ovi kontrolni vektori za segment P₁ → P₂ su P₁ + (P₂−P₀)/6 i P₂ − (P₃−P₁)/6. Bez D3 ili drugih biblioteka.</p>
+        <h3>Sitni edge-case</h3>
+        <p>Kad se trasa resampuje na 30 m korake, krajnji „rep" trase može biti samo 1 m. To je 1/30 deo punog koraka, pa svaka delta visine od 0.1 m daje fiktivnih 10 % nagiba. Filter dodat u <code>asc_desc_grad()</code>: segmenti kraći od pola koraka (15 m) se preskaču u računu max gradienta.</p>
+        <h3>Rezultat (totals)</h3>
+        <ul class="tech-list">
+          <li>Ukupan uspon: 59 → <strong>55 m</strong></li>
+          <li>Ukupan pad: 42 → <strong>38 m</strong></li>
+          <li>Centar: 8 → <strong>6 m</strong> (preciznije lokalizovani mostovi/rampe)</li>
+          <li>Max nagib: 3.2 % → <strong>3.7 %</strong> (Brzi Brod, realan — bolje uhvaćen kratak uspon)</li>
+        </ul>
+      </div>
+    </article>
+
+    <article class="post">
+      <header class="post-head">
+        <time datetime="2026-06-14">14. jun 2026.</time>
+        <h2>Realističniji uspon i pad (deadband filter)</h2>
+      </header>
+      <p class="post-summary">Brojke za ukupan uspon i pad su delovale nelogično — npr. deonica „Centar" je pokazivala uspon od 9 m iako se cela visina kreće u rasponu od svega 4.4 m. Razlog je dvostruki: jedan koncepcijski (kumulativno ≠ raspon) i jedan tehnički (šum u SRTM 30 m podacima).</p>
+      <div class="post-body">
+        <h3>Zašto uspon može biti veći od raspona</h3>
+        <p><strong>Raspon</strong> je razlika najviše i najniže tačke trase — jedan broj. <strong>Ukupan uspon</strong> je suma <em>svih</em> sitnih pozitivnih promena visine duž 14.67 km. Ako trasa nekoliko puta talasa između dve visine, raspon ostaje mali ali uspon raste. Ovo je standardna konvencija u biciklističkim sportovima (isti princip koriste Strava, Garmin, Komoot).</p>
+        <h3>Problem: SRTM šum</h3>
+        <p>SRTM 30 m podaci imaju oko 1–2 m vertikalnog šuma. Posle 5-tačkastog moving average-a ostaje ~1 m rezidualni šum. Na ravnoj deonici (npr. kej u Centru) sa 80 uzoraka, taj šum sabira nekoliko metara lažnog uspona — što je dovoljno da broj deluje sumnjivo.</p>
+        <h3>Rešenje: histerezisni deadband 1 m</h3>
+        <p>Umesto da sabira <em>svaku</em> pozitivnu promenu (kao naivni algoritam), <code>asc_desc_grad()</code> sada koristi <strong>histerezisni filter</strong>:</p>
+        <ul class="tech-list">
+          <li>Algoritam prati trenutnu „sidrišnu" tačku i tekući lokalni ekstrem.</li>
+          <li>Promena pravca se „potvrđuje" tek kad oscilacija pređe 1 m.</li>
+          <li>Manja talasanja (šum) se ignorišu; veće uzbrdice se kompletno registruju u jednoj transakciji od dna do vrha.</li>
+          <li>Ovo je isti pristup koji koriste Strava i Garmin za „elevation gain".</li>
+        </ul>
+        <p><strong>Rezultat</strong> na trasi (ukupno za 14.67 km):</p>
+        <ul class="tech-list">
+          <li>Ukupan uspon: 79 m → <strong>59 m</strong></li>
+          <li>Ukupan pad: 65 m → <strong>42 m</strong></li>
+          <li>Centar: 9 m → <strong>8 m</strong> (preostalih 8 m je realno — prilazi mostovima i rampe)</li>
+        </ul>
+        <p>UI: u karticama „Ukupan uspon" / „Ukupan pad" i u svakoj per-deonica kartici, pored vrednosti stoji ⓘ ikonica sa kratkim objašnjenjem zašto uspon može biti veći od raspona (CSS tooltip preko <code>::after</code> pseudo-elementa, sa fokus podrškom za touch uređaje).</p>
+      </div>
+    </article>
+
+    <article class="post">
+      <header class="post-head">
+        <time datetime="2026-06-12">12. jun 2026.</time>
+        <h2>Anketa: glas građana</h2>
+      </header>
+      <p class="post-summary">277 anonimnih odgovora građana Niša o tome kako koriste kej i da li bi koristili biciklistički koridor — donut chart-ovi, bar chart-ovi za multi-select pitanja i karusel slobodnih komentara.</p>
+      <div class="post-body">
+        <h3>Kako radi</h3>
+        <p>Anketa je sprovedena u Google Forms-u; CSV se obrađuje Python skriptom <code>anketa.py</code> koja izbacuje lične podatke (ime, e-mail, vreme odgovora, slobodne komentare drži posebno) i ostavlja samo agregirane brojeve po pitanju u <code>data/anketa.json</code>. Sirov CSV je u <code>.gitignore</code>-u i nikad ne dolazi do GitHub-a.</p>
+        <p>Donut chart-ovi su SVG koji se generišu u browseru (Math.PI × <code>stroke-dasharray</code>, bez biblioteke), sa semantičkim bojama: zeleno = pozitivno, žuto = umereno, sivo = pasivno, crveno = negativno. Multi-select pitanja (svrhe, način doprinosa) idu kao bar chart sa procentom <em>ispitanika</em> koji su izabrali opciju — zbir prelazi 100% jer svako bira više.</p>
+        <h3>Komentari (karusel)</h3>
+        <p>83 slobodna komentara prolaze kroz defanzivnu anonimizaciju (regex za e-mail, telefon, URL — u praksi 0 pogodaka, ali ostaje kao mreža), de-duplikuju se po lowercase tekstu, filtriraju ispod 15 znakova (eliminiše „Da" / „OK" / „+") i shuffle-uju sa fiksnim seedom da redosled bude raznovrstan ali ponovljiv. Karusel rotira automatski svakih 8 sekundi, pauzira na hover.</p>
+      </div>
+    </article>
+
+    <article class="post">
+      <header class="post-head">
+        <time datetime="2026-06-12">12. jun 2026.</time>
+        <h2>Pokrivenost zelenila i diskontinuitet senke</h2>
+      </header>
+      <p class="post-summary">Satelitska klasifikacija kroz kakav teren trasa prolazi, sa fokusom na drveće — jedini pouzdan izvor senke tokom celog dana. Strip chart pokazuje gde su rupe u senčenju duž 14.67 km trase.</p>
+      <div class="post-body">
+        <h3>Izvor podataka</h3>
+        <ul class="tech-list">
+          <li><a href="https://esa-worldcover.org/" target="_blank" rel="noopener">ESA WorldCover 2021 v2</a> — globalna satelitska klasifikacija zemljišnog pokrivača na 10 m rezoluciji (11 klasa: drveće, žbunje, trava, polja, izgrađeno, voda…). Preuzima se preko <a href="https://docs.terrascope.be/Developers/WebServices/OGC/WMTSv2.html" target="_blank" rel="noopener">Terrascope WMTS</a> kao 256×256 PNG tile-ovi, mozaikuju se u jednu sliku i keširaju u <code>data/.cache/worldcover/</code> (gitignore-ovano).</li>
+          <li><a href="https://shademap.app" target="_blank" rel="noopener">shadeMap.app</a> — eksterni alat za <em>interaktivnu</em> proveru: dugme ☀ gore-levo na mapi otvara shadeMap sa trenutnom pozicijom i slider-om za datum/sat. shadeMap radi DSM-based ray tracing i uračunava i zgrade i drveće.</li>
+        </ul>
+        <h3>Tehnički detalji</h3>
+        <p>Trasu uzorkujemo na svakih 50 m (295 tačaka za 14.67 km). Za svaku tačku uzimamo <strong>3×3 majority kernel</strong> (≈30×30 m) iz WMTS rastera — ne jedan piksel — da bi se izgladili granični artefakti gde jedan 10 m piksel istovremeno obuhvata kej i ivicu reke.</p>
+        <p><strong>Land-prior bias za vodu:</strong> biciklistička trasa je suvozemna (most je beton = built_up u WorldCover-u, ne voda), pa ako u 3×3 kernelu postoji bilo koja non-water klasa — biramo nju. Vodu vraćamo samo ako su <em>svi</em> susedi voda (= zaista preko reke, npr. most). Bez ovoga, „Centar" je pokazivao 22% trase kao vodu zbog mixed-pixel artefakta tačno na ivici keja.</p>
+        <p>Diskontinuitet senke se računa kao niz prelaza drveće ↔ otvoreno duž km osi: koliko je najduži kontinuiran deo u senci, koliko najduža rupa bez senke, koliko prelaza u svakoj deonici. Strip chart se prekida i na granici deonice da bi se uredno mapirao u per-deonica mini stripove.</p>
+      </div>
+    </article>
+
+    <article class="post">
+      <header class="post-head">
+        <time datetime="2026-06-12">12. jun 2026.</time>
+        <h2>Visinski profil trase</h2>
+      </header>
+      <p class="post-summary">Promena nadmorske visine duž 14.67 km koridora — ukupan uspon 67 m, pad 50 m, max nagib 3.2%. Trasa je relativno blaga; nije terenski izazov, ali pokazuje gde su lokalna „uzbrdica" u Niškoj Banji.</p>
+      <div class="post-body">
+        <h3>Izvor podataka</h3>
+        <ul class="tech-list">
+          <li><a href="https://www.opentopodata.org/datasets/srtm/" target="_blank" rel="noopener">Open-Topo-Data SRTM 30 m</a> — javni HTTP API koji uzorkuje SRTM Digital Elevation Model po lat/lon. Batch po 100 tačaka, rate limit 1 req/sec, 1000 req/dan. Slobodan za nekomercijalnu upotrebu.</li>
+        </ul>
+        <h3>Tehnički detalji</h3>
+        <p>Linijska trasa iz KML-a se resampuje na uniformnih 50 m, lat/lon tačke se šalju u 3 batch-a (~3 sekunde ukupno). Sirove SRTM vrednosti imaju 1–2 m šuma pa se primenjuje <strong>5-tačka centralni moving average</strong> pre nego što se računaju uspon, pad i max nagib — bez toga lokalni šum daje nerealno visok „max nagib".</p>
+        <p>Rezultat se kešira u <code>data/elevation.json</code> sa hash-om koordinata trase. Ponovni <code>make convert</code> ne udara API ako trasa nije promenjena u KML-u.</p>
+        <p>Grafikon je <strong>handroll SVG</strong> sa pozadinskim trakama po deonicama, hover linijom + tačkom + tooltip-om za pojedinačne km tačke. Bez Chart.js / Plotly.</p>
+      </div>
+    </article>
+
+    <article class="post">
+      <header class="post-head">
+        <time datetime="2026-06-12">12. jun 2026.</time>
+        <h2>Tipovi prekida u kretanju</h2>
+      </header>
+      <p class="post-summary">Klasifikacija 52 mapiranih prekida u 10 tipova: bedem, dalekovod, pritoka, nedostatak rampe, objekat, promena karaktera puta…</p>
+      <div class="post-body">
+        <h3>Tehnički detalji</h3>
+        <p>Regex pattern matching nad imenima pinova iz KML-a. Specifični patterni (npr. <code>"nedostatak rampi"</code>) se proveravaju <em>pre</em> generičkih (<code>"rampa"</code>) da se ne bi pogrešno klasifikovali. 31 od 52 prekida nema specifičan opis (samo „Прекид у кретању") pa idu u „Neoznačeno" — kandidat za buduće dopune u Google MyMaps-u.</p>
+      </div>
+    </article>
+
+    <article class="post">
+      <header class="post-head">
+        <time datetime="2026-06-05">5. jun 2026.</time>
+        <h2>Galerija „Sa terena"</h2>
+      </header>
+      <p class="post-summary">28 mapiranih fotografija sa terena, filterabilno po kategoriji (prekidi, stepenice i rampe, urbana oprema, stanja, vegetacija, urbani džepovi), lightbox sa keyboard navigacijom i swipe-om.</p>
+      <div class="post-body">
+        <h3>Tehnički detalji</h3>
+        <p>Slike su u opisima pinova na <a href="https://www.google.com/mymaps" target="_blank" rel="noopener">Google MyMaps</a> kao <code>&lt;img&gt;</code> tagovi unutar <code>&lt;description&gt;</code> CDATA sekcije. <code>convert.py</code> izvlači URL-ove regex-om i preuzima slike jednom. MyMaps koristi <code>fife=sNNNN</code> URL parametar za rezoluciju — normalizujemo na <code>fife=s1024</code> da ne preuzmemo full-res (ukupna veličina pada sa ~577 MB na ~43 MB bez vidljive razlike na popup-u / lightbox-u). Imena fajlova su SHA1 hash izvornog URL-a, pa je preuzimanje idempotentno (isti URL → isti fajl, bez duplikata).</p>
+        <p>Na kraju konverzije, orphan prune briše slike koje više nisu referencirane (ako se izmeni KML, stare slike se same uklanjaju iz <code>data/images/</code>).</p>
+      </div>
+    </article>
+
+    <article class="post">
+      <header class="post-head">
+        <time datetime="2026-06-05">5. jun 2026.</time>
+        <h2>Po deonicama — <code>meta_deonice</code> u KML-u</h2>
+      </header>
+      <p class="post-summary">Koridor je podeljen na 6 deonica (Medoševac → Centar → Delta-Lidl → Gabrovačka Reka → Brzi Brod → Niška Banja). Sva mapiranja se grupišu po deonici za lokalnu analizu — broj klupa, osvetljenja, prekida, tip podloge…</p>
+      <div class="post-body">
+        <h3>Tehnički detalji</h3>
+        <p>U Google MyMaps smo dodali poseban folder <code>meta_deonice</code> sa polygon-ima za svaku deonicu. <code>convert.py</code> ih izdvaja, sortira po lon centroid-u (zapad → istok), pa klasifikuje svaki pin / liniju iz drugih slojeva u jednu od deonica:</p>
+        <ul class="tech-list">
+          <li><strong>Pinovi (Point):</strong> ray-casting „point-in-polygon" test.</li>
+          <li><strong>Linije (LineString):</strong> klasifikacija po midpoint-u; dužina linije se proporcionalno razdeljuje između deonica preko pojedinačnih segmenata.</li>
+        </ul>
+        <p>Trasa koridora prolazi kroz različite oblike polygon-a koji ponekad imaju oštre uvale — uzorci mogu naizmenično „izaći iz" i „vratiti se u" deonicu. Smoothing pass posle klasifikacije popunjava izolovane „None" tačke ako su sa obe strane okružene istom deonicom, što ujednačuje strip chart i elevation chart pozadinske trake.</p>
+      </div>
+    </article>
+
+    <article class="post">
+      <header class="post-head">
+        <time datetime="2026-06-04">4. jun 2026.</time>
+        <h2>Inicijalna verzija sajta + KML pipeline</h2>
+      </header>
+      <p class="post-summary">Prvi prikaz: Leaflet mapa sa svim slojevima iz KML-a, KPI brojevi, bar chart-ovi po tipu podloge, urbane opreme i vegetacije.</p>
+      <div class="post-body">
+        <h3>Izvor podataka</h3>
+        <ul class="tech-list">
+          <li>Vlastiti Google MyMaps koji se preuzima preko NetworkLink-a u <code>my_maps.kml</code>. <code>make fetch</code> ekstraktuje pravi <code>&lt;href&gt;</code> i čuva u <code>koridor_data.kml</code>.</li>
+          <li>Bazna karta: <a href="https://carto.com/" target="_blank" rel="noopener">CartoDB Voyager</a> (default), <a href="https://www.esri.com/" target="_blank" rel="noopener">ESRI World Imagery</a> (satelit) i <a href="https://www.openstreetmap.fr/" target="_blank" rel="noopener">OSM HOT</a> (humanitarni stil).</li>
+          <li>OpenStreetMap kao osnova kartografskih podataka — autori prikazani u attribution-u mape.</li>
+        </ul>
+        <h3>Tehnički detalji</h3>
+        <p>Python <code>xml.etree.ElementTree</code> parser čita KML, normalizuje imena slojeva (handle typos: „vioska vegetacija" → „visoka_vegetacija", „loshe stanje" → „loše"…), kategorizuje pinove po regex pattern matching-u. Generiše po jedan GeoJSON fajl per kategoriju + <code>data/stats.json</code> sa svim agregatima.</p>
+        <p>Frontend je <strong>vanilla JavaScript + Leaflet</strong> — bez framework-a, bez build step-a, bez NPM-a. Sve je statičko, GitHub Pages servira direktno; nema backend-a.</p>
+      </div>
+    </article>
+
+  </div>
+</main>
+
+<footer class="dnevnik-footer">
+  <div class="container">
+    <p><a href="index.html">← Nazad na glavnu stranicu</a></p>
+    <p class="muted">Sav kod sajta je otvoren pod <a href="LICENSE" target="_blank" rel="noopener">GPL 3.0</a> licencom. Repository: <a href="https://github.com/biciklisticki-koridor-nis/biciklisticki-koridor-nis.github.io" target="_blank" rel="noopener">github.com/biciklisticki-koridor-nis</a>.</p>
+  </div>
+</footer>
+
+</body>
+</html>

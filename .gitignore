@@ -1,6 +1,22 @@
 # Preuzeti KML (regeneriše se sa `make fetch`)
 koridor_data.kml
 
+# Build cache za konverter (WorldCover tile PNG-ovi; sajt ih ne učitava)
+data/.cache/
+
+# Anketa sa ličnim podacima (sajt koristi samo anonimne agregate u data/anketa.json)
+anketa.csv
+
+# shadeMap pre-compute cache (sekcija je trenutno uklonjena iz UI-ja;
+# pipeline ostaje dostupan kao "uspavan" za buduće aktiviranje sa pravim
+# canopy/DSM podacima — vidi dnevnik 14. jun 2026.)
+data/shade_real.json
+
+# Node (build-time alati za shadeMap pre-compute)
+node_modules/
+package-lock.json
+.env
+
 # Python
 __pycache__/
 *.pyc

@@ -4,6 +4,36 @@
 
 const DATA = "data/";
 
+const DEONICA_COLORS = ["#2f6b46", "#d8a93a", "#8a5a2b", "#4f87a5"];
+
+const LC_COLORS = {
+  tree_cover:  "#2f6b46",
+  shrubland:   "#7fb88f",
+  grassland:   "#a4c054",
+  cropland:    "#e29b3e",
+  built_up:    "#9aa5a2",
+  bare:        "#d3d8d3",
+  water:       "#4f87a5",
+  wetland:     "#7da9ad",
+  snow_ice:    "#eef0f3",
+  mangroves:   "#3a9d6b",
+  moss_lichen: "#b9a76b",
+};
+const LC_LIGHT_TEXT = new Set(["bare", "snow_ice", "shrubland"]);
+
+const PREKID_TIP_LABELS = {
+  dalekovod:             "Dalekovod",
+  privatno_zemljiste:    "Privatno zemljište",
+  most_prelaz:           "Most / prelaz",
+  bedem:                 "Bedem",
+  pritoka:               "Pritoka / vodotok",
+  nedostatak_rampe:      "Nedostatak rampe",
+  nedostatak_stepenista: "Nedostatak stepeništa",
+  objekat:               "Objekat / ograda",
+  promena_puta:          "Promena karaktera puta",
+  ostalo:                "Neoznačeno",
+};
+
 // ---------- KPI + bar chart rendering ----------
 
 function setText(id, value) {
@@ -72,7 +102,165 @@ async function loadStats() {
     { label: "Prekidi / km",   value: s.density.prekidi_per_km,     display: s.density.prekidi_per_km.toFixed(2),     color: "warn" },
   ]);
 
+  renderTipoviPrekida(s);
   renderDeoniceCards(s);
+  renderShade(s);
+  renderLandcover(s);
+}
+
+function renderShade(s) {
+  const sh = s.shade;
+  if (!sh) return;
+  renderShadeStrip("shade-strip-total", sh.strip, s.trasa_km);
+  renderShadeAxis("shade-strip-axis", s.trasa_km);
+  renderShadeStats(sh.totals);
+  renderShadeByDeonica(s);
+}
+
+function renderShadeStrip(elId, strip, totalKm) {
+  const el = document.getElementById(elId);
+  if (!el || !Array.isArray(strip)) return;
+  const totalM = totalKm * 1000;
+  el.innerHTML = strip.map(iv => {
+    const w = totalM > 0 ? (iv.length_m / totalM) * 100 : 0;
+    const cls = iv.shade ? "shade" : "sun";
+    const dn = iv.deonica ? `${iv.deonica}: ` : "";
+    const title = `${dn}km ${iv.km_start.toFixed(2)}–${iv.km_end.toFixed(2)} (${iv.length_m} m) — ${iv.shade ? "u senci drveća" : "na suncu"}`;
+    return `<div class="strip-seg ${cls}" style="width:${w}%" title="${title}"></div>`;
+  }).join("");
+}
+
+function renderShadeAxis(elId, totalKm) {
+  const el = document.getElementById(elId);
+  if (!el) return;
+  const step = totalKm > 10 ? 2 : 1;
+  const ticks = [];
+  for (let k = 0; k <= totalKm + 0.01; k += step) ticks.push(Math.min(k, totalKm));
+  el.innerHTML = ticks.map(k => `<span>${k.toFixed(0)} km</span>`).join("");
+}
+
+function renderShadeStats(totals) {
+  const el = document.getElementById("shade-stats-total");
+  if (!el || !totals || !totals.shade) return;
+  const sh = totals.shade;
+  const gr = totals.green || { pct: 0 };
+  const openGreen = Math.max(0, Math.round((gr.pct - sh.pct) * 10) / 10);
+  const tiles = [
+    { val: sh.pct,           unit: "%",  label: "U senci drveća",                  sub: "jedino drveće daje stalnu senku" },
+    { val: openGreen,        unit: "%",  label: "Otvoreno zelenilo",               sub: "trava, polja, obradivo — zeleno, ali bez senke" },
+    { val: sh.longest_m,     unit: " m", label: "Najduži deo u senci",             sub: "neprekinut interval drveća" },
+    { val: sh.longest_gap_m, unit: " m", label: "Najduža rupa u senci",            sub: "kritična zona izloženosti suncu", warn: sh.longest_gap_m >= 1000 },
+  ];
+  el.innerHTML = tiles.map(t => `
+    <div class="shade-stat">
+      <div class="shade-stat-value ${t.warn ? "warn" : ""}">${t.val}<span class="unit">${t.unit}</span></div>
+      <div class="shade-stat-label">${t.label}</div>
+      <div class="shade-stat-sub">${t.sub}</div>
+    </div>
+  `).join("");
+}
+
+function renderShadeByDeonica(s) {
+  const el = document.getElementById("shade-by-deonica");
+  if (!el) return;
+  const sh = s.shade;
+  el.innerHTML = (s.deonice || []).map(name => {
+    const m = sh.by_deonica[name];
+    const trasaKm = (s.by_deonica[name] && s.by_deonica[name].trasa_km) || 0;
+    if (!m || trasaKm <= 0) return "";
+    const dnStrip = sh.strip.filter(iv => iv.deonica === name);
+    const dnLenM = dnStrip.reduce((acc, iv) => acc + iv.length_m, 0);
+    const segs = dnStrip.map(iv => {
+      const w = dnLenM > 0 ? (iv.length_m / dnLenM) * 100 : 0;
+      return `<div class="strip-seg ${iv.shade ? "shade" : "sun"}" style="width:${w}%" title="km ${iv.km_start.toFixed(2)}–${iv.km_end.toFixed(2)} (${iv.length_m} m) ${iv.shade ? "— senka" : "— sunce"}"></div>`;
+    }).join("");
+    const lowShade = m.shade.pct < 10;
+    const openGreen = Math.max(0, Math.round((m.green.pct - m.shade.pct) * 10) / 10);
+    return `
+      <div class="shade-deonica-card">
+        <h4>
+          <span>${name}</span>
+          <span class="pct ${lowShade ? "low" : ""}">${m.shade.pct}%</span>
+        </h4>
+        <div class="mini-strip">${segs}</div>
+        <div class="shade-deonica-row"><span class="label">🌳 Drveće (daje senku)</span><span class="value">${m.shade.pct}%</span></div>
+        <div class="shade-deonica-row"><span class="label">🌾 Otvoreno zelenilo</span><span class="value">${openGreen}%</span></div>
+        <div class="shade-deonica-row"><span class="label">Najduži deo u senci</span><span class="value">${m.shade.longest_m} m</span></div>
+        <div class="shade-deonica-row"><span class="label">Najduža rupa bez senke</span><span class="value">${m.shade.longest_gap_m} m</span></div>
+        <div class="shade-deonica-row"><span class="label">Prelaza senka ↔ sunce</span><span class="value">${m.shade.transitions}</span></div>
+      </div>`;
+  }).join("");
+}
+
+function lcStackedSegments(dist, order, labels, minPctForLabel) {
+  return order
+    .filter(k => (dist[k] || 0) > 0)
+    .map(k => {
+      const pct = dist[k];
+      const txt = pct >= minPctForLabel ? `${Math.round(pct)}%` : "";
+      const cls = LC_LIGHT_TEXT.has(k) ? "ink-dark" : "";
+      const lab = labels[k] || k;
+      const title = `${lab}: ${pct.toFixed(1)}%`;
+      return `<div class="${cls}" style="background:${LC_COLORS[k] || "#999"}; width:${pct}%" title="${title}">${txt}</div>`;
+    }).join("");
+}
+
+function renderLandcover(s) {
+  const lc = s.landcover;
+  if (!lc) return;
+  const labels = lc.labels || {};
+  const totals = lc.totals_pct || {};
+  const seen = new Set(Object.keys(totals));
+  for (const dn in (lc.by_deonica_pct || {})) {
+    Object.keys(lc.by_deonica_pct[dn]).forEach(k => seen.add(k));
+  }
+  const order = [...seen].sort((a, b) => (totals[b] || 0) - (totals[a] || 0));
+
+  const leg = document.getElementById("lc-legend");
+  if (leg) {
+    leg.innerHTML = order.map(k => `
+      <span class="lc-legend-item">
+        <span class="lc-legend-swatch" style="background:${LC_COLORS[k] || "#999"}"></span>
+        ${labels[k] || k}
+      </span>`).join("");
+  }
+
+  const totalsBar = document.getElementById("lc-totals-bar");
+  if (totalsBar) totalsBar.innerHTML = lcStackedSegments(totals, order, labels, 4);
+  const totalsKm = document.getElementById("lc-totals-km");
+  if (totalsKm) totalsKm.textContent = `${s.trasa_km.toFixed(2)} km`;
+
+  const byEl = document.getElementById("lc-by-deonica");
+  if (byEl) {
+    byEl.innerHTML = (s.deonice || []).map(name => {
+      const dist = (lc.by_deonica_pct || {})[name];
+      const km = (s.by_deonica[name] && s.by_deonica[name].trasa_km) || 0;
+      if (!dist || km <= 0) return "";
+      return `
+        <div class="lc-bar-row">
+          <div class="label">${name}</div>
+          <div class="lc-bar">${lcStackedSegments(dist, order, labels, 6)}</div>
+          <div class="km">${km.toFixed(2)} km</div>
+        </div>`;
+    }).join("");
+  }
+}
+
+function renderTipoviPrekida(s) {
+  const tipovi = s.prekidi_po_tipu || {};
+  const entries = Object.entries(tipovi)
+    .filter(([k]) => k !== "ostalo")
+    .sort((a, b) => b[1] - a[1]);
+  if (tipovi.ostalo) entries.push(["ostalo", tipovi.ostalo]);
+  const total = Object.values(tipovi).reduce((a, b) => a + b, 0);
+  bars("bars-prekidi-tipovi",
+    entries.map(([k, v]) => ({
+      label: PREKID_TIP_LABELS[k] || k,
+      value: v,
+      display: total > 0 ? `${v} · ${Math.round(100 * v / total)}%` : String(v),
+      color: k === "ostalo" ? "stone" : "warn",
+    })),
+  );
 }
 
 function renderDeoniceCards(s) {
@@ -127,6 +315,228 @@ function renderDeoniceCards(s) {
             ${row("Rampe",     c.rampe       || 0, maxCount.rampe,       "water")}
           </div>
         </div>
+      </div>`;
+  }).join("");
+}
+
+// ---------- visinski profil (SVG handroll) ----------
+
+const SVG_NS = "http://www.w3.org/2000/svg";
+
+function svgEl(name, attrs = {}) {
+  const el = document.createElementNS(SVG_NS, name);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+async function loadElevation() {
+  let elev;
+  try {
+    const r = await fetch(DATA + "elevation.json");
+    if (!r.ok) return;
+    elev = await r.json();
+  } catch (e) { return; }
+  if (!elev || !Array.isArray(elev.profile) || elev.profile.length < 2) return;
+  renderProfileStats(elev);
+  renderProfileSvg(elev);
+  renderProfileDeonice(elev);
+}
+
+function renderProfileStats(elev) {
+  const el = document.getElementById("profile-stats");
+  const t = elev.totals || {};
+  if (!el) return;
+  const tiles = [
+    { val: t.raspon_m,         unit: "m", label: "Raspon visina", sub: `${t.min_m}–${t.max_m} m n.v.` },
+    { val: t.max_gradient_pct, unit: "%", label: "Maks. nagib",   sub: "najveći lokalni nagib"   },
+  ];
+  el.innerHTML = tiles.map(s => `
+    <div class="profile-stat">
+      <div class="profile-stat-value">${s.val}<span class="unit">${s.unit}</span></div>
+      <div class="profile-stat-label">${s.label}</div>
+      <div class="profile-stat-sub">${s.sub}</div>
+    </div>
+  `).join("");
+}
+
+// Uniform Catmull-Rom → cubic Bezier konverzija. Kriva prolazi kroz sve
+// kontrolne tačke (line dot-ovi i tooltip vrednosti ostaju tačni) ali se
+// rendrira kao glatka cubic Bezier umesto polyline.
+function catmullRomPath(pts) {
+  const n = pts.length;
+  if (n === 0) return "";
+  if (n === 1) return `M ${pts[0].x.toFixed(1)} ${pts[0].y.toFixed(1)}`;
+  let d = `M ${pts[0].x.toFixed(1)} ${pts[0].y.toFixed(1)}`;
+  for (let i = 0; i < n - 1; i++) {
+    const p0 = pts[i - 1] || pts[i];
+    const p1 = pts[i];
+    const p2 = pts[i + 1];
+    const p3 = pts[i + 2] || pts[i + 1];
+    const c1x = p1.x + (p2.x - p0.x) / 6;
+    const c1y = p1.y + (p2.y - p0.y) / 6;
+    const c2x = p2.x - (p3.x - p1.x) / 6;
+    const c2y = p2.y - (p3.y - p1.y) / 6;
+    d += ` C ${c1x.toFixed(1)} ${c1y.toFixed(1)}`
+       + ` ${c2x.toFixed(1)} ${c2y.toFixed(1)}`
+       + ` ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}`;
+  }
+  return d;
+}
+
+function renderProfileSvg(elev) {
+  const svg = document.getElementById("profile-svg");
+  if (!svg) return;
+  svg.innerHTML = "";
+
+  const profile = elev.profile;
+  const totals = elev.totals;
+  const W = 1000, H = 280;
+  const M = { top: 28, right: 24, bottom: 24, left: 42 };
+  const innerW = W - M.left - M.right;
+  const innerH = H - M.top - M.bottom;
+
+  svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+  svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
+
+  const totalKm = profile[profile.length - 1].km || 1;
+  const minE = Math.floor((totals.min_m - 1) / 5) * 5;
+  const maxE = Math.ceil((totals.max_m + 1) / 5) * 5;
+  const xOf = km => M.left + (km / totalKm) * innerW;
+  const yOf = e  => M.top + (1 - (e - minE) / (maxE - minE)) * innerH;
+
+  // 1) Background bands po deonicama
+  const bandRanges = [];
+  let cur = null;
+  for (const p of profile) {
+    if (!p.deonica) { cur = null; continue; }
+    if (!cur || cur.name !== p.deonica) {
+      cur = { name: p.deonica, kmStart: p.km, kmEnd: p.km };
+      bandRanges.push(cur);
+    } else {
+      cur.kmEnd = p.km;
+    }
+  }
+  bandRanges.forEach((b, i) => {
+    const color = DEONICA_COLORS[i % DEONICA_COLORS.length];
+    const x = xOf(b.kmStart), w = Math.max(2, xOf(b.kmEnd) - x);
+    svg.appendChild(svgEl("rect", {
+      class: "band", x, y: M.top, width: w, height: innerH, fill: color,
+    }));
+    // band label iznad chart area da ne preklapa Y-tick brojeve
+    svg.appendChild(svgEl("text", {
+      class: "band-label", x: x + w / 2, y: M.top - 8, "text-anchor": "middle",
+    })).textContent = b.name;
+  });
+
+  // 2) Horizontalne grid linije + Y axis tick-ovi (5m intervali)
+  for (let e = minE; e <= maxE; e += 5) {
+    const y = yOf(e);
+    svg.appendChild(svgEl("line", {
+      class: "grid-line", x1: M.left, y1: y, x2: W - M.right, y2: y,
+    }));
+    svg.appendChild(svgEl("text", {
+      class: "axis-tick", x: M.left - 8, y: y + 3, "text-anchor": "end",
+    })).textContent = e;
+  }
+
+  // 3) Vertikalne tick-ovi (2km koraci) — poslednji tick nosi i jedinicu "km"
+  const xStep = totalKm > 8 ? 2 : 1;
+  const lastKm = Math.floor(totalKm / xStep) * xStep;
+  for (let km = 0; km <= totalKm + 0.001; km += xStep) {
+    const isLast = km === lastKm;
+    const x = xOf(Math.min(km, totalKm));
+    svg.appendChild(svgEl("line", {
+      class: "grid-line", x1: x, y1: M.top + innerH, x2: x, y2: M.top + innerH + 4,
+    }));
+    svg.appendChild(svgEl("text", {
+      class: "axis-tick", x, y: M.top + innerH + 16, "text-anchor": "middle",
+    })).textContent = isLast ? `${km} km` : `${km}`;
+  }
+
+  // 4) Area + line path (Catmull-Rom spline kroz elev_smooth tačke —
+  //    isti podaci, samo glatka SVG kriva umesto polyline cik-cak)
+  const valid = profile.filter(p => p.elev_smooth != null);
+  if (valid.length >= 2) {
+    const pts = valid.map(p => ({ x: xOf(p.km), y: yOf(p.elev_smooth) }));
+    const lineD = catmullRomPath(pts);
+    const baseY = (M.top + innerH).toFixed(1);
+    const areaD = `${lineD} L ${pts[pts.length - 1].x.toFixed(1)} ${baseY}`
+                + ` L ${pts[0].x.toFixed(1)} ${baseY} Z`;
+    svg.appendChild(svgEl("path", { class: "area", d: areaD }));
+    svg.appendChild(svgEl("path", { class: "line", d: lineD }));
+  }
+
+  // 5) Hover line + dot + capture rect
+  const hoverLine = svgEl("line", {
+    class: "hover-line", x1: 0, y1: M.top, x2: 0, y2: M.top + innerH,
+  });
+  const hoverDot = svgEl("circle", { class: "hover-dot", cx: 0, cy: 0 });
+  svg.appendChild(hoverLine);
+  svg.appendChild(hoverDot);
+
+  const capture = svgEl("rect", {
+    x: M.left, y: M.top, width: innerW, height: innerH,
+    fill: "transparent",
+  });
+  svg.appendChild(capture);
+
+  const wrap = document.getElementById("profile-chart-wrap");
+  const tt = document.getElementById("profile-tooltip");
+  const ttElev = tt.querySelector(".tt-elev");
+  const ttMeta = tt.querySelector(".tt-meta");
+
+  function onMove(evt) {
+    const rect = svg.getBoundingClientRect();
+    // SVG je preserveAspectRatio="xMidYMid meet"; mapiraj client→viewbox koristeći stvarni scale
+    const scale = rect.width / W;
+    const localX = (evt.clientX - rect.left) / scale;
+    if (localX < M.left || localX > W - M.right) { hideTooltip(); return; }
+    const km = ((localX - M.left) / innerW) * totalKm;
+    // Find nearest sample
+    let lo = 0, hi = profile.length - 1;
+    while (hi - lo > 1) {
+      const mid = (lo + hi) >> 1;
+      if (profile[mid].km < km) lo = mid; else hi = mid;
+    }
+    const p = (Math.abs(profile[lo].km - km) < Math.abs(profile[hi].km - km)) ? profile[lo] : profile[hi];
+    if (p.elev_smooth == null) { hideTooltip(); return; }
+    const cx = xOf(p.km), cy = yOf(p.elev_smooth);
+    hoverLine.setAttribute("x1", cx); hoverLine.setAttribute("x2", cx);
+    hoverLine.style.opacity = "1";
+    hoverDot.setAttribute("cx", cx); hoverDot.setAttribute("cy", cy);
+    hoverDot.style.opacity = "1";
+    ttElev.textContent = `${p.elev_smooth} m n.v.`;
+    ttMeta.textContent = `${p.km.toFixed(2)} km · ${p.deonica || "—"}`;
+    const wrapRect = wrap.getBoundingClientRect();
+    tt.style.left = `${(evt.clientX - wrapRect.left)}px`;
+    tt.style.top  = `${(cy * scale)}px`;
+    tt.hidden = false;
+    tt.style.opacity = "1";
+  }
+  function hideTooltip() {
+    hoverLine.style.opacity = "0";
+    hoverDot.style.opacity = "0";
+    tt.style.opacity = "0";
+  }
+  capture.addEventListener("mousemove", onMove);
+  capture.addEventListener("mouseleave", hideTooltip);
+  capture.addEventListener("touchmove", e => {
+    if (e.touches[0]) onMove(e.touches[0]);
+  }, { passive: true });
+  capture.addEventListener("touchend", hideTooltip);
+}
+
+function renderProfileDeonice(elev) {
+  const el = document.getElementById("profile-deonice");
+  if (!el || !elev.by_deonica) return;
+  const entries = Object.entries(elev.by_deonica);
+  el.innerHTML = entries.map(([name, d], i) => {
+    const color = DEONICA_COLORS[i % DEONICA_COLORS.length];
+    return `
+      <div class="profile-deonica-card" style="border-top: 3px solid ${color};">
+        <h4>${name}</h4>
+        <div class="profile-deonica-row"><span class="label">Raspon</span><span class="value">${d.raspon_m} m (${d.min_m}–${d.max_m})</span></div>
+        <div class="profile-deonica-row"><span class="label">Maks. nagib</span><span class="value">${d.max_gradient_pct}%</span></div>
       </div>`;
   }).join("");
 }
@@ -280,7 +690,30 @@ async function loadMap() {
 
   const socijalniLayer = bindPopups(L.geoJSON(socijalni, { pointToLayer: circleMarker("#7d3c98", 7) }));
 
-  const DEONICA_COLORS = ["#2f6b46", "#d8a93a", "#8a5a2b", "#4f87a5"];
+  // shadeMap link — daje stvarne senke iz DSM-a za trenutnu poziciju i bilo koji datum/sat
+  const ShadeMapCtrl = L.Control.extend({
+    options: { position: "topleft" },
+    onAdd: function () {
+      const btn = L.DomUtil.create("a", "leaflet-bar leaflet-control shademap-btn");
+      btn.href = "#";
+      btn.title = "Otvori shadeMap — interaktivno proveri senku za trenutnu poziciju, datum i čas";
+      btn.setAttribute("role", "button");
+      btn.setAttribute("aria-label", "Otvori shadeMap u novom tabu");
+      btn.textContent = "☀";
+      L.DomEvent.on(btn, "click", L.DomEvent.preventDefault);
+      L.DomEvent.on(btn, "click", () => {
+        const c = map.getCenter();
+        const z = Math.round(map.getZoom());
+        const t = Date.now();
+        const url = `https://shademap.app/@${c.lat.toFixed(5)},${c.lng.toFixed(5)},${z}z,${t}t,0b,0p,1m`;
+        window.open(url, "_blank", "noopener");
+      });
+      L.DomEvent.disableClickPropagation(btn);
+      return btn;
+    },
+  });
+  new ShadeMapCtrl().addTo(map);
+
   const deoniceLayer = L.geoJSON(deonice, {
     style: (f) => {
       const idx = (deonice.features || []).indexOf(f);
@@ -346,6 +779,157 @@ async function loadMap() {
   map.on("click", () => {
     if (window.innerWidth < 900) layersCtrl.collapse();
   });
+}
+
+// ---------- anketa (donut + bar) ----------
+
+const ANKETA_PALETTE = ["#2f6b46", "#4a9367", "#d8a93a", "#c08a4f", "#4f87a5", "#9aa5a2", "#c0392b"];
+
+function anketaColor(label, idx) {
+  const l = (label || "").toLowerCase();
+  // pozitivno (zeleno)
+  if (l.includes("сигурно") || l === "да" || l.includes("свакодневно")) return "#2f6b46";
+  if (l.includes("неколико пута")) return "#4a9367";
+  // umereno (žuto)
+  if (l.includes("повремено") || l.includes("можда") || l.includes("викенд")) return "#d8a93a";
+  // pasivno (siva)
+  if (l.includes("информи") || l.includes("нисам сигуран")) return "#9aa5a2";
+  // negativno (crveno)
+  if (l === "не" || l.includes("никад")) return "#c0392b";
+  return ANKETA_PALETTE[idx % ANKETA_PALETTE.length];
+}
+
+function anketaGroupSmall(answers, maxItems = 7, threshold = 5) {
+  const sorted = [...answers].sort((a, b) => b.count - a.count);
+  const main = [];
+  let other = 0;
+  let otherN = 0;
+  for (const a of sorted) {
+    if (main.length < maxItems && a.count >= threshold) main.push(a);
+    else { other += a.count; otherN += 1; }
+  }
+  if (other > 0) main.push({ label: `Ostali odgovori (${otherN})`, count: other, _other: true });
+  return main;
+}
+
+function donutSVG(answers, total) {
+  const cx = 110, cy = 110, r = 80, sw = 28;
+  const C = 2 * Math.PI * r;
+  let offset = 0;
+  const slices = answers.map((a, i) => {
+    const frac = total > 0 ? a.count / total : 0;
+    const len = frac * C;
+    const color = anketaColor(a.label, i);
+    const slice = `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${color}" stroke-width="${sw}" stroke-dasharray="${len.toFixed(2)} ${(C - len).toFixed(2)}" stroke-dashoffset="${(-offset).toFixed(2)}" transform="rotate(-90 ${cx} ${cy})"><title>${a.label}: ${a.count} (${Math.round(100 * frac)}%)</title></circle>`;
+    offset += len;
+    return slice;
+  }).join("");
+  return `<svg class="donut-svg" viewBox="0 0 220 220">
+    ${slices}
+    <text class="donut-center" x="${cx}" y="${cy - 4}">${total}</text>
+    <text class="donut-center-sub" x="${cx}" y="${cy + 16}">odgovora</text>
+  </svg>`;
+}
+
+function donutLegend(answers, total) {
+  return answers.map((a, i) => {
+    const pct = total > 0 ? Math.round(100 * a.count / total) : 0;
+    const color = anketaColor(a.label, i);
+    return `<div class="donut-legend-item">
+      <span class="donut-legend-swatch" style="background:${color}"></span>
+      <span class="donut-legend-label">${a.label}</span>
+      <span class="donut-legend-val">${a.count} · ${pct}%</span>
+    </div>`;
+  }).join("");
+}
+
+function multiBars(answers, total) {
+  const top = anketaGroupSmall(answers);
+  const maxCount = Math.max(...top.map(a => a.count), 1);
+  return top.map(a => {
+    const pct = total > 0 ? Math.round(100 * a.count / total) : 0;
+    const w = Math.max(2, 100 * a.count / maxCount);
+    return `<div class="anketa-bar-row">
+      <div class="label">${a.label}</div>
+      <div class="value">${a.count} · ${pct}%</div>
+      <div class="track"><div class="fill" style="width:${w}%"></div></div>
+    </div>`;
+  }).join("");
+}
+
+async function loadAnketa() {
+  let d;
+  try {
+    const r = await fetch(DATA + "anketa.json");
+    if (!r.ok) return;
+    d = await r.json();
+  } catch (e) { return; }
+  if (!d || !Array.isArray(d.questions)) return;
+  const totalEl = document.getElementById("anketa-total");
+  if (totalEl) totalEl.textContent = `${d.total}`;
+  const grid = document.getElementById("anketa-grid");
+  if (!grid) return;
+  grid.innerHTML = d.questions.map(q => {
+    if (q.type === "single") {
+      return `<div class="anketa-card">
+        <h3>${q.title}</h3>
+        <div class="donut-wrap">
+          ${donutSVG(q.answers, q.answered)}
+          <div class="donut-legend">${donutLegend(q.answers, q.answered)}</div>
+        </div>
+      </div>`;
+    }
+    return `<div class="anketa-card">
+      <h3>${q.title}</h3>
+      <div class="anketa-card-meta">${q.respondents} ispitanika · više od jedne opcije po osobi (zbir &gt; 100%)</div>
+      ${multiBars(q.answers, q.respondents)}
+    </div>`;
+  }).join("");
+
+  setupQuotesCarousel(d.comments || []);
+}
+
+function setupQuotesCarousel(comments) {
+  const wrap = document.getElementById("anketa-quotes");
+  if (!wrap || !comments.length) return;
+  const text = document.getElementById("quote-text");
+  const idxEl = document.getElementById("quote-idx");
+  const totalEl = document.getElementById("quote-total");
+  if (!text || !idxEl || !totalEl) return;
+
+  wrap.hidden = false;
+  totalEl.textContent = comments.length;
+
+  let idx = 0;
+  let timer = null;
+  const ADVANCE_MS = 8000;
+  const FADE_MS = 250;
+
+  function show(i) {
+    idx = (i + comments.length) % comments.length;
+    text.classList.add("fade");
+    setTimeout(() => {
+      text.textContent = comments[idx];
+      idxEl.textContent = idx + 1;
+      text.classList.remove("fade");
+    }, FADE_MS);
+  }
+
+  function play() {
+    stop();
+    timer = setInterval(() => show(idx + 1), ADVANCE_MS);
+  }
+  function stop() {
+    if (timer) { clearInterval(timer); timer = null; }
+  }
+
+  wrap.querySelector(".quote-prev").addEventListener("click", () => { show(idx - 1); play(); });
+  wrap.querySelector(".quote-next").addEventListener("click", () => { show(idx + 1); play(); });
+  wrap.addEventListener("mouseenter", stop);
+  wrap.addEventListener("mouseleave", play);
+
+  show(0);
+  play();
 }
 
 // ---------- gallery + lightbox ----------
@@ -477,7 +1061,7 @@ function setupLightbox(items, gridEl) {
 
 (async function () {
   try {
-    await Promise.all([loadStats(), loadMap(), loadGallery()]);
+    await Promise.all([loadStats(), loadMap(), loadGallery(), loadElevation(), loadAnketa()]);
   } catch (e) {
     console.error(e);
     const note = document.querySelector(".legend-note");

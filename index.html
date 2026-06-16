@@ -19,9 +19,32 @@
     <div class="cta">
       <a href="#mapa" class="btn btn-primary">Pogledaj mapu</a>
       <a href="#ukljucise" class="btn btn-ghost">Uključi se</a>
+      <a href="https://www.instagram.com/es.quina_urbana/" target="_blank" rel="noopener" class="btn btn-ig" aria-label="Prati nas na Instagramu">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18" aria-hidden="true">
+          <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+        </svg>
+        <span>@es.quina_urbana</span>
+      </a>
     </div>
   </div>
 </header>
+
+<section id="glas" class="glas-section">
+  <div class="container">
+    <p class="glas-intro">Šta građani Niša kažu o ideji koridora — iz <a href="#anketa">ankete sa 277 odgovora</a>:</p>
+    <div class="anketa-quotes" id="anketa-quotes" hidden>
+      <button class="quote-nav quote-prev" type="button" aria-label="Prethodni komentar">‹</button>
+      <div class="quote-card">
+        <span class="quote-mark" aria-hidden="true">&ldquo;</span>
+        <p class="quote-text" id="quote-text">—</p>
+        <div class="quote-meta">
+          <span id="quote-idx">1</span> / <span id="quote-total">—</span> · anoniman komentar iz ankete
+        </div>
+      </div>
+      <button class="quote-nav quote-next" type="button" aria-label="Sledeći komentar">›</button>
+    </div>
+  </div>
+</section>
 
 <section id="pregled" class="pregled">
   <div class="container">
@@ -103,16 +126,87 @@
         <p class="card-sub">Koliko često se nešto pojavljuje na 1 km koridora.</p>
         <div class="bars" id="bars-gustina"></div>
       </div>
+
+      <div class="card">
+        <h3>Tipovi prekida</h3>
+        <p class="card-sub">Konkretni razlozi prekida u kretanju duž trase.</p>
+        <div class="bars" id="bars-prekidi-tipovi"></div>
+      </div>
     </div>
+  </div>
+</section>
+
+<section id="visina" class="visina-section">
+  <div class="container">
+    <h2>Visinski profil trase</h2>
+    <p class="lead">Promena nadmorske visine duž koridora. Visine su uzorkovane na svakih 50 m iz SRTM 30 m digitalnog modela terena.</p>
+
+    <div class="profile-stats" id="profile-stats"></div>
+
+    <div class="profile-chart-wrap" id="profile-chart-wrap">
+      <svg id="profile-svg" class="profile-svg" aria-label="Visinski profil duž trase koridora"></svg>
+      <div class="profile-tooltip" id="profile-tooltip" hidden>
+        <div class="tt-elev"></div>
+        <div class="tt-meta"></div>
+      </div>
+    </div>
+
+    <h3 style="margin-top: 1.5rem;">Po deonicama</h3>
+    <p class="muted" style="margin-bottom: 1rem;">Kumulativan uspon i pad unutar svake deonice, sa rasponom visina i najvećim lokalnim nagibom.</p>
+    <div class="profile-deonice" id="profile-deonice"></div>
+  </div>
+</section>
+
+<section id="zelenilo" class="zelenilo-section">
+  <div class="container">
+    <h2>Pokrivenost zelenila i diskontinuitet senke</h2>
+    <p class="lead">Drveće je jedini pouzdan izvor senke duž trase tokom dana — trava, polja i obradiva zemlja ne štite biciklistu od sunca. „Diskontinuitet" su rupe u senčenju gde se trasa duže izlaže suncu. Podaci iz ESA WorldCover 2021 (satelit, 10 m), uzorkovano na svakih 50 m i grupisano u 3×3 majority kernel.</p>
+
+    <h3 style="margin-top: 1.5rem;">Senka duž cele trase</h3>
+    <div class="shade-strip-wrap">
+      <div class="shade-strip" id="shade-strip-total"></div>
+      <div class="shade-strip-axis" id="shade-strip-axis"></div>
+    </div>
+
+    <div class="shade-stats" id="shade-stats-total"></div>
+
+    <h3 style="margin-top: 2rem;">Po deonicama</h3>
+    <div class="shade-by-deonica" id="shade-by-deonica"></div>
+
+    <p class="muted" style="margin-top: 1.5rem;">Klikni „<span style="color:#d8a93a;font-weight:700">☀</span>" gore-levo na mapi da otvoriš shadeMap.app i interaktivno proveriš senku za bilo koji datum i sat (uzima u obzir i zgrade i teren).</p>
+
+    <h3 style="margin-top: 2.5rem;">Kontekst: pokrivenost zemljišta</h3>
+    <p class="muted">Šta okruženje trase — drveće, trava, zemljište, izgrađeno ili voda. Pomaže da razumemo zašto je neka deonica bez senke (npr. obradivo polje) ili dominantno u senci (npr. šuma).</p>
+
+    <div class="lc-legend" id="lc-legend"></div>
+
+    <h4 style="margin-top: 1rem;">Ukupno duž cele trase</h4>
+    <div class="lc-bar-row">
+      <div class="label">Cela trasa</div>
+      <div class="lc-bar" id="lc-totals-bar"></div>
+      <div class="km" id="lc-totals-km">—</div>
+    </div>
+
+    <h4 style="margin-top: 1.5rem;">Po deonicama</h4>
+    <div class="lc-by-deonica" id="lc-by-deonica"></div>
   </div>
 </section>
 
 <section id="deonice" class="deonice-section">
   <div class="container">
     <h2>Po deonicama</h2>
-    <p class="lead">Koridor je podeljen na 6 deonica. Sva mapiranja unutar svake deonice — broj klupa, osvetljenja, prekida — pomažu da vidiš stanje <em>tvog</em> dela trase. Sve trake koriste iste skale, pa direktno porediš deonice međusobno.</p>
+    <p class="lead">Koridor je podeljen na 6 deonica. Sva mapiranja unutar svake deonice — broj klupa, osvetljenja, prekida — pomažu da vidimo stanje <em>tog</em> dela trase. Sve trake koriste iste skale, pa direktno poredimo deonice međusobno.</p>
     <div class="deonice-grid" id="deonice-grid"></div>
     <p class="muted" style="margin-top: 1.5rem;">Granice deonica su prikazane na <a href="#mapa">mapi</a> kao sloj „Granice deonica".</p>
+  </div>
+</section>
+
+<section id="anketa" class="anketa-section">
+  <div class="container">
+    <h2>Šta građani misle</h2>
+    <p class="lead">Rezultati ankete sprovedene u aprilu 2026. — <strong id="anketa-total">—</strong> odgovora građana Niša o tome kako koriste kej i koliko žele da podrže ideju biciklističkog koridora.</p>
+    <div class="anketa-grid" id="anketa-grid"></div>
+    <p class="muted" style="margin-top: 1.5rem;">Lični podaci ispitanika nisu deo ovog prikaza. Prikazani su samo anonimni agregati i slobodni komentari sa uklonjenim eventualnim mejlovima i telefonima. Karusel sa komentarima je <a href="#glas">na vrhu strane</a>.</p>
   </div>
 </section>
 
@@ -154,14 +248,32 @@
         <h3>Podeli inicijativu</h3>
         <p>Što više nas se zalaže, veće su šanse da koridor postane realnost.</p>
       </div>
+      <a href="https://www.instagram.com/es.quina_urbana/" target="_blank" rel="noopener" class="cta-card cta-card-link cta-card-ig">
+        <div class="cta-card-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="26" height="26">
+            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+          </svg>
+        </div>
+        <h3>Prati na Instagramu</h3>
+        <p><strong>@es.quina_urbana</strong> — najave okupljanja, fotografije sa terena i novosti inicijative.</p>
+      </a>
     </div>
   </div>
 </section>
 
 <footer>
   <div class="container">
-    <p>Podaci: terensko mapiranje 2025. · Osnova: OpenStreetMap · Mapa: Leaflet.js</p>
+    <p>Podaci: terensko mapiranje 2026. · Osnova: OpenStreetMap · Mapa: Leaflet.js</p>
     <p class="muted">Nišavski biciklistički koridor — inicijativa zajednice, Niš</p>
+    <p class="muted footer-meta">
+      <a href="https://www.instagram.com/es.quina_urbana/" target="_blank" rel="noopener">Instagram</a>
+      <span class="footer-sep">·</span>
+      <a href="dnevnik.html">Tehnički dnevnik</a>
+      <span class="footer-sep">·</span>
+      Otvoreni kod pod <a href="LICENSE" target="_blank" rel="noopener">GPL 3.0</a> licencom
+      <span class="footer-sep">·</span>
+      <a href="https://github.com/biciklisticki-koridor-nis/biciklisticki-koridor-nis.github.io" target="_blank" rel="noopener">GitHub</a>
+    </p>
   </div>
 </footer>
 

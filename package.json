@@ -1,0 +1,14 @@
+{
+  "name": "biciklisticki-koridor-build-tools",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Build-time alati za pre-computing shadeMap senke (Puppeteer + leaflet-shadow-simulator). Ne servira ništa u runtime-u — sajt je čist statika.",
+  "scripts": {
+    "shade": "node shade_compute.js"
+  },
+  "dependencies": {
+    "leaflet": "^1.9.4",
+    "leaflet-shadow-simulator": "^0.67.0",
+    "puppeteer": "^25.0.0"
+  }
+}
