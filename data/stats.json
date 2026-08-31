@@ -1,5 +1,5 @@
 {
-  "total_placemarks": 507,
+  "total_placemarks": 625,
   "by_layer": {
     "Zelena infrastruktura": 92,
     "Indicaciones de Medoševac a Коњички клуб \"ЧЕГАР\", Niška Banja": 5,
@@ -7,15 +7,17 @@
     "Stepenice i rampe": 121,
     "Urbana oprema i infrastruktura": 221,
     "Stanja očuvanosti (stepenice, rampe, staze i mostove": 14,
-    "Javni socijalni sodrzini (urbani dzepovi)": 2
+    "Javni socijalni sodrzini (urbani dzepovi)": 2,
+    "Raspored na tabli za akcija": 40,
+    "Definirane staze": 78
   },
   "trasa_km": 14.67,
   "staze": {
-    "asfalt_m": 2535.8,
+    "asfalt_m": 2536.9,
     "popločana_m": 1111.3,
-    "zemljana_m": 15512.0,
+    "zemljana_m": 15513.9,
     "ostalo_m": 0.0,
-    "total_m": 19159.1,
+    "total_m": 19162.1,
     "asfalt_pct": 13.2,
     "zemljana_pct": 81.0,
     "popločana_pct": 5.8
@@ -61,24 +63,24 @@
   ],
   "by_deonica": {
     "Medoševac": {
-      "trasa_m": 2318.1,
+      "trasa_m": 2641.3,
       "counts": {
-        "zelena": 9,
-        "prekidi": 9,
-        "stepenice": 1,
-        "rampe": 3,
+        "zelena": 10,
+        "prekidi": 12,
+        "stepenice": 2,
+        "rampe": 4,
         "osvetljenje": 8,
         "kante": 2,
         "sport": 1,
-        "stanja": 2
+        "stanja": 4
       },
       "staze_m": {
         "asfalt": 195.7,
         "popločana": 0.0,
-        "zemljana": 1523.6,
+        "zemljana": 1719.4,
         "ostalo": 0.0
       },
-      "trasa_km": 2.32
+      "trasa_km": 2.64
     },
     "Centar": {
       "trasa_m": 1807.7,
@@ -104,9 +106,9 @@
     "Delta - Lidl": {
       "trasa_m": 2527.5,
       "counts": {
-        "zelena": 16,
+        "zelena": 18,
         "prekidi": 4,
-        "stepenice": 15,
+        "stepenice": 14,
         "rampe": 3,
         "osvetljenje": 60,
         "klupe": 5,
@@ -119,7 +121,7 @@
       "staze_m": {
         "asfalt": 1059.8,
         "popločana": 0.0,
-        "zemljana": 3623.7,
+        "zemljana": 3548.0,
         "ostalo": 0.0
       },
       "trasa_km": 2.53
@@ -129,13 +131,13 @@
       "counts": {
         "zelena": 12,
         "prekidi": 3,
-        "stepenice": 35,
+        "stepenice": 37,
         "osvetljenje": 16
       },
       "staze_m": {
         "asfalt": 243.5,
         "popločana": 0.0,
-        "zemljana": 2340.2,
+        "zemljana": 2416.0,
         "ostalo": 0.0
       },
       "trasa_km": 0.0
@@ -143,15 +145,16 @@
     "Brzi Brod": {
       "trasa_m": 3544.9,
       "counts": {
-        "zelena": 5,
+        "zelena": 6,
         "prekidi": 20,
         "urbana_ostalo": 2,
         "osvetljenje": 28,
         "kante": 1,
+        "letnjikovci": 2,
         "sport": 1
       },
       "staze_m": {
-        "asfalt": 770.6,
+        "asfalt": 724.9,
         "popločana": 0.0,
         "zemljana": 3591.7,
         "ostalo": 0.0
@@ -171,10 +174,80 @@
       "staze_m": {
         "asfalt": 0.0,
         "popločana": 0.0,
-        "zemljana": 3759.7,
+        "zemljana": 3776.3,
         "ostalo": 0.0
       },
       "trasa_km": 4.15
+    }
+  },
+  "staze_mreza": {
+    "snap_m": 2.0,
+    "near_m": 40.0,
+    "osa_tip": "bici",
+    "osa_km": 14.03,
+    "tipovi": {
+      "bici": {
+        "label": "Biciklistička staza",
+        "n_linija": 41,
+        "n_lanaca": 33,
+        "duzina_km": 21.6,
+        "osa_km": 14.03,
+        "pokrivenost_pct": 100.0,
+        "rupe": [],
+        "by_deonica_km": {
+          "Medoševac": 2.34,
+          "Centar": 2.09,
+          "Delta - Lidl": 3.93,
+          "Gabrovačka Reka": 3.23,
+          "Brzi Brod": 4.25,
+          "Niška Banja": 4.46
+        }
+      },
+      "pesacki_gornji": {
+        "label": "Pešačka staza — gornji bedem",
+        "n_linija": 28,
+        "n_lanaca": 22,
+        "duzina_km": 17.59,
+        "osa_km": null,
+        "pokrivenost_pct": 99.3,
+        "rupe": [],
+        "by_deonica_km": {
+          "Medoševac": 2.53,
+          "Centar": 1.97,
+          "Delta - Lidl": 2.85,
+          "Gabrovačka Reka": 1.52,
+          "Brzi Brod": 3.59,
+          "Niška Banja": 4.27
+        }
+      },
+      "pesacki_donji": {
+        "label": "Pešačka staza — donji bedem",
+        "n_linija": 9,
+        "n_lanaca": 6,
+        "duzina_km": 12.65,
+        "osa_km": null,
+        "pokrivenost_pct": 90.0,
+        "rupe": [
+          {
+            "km_od": 1.69,
+            "km_do": 2.13,
+            "duzina_m": 450
+          },
+          {
+            "km_od": 13.23,
+            "km_do": 14.03,
+            "duzina_m": 810
+          }
+        ],
+        "by_deonica_km": {
+          "Medoševac": 1.65,
+          "Centar": 1.64,
+          "Delta - Lidl": 2.55,
+          "Gabrovačka Reka": 0.0,
+          "Brzi Brod": 3.73,
+          "Niška Banja": 2.97
+        }
+      }
     }
   },
   "density": {
@@ -191,50 +264,38 @@
       "min_m": 187.2,
       "max_m": 210.0,
       "raspon_m": 22.8,
-      "ascent_m": 55,
-      "descent_m": 38,
-      "max_gradient_pct": 10.0
+      "max_gradient_pct": 3.7
     },
     "by_deonica": {
       "Medoševac": {
         "min_m": 187.2,
         "max_m": 191.9,
         "raspon_m": 4.7,
-        "ascent_m": 7,
-        "descent_m": 8,
         "max_gradient_pct": 2.7
       },
       "Centar": {
         "min_m": 191.1,
         "max_m": 195.6,
         "raspon_m": 4.5,
-        "ascent_m": 6,
-        "descent_m": 6,
         "max_gradient_pct": 2.3
       },
       "Delta - Lidl": {
         "min_m": 191.9,
         "max_m": 198.0,
         "raspon_m": 6.1,
-        "ascent_m": 8,
-        "descent_m": 5,
         "max_gradient_pct": 2.7
       },
       "Brzi Brod": {
         "min_m": 195.3,
         "max_m": 205.1,
         "raspon_m": 9.8,
-        "ascent_m": 20,
-        "descent_m": 12,
         "max_gradient_pct": 3.7
       },
       "Niška Banja": {
         "min_m": 201.4,
         "max_m": 210.0,
         "raspon_m": 8.6,
-        "ascent_m": 12,
-        "descent_m": 6,
-        "max_gradient_pct": 10.0
+        "max_gradient_pct": 2.3
       }
     }
   },

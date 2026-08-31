@@ -6,25 +6,26 @@ KML     := koridor_data.kml
 # Ekstraktuje href iz NetworkLink-a u $(SOURCE) (radi i sa CDATA wrapperom).
 KML_URL  = $(shell grep -oP '<href>\s*(<!\[CDATA\[)?\K[^]<]+' $(SOURCE))
 
-.PHONY: help convert serve fetch analyze clean all venv anketa node-deps shade
+.PHONY: help convert serve fetch analyze clean all venv anketa node-deps shade canopy
 
 help:
 	@echo "Dostupni targeti:"
-	@echo "  make venv      - kreira .venv/ i instalira Python zavisnosti (Pillow)"
+	@echo "  make venv      - kreira .venv/ i instalira Python zavisnosti (Pillow, numpy, rasterio)"
 	@echo "  make convert   - KML -> GeoJSON + stats.json + slike + visine + land cover (idempotentno)"
+	@echo "  make canopy    - senka od krošnji za sve tri staze (traži convert) -> data/shade_canopy.json"
 	@echo "  make anketa    - anonimizuje anketa.csv -> data/anketa.json (samo agregati)"
 	@echo "  make node-deps - instalira Node zavisnosti za shadeMap pre-compute (Puppeteer)"
 	@echo "  make shade     - pre-računa pokrivenost senkom (treba SHADEMAP_API_KEY env)"
 	@echo "  make serve     - pokrece lokalni HTTP server na portu $(PORT)"
 	@echo "  make fetch     - preuzima sveže podatke sa Google MyMaps (-> $(KML))"
 	@echo "  make analyze   - prikazuje pregled KML strukture (analyze.py)"
-	@echo "  make all       - fetch + convert + anketa"
+	@echo "  make all       - fetch + convert + anketa + canopy"
 	@echo "  make clean     - briše data/ (GeoJSON + slike) i preuzeti KML"
 
 venv:
 	python3 -m venv $(VENV)
 	$(VENV)/bin/pip install --upgrade pip
-	$(VENV)/bin/pip install Pillow
+	$(VENV)/bin/pip install Pillow numpy rasterio
 	@echo "Venv spreman: 'make convert' automatski koristi $(VENV)/bin/python"
 
 convert:
@@ -56,7 +57,10 @@ shade:
 	@test -d node_modules || { echo "Prvo: make node-deps"; exit 1; }
 	$(PYTHON) shade_real.py
 
-all: fetch convert anketa
+canopy:
+	$(PYTHON) shade_canopy.py
+
+all: fetch convert anketa canopy
 
 clean:
 	rm -rf data/

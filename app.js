@@ -111,10 +111,10 @@ async function loadStats() {
 function renderShade(s) {
   const sh = s.shade;
   if (!sh) return;
+  // detaljna analiza (stvarna senka po satu, sve tri staze) je na analiza.html;
+  // ovde ostaje samo traka kao gruba orijentacija
   renderShadeStrip("shade-strip-total", sh.strip, s.trasa_km);
   renderShadeAxis("shade-strip-axis", s.trasa_km);
-  renderShadeStats(sh.totals);
-  renderShadeByDeonica(s);
 }
 
 function renderShadeStrip(elId, strip, totalKm) {
@@ -137,59 +137,6 @@ function renderShadeAxis(elId, totalKm) {
   const ticks = [];
   for (let k = 0; k <= totalKm + 0.01; k += step) ticks.push(Math.min(k, totalKm));
   el.innerHTML = ticks.map(k => `<span>${k.toFixed(0)} km</span>`).join("");
-}
-
-function renderShadeStats(totals) {
-  const el = document.getElementById("shade-stats-total");
-  if (!el || !totals || !totals.shade) return;
-  const sh = totals.shade;
-  const gr = totals.green || { pct: 0 };
-  const openGreen = Math.max(0, Math.round((gr.pct - sh.pct) * 10) / 10);
-  const tiles = [
-    { val: sh.pct,           unit: "%",  label: "U senci drveća",                  sub: "jedino drveće daje stalnu senku" },
-    { val: openGreen,        unit: "%",  label: "Otvoreno zelenilo",               sub: "trava, polja, obradivo — zeleno, ali bez senke" },
-    { val: sh.longest_m,     unit: " m", label: "Najduži deo u senci",             sub: "neprekinut interval drveća" },
-    { val: sh.longest_gap_m, unit: " m", label: "Najduža rupa u senci",            sub: "kritična zona izloženosti suncu", warn: sh.longest_gap_m >= 1000 },
-  ];
-  el.innerHTML = tiles.map(t => `
-    <div class="shade-stat">
-      <div class="shade-stat-value ${t.warn ? "warn" : ""}">${t.val}<span class="unit">${t.unit}</span></div>
-      <div class="shade-stat-label">${t.label}</div>
-      <div class="shade-stat-sub">${t.sub}</div>
-    </div>
-  `).join("");
-}
-
-function renderShadeByDeonica(s) {
-  const el = document.getElementById("shade-by-deonica");
-  if (!el) return;
-  const sh = s.shade;
-  el.innerHTML = (s.deonice || []).map(name => {
-    const m = sh.by_deonica[name];
-    const trasaKm = (s.by_deonica[name] && s.by_deonica[name].trasa_km) || 0;
-    if (!m || trasaKm <= 0) return "";
-    const dnStrip = sh.strip.filter(iv => iv.deonica === name);
-    const dnLenM = dnStrip.reduce((acc, iv) => acc + iv.length_m, 0);
-    const segs = dnStrip.map(iv => {
-      const w = dnLenM > 0 ? (iv.length_m / dnLenM) * 100 : 0;
-      return `<div class="strip-seg ${iv.shade ? "shade" : "sun"}" style="width:${w}%" title="km ${iv.km_start.toFixed(2)}–${iv.km_end.toFixed(2)} (${iv.length_m} m) ${iv.shade ? "— senka" : "— sunce"}"></div>`;
-    }).join("");
-    const lowShade = m.shade.pct < 10;
-    const openGreen = Math.max(0, Math.round((m.green.pct - m.shade.pct) * 10) / 10);
-    return `
-      <div class="shade-deonica-card">
-        <h4>
-          <span>${name}</span>
-          <span class="pct ${lowShade ? "low" : ""}">${m.shade.pct}%</span>
-        </h4>
-        <div class="mini-strip">${segs}</div>
-        <div class="shade-deonica-row"><span class="label">🌳 Drveće (daje senku)</span><span class="value">${m.shade.pct}%</span></div>
-        <div class="shade-deonica-row"><span class="label">🌾 Otvoreno zelenilo</span><span class="value">${openGreen}%</span></div>
-        <div class="shade-deonica-row"><span class="label">Najduži deo u senci</span><span class="value">${m.shade.longest_m} m</span></div>
-        <div class="shade-deonica-row"><span class="label">Najduža rupa bez senke</span><span class="value">${m.shade.longest_gap_m} m</span></div>
-        <div class="shade-deonica-row"><span class="label">Prelaza senka ↔ sunce</span><span class="value">${m.shade.transitions}</span></div>
-      </div>`;
-  }).join("");
 }
 
 function lcStackedSegments(dist, order, labels, minPctForLabel) {
@@ -595,6 +542,12 @@ function bindPopups(layer) {
   return layer;
 }
 
+const MREZA_STYLE = {
+  bici:           { color: "#e76f1f", label: "Biciklistička staza" },
+  pesacki_gornji: { color: "#4f87a5", label: "Pešačka staza — gornji bedem" },
+  pesacki_donji:  { color: "#7d3c98", label: "Pešačka staza — donji bedem" },
+};
+
 const SURFACE_STYLE = {
   asfalt:    { color: "#3b4a40", weight: 5, opacity: 0.95 },
   popločana: { color: "#9aa5a2", weight: 5, opacity: 0.95 },
@@ -649,6 +602,7 @@ async function loadMap() {
     loadGeoJSON("zelena"), loadGeoJSON("stanja"), loadGeoJSON("socijalni"),
     loadGeoJSON("deonice"),
   ]);
+  const mreza = await loadGeoJSON("staze_mreza");
 
   // styled layers
   const trasaLayer = L.geoJSON(trasa, {
@@ -660,6 +614,27 @@ async function loadMap() {
     style: f => SURFACE_STYLE[f.properties.podloga] || SURFACE_STYLE.ostalo,
     onEachFeature: (f, l) => l.bindPopup(popup(f)),
   });
+
+  // tri paralelne staze iz sloja „Definirane staze" — koridor nije jedna linija
+  const mrezaLayer = tip => L.geoJSON(mreza, {
+    filter: f => f.properties.tip === tip,
+    style: f => ({
+      color: MREZA_STYLE[tip].color,
+      weight: f.properties.uloga === "osa" ? 5 : 3,
+      opacity: 0.95,
+      dashArray: f.properties.uloga === "osa" ? null : "6,5",
+    }),
+    onEachFeature: (f, l) => {
+      const p = f.properties;
+      const km = p.km_od !== null ? `km ${p.km_od}–${p.km_do}` : "van glavne ose";
+      l.bindPopup(`<strong>${p.label}</strong><br>` +
+        `<span class="muted">${p.uloga === "osa" ? "glavna osa" : "prilaz / krak"} · ` +
+        `${Math.round(p.duzina_m)} m · ${km}</span>`);
+    },
+  });
+  const biciLayer   = mrezaLayer("bici");
+  const gornjiLayer = mrezaLayer("pesacki_gornji");
+  const donjiLayer  = mrezaLayer("pesacki_donji");
 
   const prekidiLayer = bindPopups(L.geoJSON(prekidi, {
     pointToLayer: (f, ll) => L.marker(ll, { icon: triangleIcon("#c0392b") }),
@@ -726,8 +701,11 @@ async function loadMap() {
     },
   });
 
-  // add defaults
-  trasaLayer.addTo(map);
+  // add defaults — tri staze zamenjuju staru Google rutu kao podrazumevani
+  // prikaz; „Glavna trasa" ostaje dostupna jer se KPI i profil još računaju sa nje
+  biciLayer.addTo(map);
+  gornjiLayer.addTo(map);
+  donjiLayer.addTo(map);
   stazeLayer.addTo(map);
   prekidiLayer.addTo(map);
   stepeniceLayer.addTo(map);
@@ -741,7 +719,10 @@ async function loadMap() {
   // layer control
   const overlays = {
     "Granice deonica": deoniceLayer,
-    "Glavna trasa": trasaLayer,
+    "Biciklistička staza": biciLayer,
+    "Pešačka — gornji bedem": gornjiLayer,
+    "Pešačka — donji bedem": donjiLayer,
+    "Glavna trasa (stara ruta)": trasaLayer,
     "Staze (po tipu podloge)": stazeLayer,
     "Prekidi u kretanju": prekidiLayer,
     "Stepenice": stepeniceLayer,
