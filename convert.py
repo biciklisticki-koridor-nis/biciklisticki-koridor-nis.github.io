@@ -112,6 +112,11 @@ def norm(name):
     return re.sub(r"\s+", " ", n)
 
 
+def strip_tags(text):
+    """Goli tekst iz KML <description> (MyMaps ume da ubaci HTML i slike)."""
+    return re.sub(r"<[^>]+>", " ", text or "")
+
+
 def canonical_urban(n):
     """Map a normalized urban-equipment name to a canonical category id."""
     if re.search(r"osvetl", n):  # osvetljenje / osvetlenje / osvetluvanje
@@ -400,6 +405,218 @@ def compute_or_load_elevation(trasa_coords, deonice):
     return data
 
 
+# ---------- mreža staza („Definirane staze") ----------
+
+MREZA_FOLDER_PREFIX = "definirane staze"
+MREZA_SNAP_M = 2.0        # tolerancija spajanja fragmenata po krajnjim tačkama
+MREZA_NEAR_M = 40.0       # „staza postoji ovde" u odnosu na referentnu osu
+MREZA_GAP_MIN_M = 150.0   # kraće rupe su šum crtanja, ne stvarni prekid
+MREZA_STEP_M = 10.0       # korak uzorkovanja za pokrivenost i km-projekciju
+
+MREZA_LABELS = {
+    "bici":           "Biciklistička staza",
+    "pesacki_gornji": "Pešačka staza — gornji bedem",
+    "pesacki_donji":  "Pešačka staza — donji bedem",
+}
+
+
+def canonical_mreza(n):
+    """Tip staze iz <description>, ne iz imena.
+
+    U MyMaps-u je klasifikacija upisana u opis placemark-a; imena su
+    auto-generisana („Línea 52") i ponavljaju se, pa su neupotrebljiva.
+    Typo handling: „peshaci" umesto „pešaci".
+    """
+    if "bici" in n or "bicikl" in n:
+        return "bici"
+    if "gornj" in n:
+        return "pesacki_gornji"
+    if "donj" in n:
+        return "pesacki_donji"
+    return None
+
+
+def _splice_pass(segments, snap_m):
+    """Jedan greedy prolaz spajanja: uzmi liniju, pa je širi na oba kraja."""
+    remaining = list(segments)
+    chains = []
+    while remaining:
+        chain = remaining.pop(0)
+        extended = True
+        while extended:
+            extended = False
+            for i, seg in enumerate(remaining):
+                for cand in (seg, seg[::-1]):
+                    if haversine_m(chain[-1], cand[0]) <= snap_m:
+                        chain = chain + cand[1:]
+                    elif haversine_m(chain[0], cand[-1]) <= snap_m:
+                        chain = cand[:-1] + chain
+                    else:
+                        continue
+                    remaining.pop(i)
+                    extended = True
+                    break
+                if extended:
+                    break
+        chains.append(chain)
+    return chains
+
+
+def splice_chains(segments, snap_m=MREZA_SNAP_M):
+    """Spoji fragmente u orijentisane lance po poklapanju krajnjih tačaka.
+
+    Linije su u MyMaps-u crtane u komadima i bez redosleda; bez spajanja
+    nijedna mreža osim biciklističke ose nema upotrebljivu km-osu.
+    Prolaz se ponavlja jer greedy pass ne vidi lance zatvorene pre njega —
+    dva takva lanca mogu da se dodiruju krajevima.
+    Rezultat je sortiran po dužini opadajuće (prvi lanac = osa mreže).
+    """
+    chains = [list(s) for s in segments if len(s) >= 2]
+    while True:
+        merged = _splice_pass(chains, snap_m)
+        if len(merged) == len(chains):
+            break
+        chains = merged
+    chains.sort(key=line_length_m, reverse=True)
+    return chains
+
+
+def _planar(coords, lat0):
+    """(lon, lat) -> (x, y) u metrima, lokalna ravan; dovoljno za <1 km raspone."""
+    mx = 111320.0 * math.cos(math.radians(lat0))
+    return [(lon * mx, lat * 111320.0) for lon, lat in coords]
+
+
+def _grid_index(pts, cell_m):
+    g = {}
+    for x, y in pts:
+        g.setdefault((int(x // cell_m), int(y // cell_m)), []).append((x, y))
+    return g
+
+
+def _grid_nearest(g, cell_m, x, y):
+    """Najbliža tačka iz indeksa, ili None ako je dalja od cell_m."""
+    cx, cy = int(x // cell_m), int(y // cell_m)
+    best, best_pt = float("inf"), None
+    for dx in (-1, 0, 1):
+        for dy in (-1, 0, 1):
+            for px, py in g.get((cx + dx, cy + dy), ()):
+                d = math.hypot(px - x, py - y)
+                if d < best:
+                    best, best_pt = d, (px, py)
+    return (best, best_pt) if best <= cell_m else (None, None)
+
+
+def build_staze_mreza(pms, deonice):
+    """Grupiši, spoji i izmeri tri mreže staza. Vraća (features, stats).
+
+    Referentna osa celog koridora = najduži lanac tipa „bici". Ostale dve
+    mreže se mere prema njoj (pokrivenost, rupe, km-raspon), da bi sve
+    analize ostale na istoj kilometraži.
+    """
+    by_tip = {}
+    n_lines = {}
+    skipped = []
+    for p in pms:
+        if not p["geom"] or p["geom"]["type"] != "LineString":
+            continue
+        tip = canonical_mreza(p["desc_norm"])
+        if tip is None:
+            skipped.append(p["name"])
+            continue
+        by_tip.setdefault(tip, []).append(p["coords"])
+        n_lines[tip] = n_lines.get(tip, 0) + 1
+    if skipped:
+        print(f"  ! {len(skipped)} linija bez prepoznatog opisa: {skipped[:5]}")
+
+    chains = {tip: splice_chains(segs) for tip, segs in by_tip.items()}
+    if "bici" not in chains or not chains["bici"]:
+        print("  ! nema linija tipa „bici“ — mreža staza preskočena")
+        return [], {}
+
+    axis = chains["bici"][0]
+    lat0 = axis[len(axis) // 2][1]
+    axis_samples = sample_line(axis, MREZA_STEP_M)
+    axis_xy = _planar([(lo, la) for lo, la, _ in axis_samples], lat0)
+    axis_km = [m / 1000.0 for _, _, m in axis_samples]
+    axis_grid = {xy: km for xy, km in zip(axis_xy, axis_km)}
+    grid = _grid_index(axis_xy, MREZA_NEAR_M)
+
+    def km_range(coords):
+        """Raspon kilometraže ose koji linija pokriva (None ako je van dometa)."""
+        kms = []
+        for lon, lat, _ in sample_line(coords, MREZA_STEP_M):
+            (x, y), = _planar([(lon, lat)], lat0)
+            d, pt = _grid_nearest(grid, MREZA_NEAR_M, x, y)
+            if pt is not None:
+                kms.append(axis_grid[pt])
+        return (round(min(kms), 2), round(max(kms), 2)) if kms else (None, None)
+
+    features = []
+    tip_stats = {}
+    for tip in ("bici", "pesacki_gornji", "pesacki_donji"):
+        if tip not in chains:
+            continue
+        # pokrivenost ose: koliko km ose ima ovu stazu u blizini
+        pts = []
+        for ch in chains[tip]:
+            pts.extend(_planar([(lo, la) for lo, la, _ in sample_line(ch, MREZA_STEP_M)], lat0))
+        tip_grid = _grid_index(pts, MREZA_NEAR_M)
+        covered = [_grid_nearest(tip_grid, MREZA_NEAR_M, x, y)[0] is not None
+                   for x, y in axis_xy]
+        rupe = []
+        i = 0
+        while i < len(covered):
+            if not covered[i]:
+                j = i
+                while j < len(covered) and not covered[j]:
+                    j += 1
+                if (j - i) * MREZA_STEP_M >= MREZA_GAP_MIN_M:
+                    rupe.append({"km_od": round(axis_km[i], 2),
+                                 "km_do": round(axis_km[j - 1], 2),
+                                 "duzina_m": round((j - i) * MREZA_STEP_M)})
+                i = j
+            else:
+                i += 1
+
+        total_m = 0.0
+        osa_m = 0.0
+        by_deon = {name: 0.0 for name, _ in deonice}
+        for idx, ch in enumerate(chains[tip]):
+            length = line_length_m(ch)
+            total_m += length
+            uloga = "osa" if (tip == "bici" and idx == 0) else "krak"
+            if uloga == "osa":
+                osa_m = length
+            km_od, km_do = km_range(ch)
+            for dn, ln in line_length_by_deonica(ch, deonice).items():
+                by_deon[dn] += ln
+            features.append(feature(
+                {"type": "LineString", "coordinates": [list(c) for c in ch]},
+                {"tip": tip, "label": MREZA_LABELS[tip], "uloga": uloga,
+                 "duzina_m": round(length, 1), "km_od": km_od, "km_do": km_do,
+                 "deonica": classify_deonica("LineString", ch, deonice)}))
+
+        tip_stats[tip] = {
+            "label": MREZA_LABELS[tip],
+            "n_linija": n_lines.get(tip, 0),
+            "n_lanaca": len(chains[tip]),
+            "duzina_km": round(total_m / 1000.0, 2),
+            "osa_km": round(osa_m / 1000.0, 2) if osa_m else None,
+            "pokrivenost_pct": round(100.0 * sum(covered) / len(covered), 1),
+            "rupe": rupe,
+            "by_deonica_km": {k: round(v / 1000.0, 2) for k, v in by_deon.items()},
+        }
+
+    return features, {
+        "snap_m": MREZA_SNAP_M,
+        "near_m": MREZA_NEAR_M,
+        "osa_tip": "bici",
+        "osa_km": round(line_length_m(axis) / 1000.0, 2),
+        "tipovi": tip_stats,
+    }
+
+
 # ---------- image extraction ----------
 
 def extract_image_urls(description):
@@ -463,7 +680,8 @@ def folder_placemarks(folder):
         else:
             coords = []
             geom = None
-        out.append({"name": nm, "norm": norm(nm), "geom": geom, "images": images, "coords": coords})
+        out.append({"name": nm, "norm": norm(nm), "desc_norm": norm(strip_tags(desc)),
+                    "geom": geom, "images": images, "coords": coords})
     return out
 
 
@@ -504,9 +722,12 @@ def main():
     # Izdvoji meta_deonice folder pre svega ostalog
     deonice = []  # list of (name, ring_coords) zapadno -> istočno
     other_folders = []
+    mreza_folder = None
     for folder in folders:
         fname = (folder.find(f"{KML_NS}name").text or "").strip()
-        if fname.lower().startswith("meta_deonice"):
+        if fname.lower().startswith(MREZA_FOLDER_PREFIX):
+            mreza_folder = (fname, folder)
+        elif fname.lower().startswith("meta_deonice"):
             for pm in folder.findall(f"{KML_NS}Placemark"):
                 pm_nm_el = pm.find(f"{KML_NS}name")
                 pm_nm = (pm_nm_el.text or "").strip() if pm_nm_el is not None else ""
@@ -649,6 +870,22 @@ def main():
             "properties": {"name": name},
         })
     write_geojson("deonice", deonice_features)
+
+    # mreža staza: bici osa + krakovi + dve pešačke staze na bedemima
+    if mreza_folder is not None:
+        fname, folder = mreza_folder
+        pms = folder_placemarks(folder)
+        stats["total_placemarks"] += len(pms)
+        stats["by_layer"][fname] = len(pms)
+        mreza_features, mreza_stats = build_staze_mreza(pms, deonice)
+        if mreza_features:
+            write_geojson("staze_mreza", mreza_features)
+            stats["staze_mreza"] = mreza_stats
+            for tip, st in mreza_stats["tipovi"].items():
+                rupe = f", rupe {len(st['rupe'])}" if st["rupe"] else ""
+                print(f"     {st['label']}: {st['n_linija']} linija -> "
+                      f"{st['n_lanaca']} lanaca, {st['duzina_km']} km, "
+                      f"pokriva {st['pokrivenost_pct']}% ose{rupe}")
 
     # write all layers
     print("Layers written:")
