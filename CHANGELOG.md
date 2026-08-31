@@ -5,6 +5,114 @@ Format prati [Keep a Changelog](https://keepachangelog.com/sr/1.1.0/).
 
 ## [Neobjavljeno]
 
+### Dodato
+- **Parser sloja „Definirane staze" → `data/staze_mreza.geojson`** — koridor
+  više nije jedna linija nego tri paralelne mreže: biciklistička staza,
+  pešačka na gornjem i pešačka na donjem bedemu.
+  - Klasifikacija se čita iz `<description>` placemark-a, ne iz imena —
+    MyMaps imena su auto-generisana („Línea 52") i ponavljaju se.
+    Typo handling „peshaci" → `pesacki_*`, kao i za vegetaciju.
+  - `splice_chains()` spaja fragmente u orijentisane lance po poklapanju
+    krajnjih tačaka (2 m): 78 linija → 61 lanac. Bez toga nijedna mreža
+    osim biciklističke nema upotrebljivu km-osu. Y-raskrsnice ostaju
+    razdvojene — polilinija se ne grana.
+  - **Referentna osa koridora** = najduži lanac tipa `bici`
+    (`uloga: "osa"`, 14.03 km); ostalih 32 `bici` lanaca su `krak`
+    (prilazi naseljima, rampe, izlaz na petlju).
+  - Svaki lanac nosi `km_od`/`km_do` — raspon kilometraže ose koji pokriva,
+    da bi sve tri mreže ostale na istoj kilometraži. `null` za tri kraka
+    uz Gabrovačku Reku, koji su dalje od 40 m od ose.
+  - `stats.staze_mreza`: dužina, broj lanaca, pokrivenost ose i rupe po
+    mreži. Gornji bedem pokriva 99.3 % ose, donji **90.0 %** — nedostaje
+    na km 1.69–2.13 (450 m) i km 13.23–14.03 (810 m).
+  - Ostatak pipeline-a je netaknut: `trasa_km` je i dalje 14.67 km sa stare
+    „Indicaciones" linije. Prelazak sajta na novu osu je zaseban korak.
+- **Stranica „Analiza podataka" (`analiza.html`) sa sekcijom „Pokrivenost
+  senkom"** — senka od krošnji izračunata sat po sat za 4 referentna dana
+  (solsticiji + ravnodnevnice), na 10 m koraku duž trase (1.469 tačaka):
+  - Toplotna mapa km × sat (canvas, tabovi po dobu godine, hover tooltip
+    sa visinom krošnje, granice deonica).
+  - Mapa sa trasom obojenom po stanju sunce/senka u izabranom satu
+    (custom Leaflet canvas layer + klizač); režim „Ceo dan" boji trasu
+    gradijentom po ukupnim sunčanim satima.
+  - Stat kartice + tabela po deonicama (pokrivenost drvoredom, prosečna
+    visina krošnje, % senke po datumu).
+- **`shade_canopy.py` + `make canopy`** — reaktivacija uspavanog shade
+  eksperimenta iz juna: uslov iz post-mortema („slobodan canopy source")
+  ispunjen je pojavom [Meta/WRI Canopy Height Map](https://registry.opendata.aws/dataforgood-fb-forests/)
+  (1 m, CC BY 4.0, COG na AWS Open Data — čita se samo prozor oko trase).
+  Umesto shadeMap SDK-a: NOAA položaj sunca + numpy ray-marching od
+  bicikliste (1.5 m) ka suncu preko rastera krošnji. Bez API ključa i
+  Puppeteer-a. Sanity check: dec 15.8 % > mar 13.0 % > jun 9.0 % senke
+  (nisko sunce = duže senke); pokrivenost drvećem 26.8 % konzistentna sa
+  WorldCover proksijem (23.4 %). Izlaz `data/shade_canopy.json` (75 KB);
+  CHM keš u `data/.cache/canopy/`. Venv sada uključuje numpy + rasterio.
+- Linkovi na novu stranicu sa početne (sekcija zelenila + footer);
+  dnevnik post sa metodom i ograničenjima (snimci 2018–2020, bez zgrada,
+  teren zanemaren).
+
+- **WhatsApp grupa zajednice** — dugme „Uključi se" u hero-u sada vodi direktno
+  na grupu (ranije skrolovalo na sekciju), plus kartica u sekciji „Uključi se"
+  i link u futeru.
+- **Tri staze na glavnoj mapi** — `staze_mreza.geojson` se crta kao tri sloja
+  (biciklistička narandžasto, gornji bedem plavo, donji bedem ljubičasto;
+  puna linija = glavna osa, isprekidana = prilazi), sa legendom iznad mape.
+  Stara „Glavna trasa" ostaje kao sloj, ali podrazumevano isključena — KPI
+  dužine i visinski profil se i dalje računaju sa nje.
+  - Globalni prekidač staza na početnoj **namerno nije dodat**: dužina, profil
+    i gustine opreme se i dalje računaju sa stare linije, pa bi prekidač
+    obećavao da se svi brojevi menjaju po stazi, a menjali bi se samo neki.
+- **Kontinuitet drvoreda po stazi** — `shade_canopy.py` računa najduži
+  neprekidan deo uz drvored, najdužu rupu i broj prelaza, iz CHM podataka
+  (1 m) umesto dosadašnjeg WorldCover proksija (10 m). Prikazano kao dve nove
+  stat kartice i kolona u tabeli na `analiza.html`. Rupe u samoj stazi
+  prekidaju niz, da se odsustvo staze ne bi računalo kao odsustvo drvoreda.
+  Najduži deo biciklističke staze bez ijednog drveta uz nju: **3.13 km**
+  (gornji bedem 1.01 km, donji 1.46 km).
+
+### Izmenjeno
+- **Sekcija senke na početnoj svedena na traku + link** — dosad su tu stajale
+  stat kartice i kartice po deonicama izvedene iz ESA WorldCover klasifikacije
+  zemljišta (10 m), pod imenom „senka". To je odgovaralo na drugo pitanje
+  („ima li ovde drveća kao klase zemljišta") nego `analiza.html`
+  („da li je staza stvarno u senci u 14h"), a brojevi se nisu slagali.
+  Sada na početnoj ostaje traka kao gruba orijentacija, preimenovana u
+  „Drvored duž cele trase", a stvarna senka i kontinuitet su na `analiza.html`.
+  Uklonjeni `renderShadeStats()` i `renderShadeByDeonica()` iz `app.js`.
+- **Senka se računa za sve tri staze** — `shade_canopy.py` više ne čita jednu
+  liniju nego `data/staze_mreza.geojson`, i računa zaseban profil senke za
+  biciklističku stazu i obe pešačke. Kilometraža je zajednička: svaka tačka
+  dobija km projekcijom na biciklističku osu (tačke dalje od 40 m —
+  prilazi naseljima — se izostavljaju), pa su tri profila direktno uporediva.
+  `CANOPY_SCHEMA` 2 → 3, izlaz 75 KB → 214 KB.
+  - **Nalaz: donji bedem ima duplo više hlada.** U junu 23.8 % vremena u
+    senci, prema 11.6 % na biciklističkoj i 8.6 % na gornjem bedemu;
+    pokrivenost drvoredom 50.3 % prema 27.3 % i 27.6 %. Tri staze su na
+    svega ~9 m jedna od druge, ali su tri različite mikroklime. Razlika je
+    najveća u Brzom Brodu (donji bedem 77.7 % uz drvored) i najmanja u
+    Medoševcu (0.6 %).
+  - Prelazak sa stare „biciklisticka trasa" linije na novu bici osu sam
+    diže senku u junu sa 8.0 % na 11.6 % — nova osa prolazi bliže drvoredu.
+    Provereno puštanjem stare linije kroz novi kod: reprodukuje 8.0 %,
+    dakle razlika je geometrijska, ne posledica izmene računa.
+  - `analiza.html` dobija prekidač staza; heat-mapa i tabela prate izbor.
+    x-osa heat-mape je uvek puna dužina referentne ose, pa se prekidi u
+    pešačkim stazama vide kao praznine umesto da se sakriju rastezanjem.
+  - CHM keš sada nosi hash uzoraka i sam se poništava kad se skup staza
+    promeni — prozor mora da pokrije sve tri.
+- **Senka se računa po ručno crtanoj trasi** — `shade_canopy.py` sada čita
+  liniju „biciklisticka trasa" iz `meta_deonice` sloja KML-a (fallback:
+  `data/trasa.geojson`), a deonice dodeljuje point-in-polygon testom na
+  `deonice.geojson` poligonima. Nova linija (14.40 km, medijan 2.0 m od
+  terenski mapiranih staza vs 3.5 m kod Google-rutirane) prati stazu na
+  keju umesto okolnih ulica; ispravlja obilaske na km 2.9, 4.7–5.1 i 11.2.
+  Efekat na brojke: ukupna senka 21. jun 9.0 % → **7.8 %**; najveća
+  promena u Centru (16.1 % → 0.9 % jun) — stara linija je senku
+  „pozajmljivala" od drvoreda na uličnoj strani, dok stvarna staza ide
+  otvorenim donjim šetalištem. `CANOPY_SCHEMA` 1 → 2. Ostatak sajta
+  (dužina, profil) za sada ostaje na staroj trasi — odluka o potpunom
+  prelasku je odložena.
+
 ## [2026-06-14]
 
 ### Uklonjeno
