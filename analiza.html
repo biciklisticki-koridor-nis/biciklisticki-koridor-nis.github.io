@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Analiza podataka — Nišavski biciklistički koridor</title>
+  <meta name="description" content="Dubinske analize podataka sa terena: pokrivenost senkom po satu i dobu godine duž keja Nišave." />
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<header class="hero page-hero">
+  <div class="container">
+    <p class="eyebrow"><a href="index.html">Nišavski biciklistički koridor</a> · Analiza podataka</p>
+    <h1>Analiza podataka</h1>
+    <p class="subtitle">Dubinske analize izvedene iz mapiranja i otvorenih satelitskih izvora — za pitanja na koja sama mapa ne odgovara.</p>
+  </div>
+</header>
+
+<section id="senka" class="zelenilo-section senka-analiza">
+  <div class="container">
+    <h2>Pokrivenost senkom</h2>
+    <p class="lead">Gde i kada ima hlada? Za svaku tačku (na svakih 10 m) izračunato je da li je u senci drveća, za svaki sat u danu i četiri referentna dana u godini. Visine krošnji su iz <a href="https://registry.opendata.aws/dataforgood-fb-forests/" target="_blank" rel="noopener">Meta/WRI globalne mape visine krošnji</a> (satelit, 1 m rezolucija), a senka je izračunata praćenjem zraka od šetača ili bicikliste ka suncu preko tih krošnji.</p>
+
+    <p class="lead">Koridor nije jedna staza nego tri paralelne, na svega desetak metara jedna od druge — i one nemaju isti hlad. Biraj koju gledaš; kilometraža je zajednička, merena po biciklističkoj osi, pa su brojevi uporedivi.</p>
+
+    <div class="chip-filters" id="staza-pills" role="tablist" aria-label="Staza"></div>
+
+    <div class="shade-stats" id="senka-stats"></div>
+
+    <h3 style="margin-top: 2rem;">Senka po satu, duž cele trase</h3>
+    <p class="muted">Svaka kolona je 10 m trase, svaki red jedan sat u danu. Pređi mišem (ili dodirni) za detalje.</p>
+
+    <div class="chip-filters" id="senka-tabs" role="tablist" aria-label="Referentni dan"></div>
+
+    <div class="heatmap-wrap" id="heatmap-wrap">
+      <canvas id="senka-heatmap" aria-label="Toplotna mapa senke po kilometru i satu"></canvas>
+      <div class="heatmap-tooltip" id="heatmap-tooltip" hidden>
+        <div class="tt-state"></div>
+        <div class="tt-meta"></div>
+      </div>
+    </div>
+    <div class="heatmap-legend" aria-hidden="false">
+      <span class="hl-item"><span class="hl-swatch" style="background:#f0d684"></span> sunce</span>
+      <span class="hl-item"><span class="hl-swatch" style="background:#2f6b46"></span> senka drveća</span>
+      <span class="hl-item"><span class="hl-swatch" style="background:#e7e4dc"></span> pre izlaska / posle zalaska</span>
+    </div>
+
+    <h3 style="margin-top: 2.5rem;">Senka na mapi, sat po sat</h3>
+    <p class="muted">Izaberi dan i pomeri klizač — trasa se boji prema stanju u tom satu. Režim „Ceo dan" boji trasu po ukupnom broju sunčanih sati.</p>
+
+    <div class="shade-map-controls">
+      <div class="chip-filters" id="map-date-pills" role="tablist" aria-label="Referentni dan za mapu"></div>
+      <div class="chip-filters" id="map-mode-pills" role="tablist" aria-label="Režim prikaza"></div>
+      <div class="hour-slider-row" id="hour-slider-row">
+        <span class="hour-label" id="hour-label">12:00</span>
+        <input type="range" id="hour-slider" min="6" max="19" step="1" value="12"
+               aria-label="Sat u danu" />
+      </div>
+      <div class="hour-gradient-legend" id="gradient-legend" hidden>
+        <span>0 h sunca</span>
+        <span class="gradient-bar" aria-hidden="true"></span>
+        <span id="gradient-max">14 h</span>
+      </div>
+    </div>
+    <div id="shade-map" aria-label="Mapa senke duž trase"></div>
+
+    <h3 style="margin-top: 2.5rem;">Po deonicama</h3>
+    <div class="table-scroll">
+      <table class="senka-table" id="senka-table">
+        <caption class="sr-only">Procenat vremena u senci po deonici i referentnom danu</caption>
+      </table>
+    </div>
+
+    <p class="muted" style="margin-top: 1.5rem;">
+      <strong>Metod i ograničenja:</strong> visine krošnji su procenjene iz satelitskih snimaka 2018–2020, pa se novije sadnje i seče ne vide. Senka zgrada nije uračunata (trasa je uglavnom daleko od objekata), a teren je zanemaren — kej je ravan, dno doline. Detalji u <a href="dnevnik.html">tehničkom dnevniku</a>. Za interaktivnu proveru senke sa zgradama, dugme „<span style="color:#d8a93a;font-weight:700">☀</span>" na <a href="index.html#mapa">glavnoj mapi</a> otvara shadeMap.app.
+    </p>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <p>Podaci: terensko mapiranje 2026. · Krošnje: Meta/WRI Canopy Height (CC BY 4.0) · Mapa: Leaflet.js</p>
+    <p class="muted">Nišavski biciklistički koridor — inicijativa zajednice, Niš</p>
+    <p class="muted footer-meta">
+      <a href="index.html">Početna</a>
+      <span class="footer-sep">·</span>
+      <a href="dnevnik.html">Tehnički dnevnik</a>
+      <span class="footer-sep">·</span>
+      Otvoreni kod pod <a href="LICENSE" target="_blank" rel="noopener">GPL 3.0</a> licencom
+      <span class="footer-sep">·</span>
+      <a href="https://github.com/biciklisticki-koridor-nis/biciklisticki-koridor-nis.github.io" target="_blank" rel="noopener">GitHub</a>
+    </p>
+  </div>
+</footer>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="analiza.js"></script>
+
+</body>
+</html>

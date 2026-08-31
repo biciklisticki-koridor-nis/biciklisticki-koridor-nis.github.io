@@ -85,6 +85,16 @@ p  { margin: 0 0 1em; color: var(--ink-700); }
 }
 .btn-ig:hover { transform: translateY(-1px); filter: brightness(1.08); }
 .btn-ig svg { flex-shrink: 0; }
+.btn-wa {
+  background: #25d366;
+  color: #0b3d22;
+  border-color: transparent;
+  display: inline-flex;
+  align-items: center;
+  gap: .55rem;
+}
+.btn-wa:hover { transform: translateY(-1px); filter: brightness(1.06); }
+.btn-wa svg { flex-shrink: 0; }
 
 /* ---------- pregled / KPI ---------- */
 .pregled { padding: 4rem 0; }
@@ -127,6 +137,36 @@ p  { margin: 0 0 1em; color: var(--ink-700); }
   font-size: .93rem;
   color: var(--ink-700);
 }
+.mreza-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem 1.4rem;
+  margin: .8rem 0 1.2rem;
+  font-size: .9rem;
+  color: var(--ink-700);
+}
+.mreza-legend .ml-item { display: inline-flex; align-items: center; gap: .5rem; }
+.mreza-legend .ml-line {
+  display: inline-block;
+  width: 26px;
+  height: 4px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+.lead-list { margin: .6rem 0 .9rem; padding-left: 1.2rem; }
+.lead-list li { margin-bottom: .35rem; }
+.btn-inline {
+  display: inline-block;
+  padding: .5rem .95rem;
+  border-radius: 999px;
+  background: var(--green-700, #2f6b46);
+  color: #fff;
+  font-weight: 600;
+  font-size: .9rem;
+  text-decoration: none;
+  transition: transform .15s ease, filter .15s ease;
+}
+.btn-inline:hover { transform: translateY(-1px); filter: brightness(1.08); }
 .shademap-btn {
   display: flex !important;
   align-items: center;
@@ -870,6 +910,11 @@ p  { margin: 0 0 1em; color: var(--ink-700); }
 }
 .cta-card-ig h3 { color: var(--green-900); }
 .cta-card-ig strong { color: #cc2366; font-weight: 700; }
+.cta-card-wa .cta-card-icon {
+  background: #25d366;
+  box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
+}
+.cta-card-wa h3 { color: var(--green-900); }
 
 /* ---------- dnevnik (poseban article layout) ---------- */
 .dnevnik-body { background: var(--sand-50); }
@@ -963,6 +1008,8 @@ footer p { color: rgba(255,255,255,.7); margin: 0 0 .3em; }
 footer .muted { color: rgba(255,255,255,.45); }
 footer a { color: rgba(255,255,255,.85); text-decoration: none; border-bottom: 1px solid rgba(255,255,255,.25); }
 footer a:hover { color: #fff; border-bottom-color: rgba(255,255,255,.6); }
+.footer-nav { margin-top: 1.1em; font-size: 1rem; font-weight: 600; }
+.footer-nav a { border-bottom-width: 2px; border-bottom-color: rgba(255,255,255,.45); }
 .footer-meta { margin-top: .9em; font-size: .82rem; }
 .footer-sep { color: rgba(255,255,255,.3); margin: 0 .45em; }
 
@@ -980,6 +1027,143 @@ footer a:hover { color: #fff; border-bottom-color: rgba(255,255,255,.6); }
   filter: drop-shadow(0 1px 2px rgba(0,0,0,.45));
 }
 
+/* ---------- analiza podataka (analiza.html) ---------- */
+.page-hero { padding: 3rem 0 3.2rem; }
+.page-hero .eyebrow a { color: rgba(255,255,255,.75); text-decoration: none; border-bottom: 1px solid rgba(255,255,255,.3); }
+.page-hero .eyebrow a:hover { color: #fff; border-bottom-color: rgba(255,255,255,.7); }
+.page-hero .subtitle { margin-bottom: 0; }
+
+.senka-analiza { border-bottom: none; }
+
+.heatmap-wrap {
+  position: relative;
+  margin: 1rem 0 .6rem;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: .8rem .6rem .5rem;
+  box-shadow: var(--shadow);
+}
+#senka-heatmap { display: block; width: 100%; }
+.heatmap-tooltip {
+  position: absolute;
+  pointer-events: none;
+  background: var(--ink-900);
+  color: #fff;
+  border-radius: 8px;
+  padding: .45rem .65rem;
+  font-size: .8rem;
+  line-height: 1.35;
+  white-space: nowrap;
+  z-index: 5;
+  box-shadow: 0 4px 14px rgba(0,0,0,.25);
+}
+.heatmap-tooltip .tt-state { font-weight: 700; }
+.heatmap-tooltip .tt-meta { color: rgba(255,255,255,.75); font-variant-numeric: tabular-nums; }
+.heatmap-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  font-size: .82rem;
+  color: var(--ink-700);
+  margin-bottom: .4rem;
+}
+.hl-item { display: inline-flex; align-items: center; gap: .4rem; }
+.hl-swatch {
+  width: 14px; height: 14px;
+  border-radius: 4px;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.12);
+}
+
+.shade-map-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .6rem 1.4rem;
+  margin: 1rem 0 .8rem;
+}
+.shade-map-controls .chip-filters { margin: 0; }
+.hour-slider-row[hidden], .hour-gradient-legend[hidden] { display: none; }
+.hour-slider-row {
+  display: inline-flex;
+  align-items: center;
+  gap: .7rem;
+  flex: 1 1 240px;
+  max-width: 380px;
+}
+.hour-label {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--green-900);
+  min-width: 3.2em;
+}
+#hour-slider {
+  flex: 1;
+  accent-color: var(--green-700);
+  cursor: pointer;
+}
+.hour-gradient-legend {
+  display: inline-flex;
+  align-items: center;
+  gap: .55rem;
+  font-size: .8rem;
+  color: var(--ink-500);
+  font-variant-numeric: tabular-nums;
+}
+.gradient-bar {
+  display: inline-block;
+  width: 120px; height: 12px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, #2f6b46, #d8a93a);
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.1);
+}
+#shade-map {
+  height: 420px;
+  width: 100%;
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+  z-index: 0;
+}
+
+.table-scroll { overflow-x: auto; }
+.senka-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;
+  font-size: .92rem;
+  box-shadow: var(--shadow);
+}
+.senka-table th, .senka-table td {
+  padding: .55rem .8rem;
+  text-align: left;
+  border-bottom: 1px solid var(--line);
+}
+.senka-table thead th {
+  background: var(--green-100);
+  color: var(--green-900);
+  font-size: .82rem;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+.senka-table td.num { font-variant-numeric: tabular-nums; text-align: right; }
+.senka-table th:nth-child(n+2), .senka-table thead th:nth-child(n+2) { text-align: right; }
+.senka-table tbody tr:last-child td { border-bottom: none; background: var(--sand-100); }
+.senka-table tfoot td { font-size: .78rem; border-bottom: none; padding-top: .5rem; }
+
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 @media (max-width: 640px) {
   .hero { padding: 3rem 0 3.5rem; }
   #map { height: 460px; }
@@ -994,4 +1178,6 @@ footer a:hover { color: #fff; border-bottom-color: rgba(255,255,255,.6); }
   .bar-row .label { grid-area: label; }
   .bar-row .value { grid-area: value; }
   .bar-row .track { grid-area: track; }
+  #shade-map { height: 340px; }
+  .hour-slider-row { flex-basis: 100%; max-width: none; }
 }
