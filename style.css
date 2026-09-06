@@ -1027,12 +1027,103 @@ footer a:hover { color: #fff; border-bottom-color: rgba(255,255,255,.6); }
   filter: drop-shadow(0 1px 2px rgba(0,0,0,.45));
 }
 
-/* ---------- analiza podataka (analiza.html) ---------- */
+/* ---------- zaglavlje stranica analiza (analize.html + pojedinačne) ---------- */
 .page-hero { padding: 3rem 0 3.2rem; }
 .page-hero .eyebrow a { color: rgba(255,255,255,.75); text-decoration: none; border-bottom: 1px solid rgba(255,255,255,.3); }
 .page-hero .eyebrow a:hover { color: #fff; border-bottom-color: rgba(255,255,255,.7); }
 .page-hero .subtitle { margin-bottom: 0; }
 
+/* ---------- spisak analiza (analize.html) ---------- */
+.analize-main { padding: 2.6rem 0 3.4rem; }
+.analize-main > .container > .lead { max-width: 760px; }
+
+.analiza-grupa { margin-top: 2.6rem; }
+.analiza-grupa h2 { margin-bottom: .3em; }
+.grupa-lead { max-width: 640px; margin-top: 0; }
+
+.analiza-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+  gap: 1rem;
+  margin-top: 1.4rem;
+}
+
+.analiza-card {
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1.2rem 1.25rem 1.3rem;
+  box-shadow: var(--shadow);
+}
+.analiza-card h3 { margin-bottom: .45em; }
+.analiza-card p { margin: 0 0 .8em; color: var(--ink-700); font-size: .95rem; }
+.analiza-card p:last-of-type { margin-bottom: 0; }
+
+.analiza-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .6rem;
+  margin-bottom: .7rem;
+}
+.analiza-num {
+  font-weight: 800;
+  font-size: 1.05rem;
+  color: var(--green-500);
+  font-variant-numeric: tabular-nums;
+}
+.analiza-status {
+  font-size: .74rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  padding: .2em .6em;
+  border-radius: 999px;
+}
+.status-live { background: var(--green-100); color: var(--green-700); }
+.status-plan { background: var(--sand-100); color: var(--ink-500); }
+
+.analiza-nalaz {
+  background: var(--green-100);
+  border-left: 3px solid var(--green-500);
+  border-radius: 0 8px 8px 0;
+  padding: .6rem .75rem;
+  font-size: .9rem !important;
+}
+.analiza-nalaz strong { color: var(--green-900); }
+
+.analiza-card-live {
+  text-decoration: none;
+  color: inherit;
+  border-color: var(--green-500);
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.analiza-card-live:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(31, 59, 45, 0.14);
+}
+.analiza-cta {
+  margin-top: auto;
+  padding-top: 1rem;
+  font-weight: 700;
+  color: var(--green-700);
+  font-size: .95rem;
+}
+
+.analiza-card-plan { background: var(--sand-100); box-shadow: none; }
+.analiza-card-plan h3 { color: var(--ink-700); }
+
+.analiza-grupa-najava { margin-top: 3rem; }
+.analiza-grupa-najava p { max-width: 720px; }
+
+@media (max-width: 640px) {
+  .analiza-list { grid-template-columns: 1fr; }
+  .analize-main { padding: 2rem 0 2.6rem; }
+}
+
+/* ---------- analiza 9.1 (9.1.shade_and_tree_canopy_coverage.html) ---------- */
 .senka-analiza { border-bottom: none; }
 
 .heatmap-wrap {

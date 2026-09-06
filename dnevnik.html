@@ -25,7 +25,7 @@
         <time datetime="2026-07-19">19. jul 2026.</time>
         <h2>Senka sat po sat: uspavani eksperiment vaskrsao sa pravim podacima o krošnjama</h2>
       </header>
-      <p class="post-summary">Post-mortem shadeMap eksperimenta (ispod, 14. jun) završio se rečenicom: <em>„aktivacija je trivijalna ako se pojavi slobodno dostupan canopy/DSM tile source"</em>. Taj uslov je ispunjen — <a href="https://registry.opendata.aws/dataforgood-fb-forests/" target="_blank" rel="noopener">Meta/WRI globalna mapa visine krošnji</a> (1 m rezolucija, CC BY 4.0) pokriva Niš. Umesto reaktivacije shadeMap SDK-a, senku sada računamo sami: NOAA formule za položaj sunca + numpy ray-marching. Rezultat je nova stranica <a href="analiza.html#senka">Analiza podataka → Pokrivenost senkom</a>.</p>
+      <p class="post-summary">Post-mortem shadeMap eksperimenta (ispod, 14. jun) završio se rečenicom: <em>„aktivacija je trivijalna ako se pojavi slobodno dostupan canopy/DSM tile source"</em>. Taj uslov je ispunjen — <a href="https://registry.opendata.aws/dataforgood-fb-forests/" target="_blank" rel="noopener">Meta/WRI globalna mapa visine krošnji</a> (1 m rezolucija, CC BY 4.0) pokriva Niš. Umesto reaktivacije shadeMap SDK-a, senku sada računamo sami: NOAA formule za položaj sunca + numpy ray-marching. Rezultat je nova stranica <a href="9.1.shade_and_tree_canopy_coverage.html#senka">Analiza 9.1 → Senka i pokrivenost krošnjama</a>.</p>
       <div class="post-body">
         <h3>Izvor podataka</h3>
         <p>Meta/WRI Canopy Height Map je globalni raster visina krošnji procenjen iz Maxar satelitskih snimaka (2018–2020) mašinskim učenjem, dostupan kao Cloud-Optimized GeoTIFF na AWS Open Data. Niš pada u jedan tile od 686 MB — ali COG format dozvoljava čitanje samo prozora oko trase preko HTTP range zahteva (~15.000 × 3.700 px na 1.19 m/px). Validacija: pokrivenost drvećem duž trase po ovom izvoru (26.8 %) konzistentna je sa postojećom ESA WorldCover analizom (23.4 %), uz bonus stvarnih visina 5–22 m.</p>
@@ -38,7 +38,7 @@
           <li>Bitna lekcija iz uzorkovanja: visinu krošnje kod tačke tražimo u prozoru ±10 m — drvored je <em>pored</em> staze, pa tačkasto očitavanje na osi trase daje lažne nule.</li>
         </ul>
         <h3>Prikaz</h3>
-        <p>Nova stranica <code>analiza.html</code>: toplotna mapa km × sat (canvas, 4 taba za doba godine, hover tooltip sa visinom krošnje), mapa sa trasom obojenom po stanju u izabranom satu (custom Leaflet canvas layer + klizač; režim „Ceo dan" boji po ukupnim sunčanim satima) i tabela po deonicama. Sve i dalje statičko — <code>make canopy</code> generiše <code>data/shade_canopy.json</code> (75 KB), sajt ga samo čita.</p>
+        <p>Nova stranica <code>9.1.shade_and_tree_canopy_coverage.html</code> (tada <code>analiza.html</code>): toplotna mapa km × sat (canvas, 4 taba za doba godine, hover tooltip sa visinom krošnje), mapa sa trasom obojenom po stanju u izabranom satu (custom Leaflet canvas layer + klizač; režim „Ceo dan" boji po ukupnim sunčanim satima) i tabela po deonicama. Sve i dalje statičko — <code>make canopy</code> generiše <code>data/shade_canopy.json</code> (75 KB), sajt ga samo čita.</p>
         <h3>Ograničenja</h3>
         <ul class="tech-list">
           <li>Snimci 2018–2020: novije sadnje i seče se ne vide.</li>

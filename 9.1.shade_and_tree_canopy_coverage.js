@@ -1,4 +1,4 @@
-/* Analiza podataka — Pokrivenost senkom.
+/* Analiza 9.1 — Senka i pokrivenost krošnjama.
  * Čita data/shade_canopy.json (shade_canopy.py): za svaku tačku svake od tri
  * staze (10 m) bitmask sunce/senka po satu, za 4 referentna dana. Renderuje
  * heat-mapu km × sat (canvas) i mapu sa stazom obojenom po stanju u satu.

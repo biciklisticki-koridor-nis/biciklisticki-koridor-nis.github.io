@@ -6,6 +6,10 @@ Format prati [Keep a Changelog](https://keepachangelog.com/sr/1.1.0/).
 ## [Neobjavljeno]
 
 ### Dodato
+- **Stranica „Analize podataka" (`analize.html`)** — rasputnica ka svim
+  analizama, grupisana po sekcijama okvira. Za sada je popunjena sekcija
+  9 („Kvalitet životne sredine"): 9.1 objavljena, 9.2 i 9.3 najavljene.
+  Link je u futeru početne strane i u futeru svake analize.
 - **Parser sloja „Definirane staze" → `data/staze_mreza.geojson`** — koridor
   više nije jedna linija nego tri paralelne mreže: biciklistička staza,
   pešačka na gornjem i pešačka na donjem bedemu.
@@ -27,9 +31,10 @@ Format prati [Keep a Changelog](https://keepachangelog.com/sr/1.1.0/).
     na km 1.69–2.13 (450 m) i km 13.23–14.03 (810 m).
   - Ostatak pipeline-a je netaknut: `trasa_km` je i dalje 14.67 km sa stare
     „Indicaciones" linije. Prelazak sajta na novu osu je zaseban korak.
-- **Stranica „Analiza podataka" (`analiza.html`) sa sekcijom „Pokrivenost
-  senkom"** — senka od krošnji izračunata sat po sat za 4 referentna dana
-  (solsticiji + ravnodnevnice), na 10 m koraku duž trase (1.469 tačaka):
+- **Stranica „9.1 Senka i pokrivenost krošnjama"
+  (`9.1.shade_and_tree_canopy_coverage.html`)** — senka od krošnji izračunata
+  sat po sat za 4 referentna dana (solsticiji + ravnodnevnice), na 10 m
+  koraku duž trase (1.469 tačaka):
   - Toplotna mapa km × sat (canvas, tabovi po dobu godine, hover tooltip
     sa visinom krošnje, granice deonica).
   - Mapa sa trasom obojenom po stanju sunce/senka u izabranom satu
@@ -65,19 +70,24 @@ Format prati [Keep a Changelog](https://keepachangelog.com/sr/1.1.0/).
 - **Kontinuitet drvoreda po stazi** — `shade_canopy.py` računa najduži
   neprekidan deo uz drvored, najdužu rupu i broj prelaza, iz CHM podataka
   (1 m) umesto dosadašnjeg WorldCover proksija (10 m). Prikazano kao dve nove
-  stat kartice i kolona u tabeli na `analiza.html`. Rupe u samoj stazi
+  stat kartice i kolona u tabeli na `9.1.shade_and_tree_canopy_coverage.html`. Rupe u samoj stazi
   prekidaju niz, da se odsustvo staze ne bi računalo kao odsustvo drvoreda.
   Najduži deo biciklističke staze bez ijednog drveta uz nju: **3.13 km**
   (gornji bedem 1.01 km, donji 1.46 km).
 
 ### Izmenjeno
+- **`analiza.html` → `9.1.shade_and_tree_canopy_coverage.html`** (i prateći
+  `analiza.js`). Stranica više nije „ta jedna analiza" nego prva u nizu, pa
+  ime nosi broj sekcije iz okvira. Naslov je sada „9.1 Senka i pokrivenost
+  krošnjama", a putanja do nje ide preko `analize.html`. Stara adresa vraća
+  404 — stranica je bila javna nekoliko dana, bez spoljnih linkova.
 - **Sekcija senke na početnoj svedena na traku + link** — dosad su tu stajale
   stat kartice i kartice po deonicama izvedene iz ESA WorldCover klasifikacije
   zemljišta (10 m), pod imenom „senka". To je odgovaralo na drugo pitanje
-  („ima li ovde drveća kao klase zemljišta") nego `analiza.html`
+  („ima li ovde drveća kao klase zemljišta") nego `9.1.shade_and_tree_canopy_coverage.html`
   („da li je staza stvarno u senci u 14h"), a brojevi se nisu slagali.
   Sada na početnoj ostaje traka kao gruba orijentacija, preimenovana u
-  „Drvored duž cele trase", a stvarna senka i kontinuitet su na `analiza.html`.
+  „Drvored duž cele trase", a stvarna senka i kontinuitet su na `9.1.shade_and_tree_canopy_coverage.html`.
   Uklonjeni `renderShadeStats()` i `renderShadeByDeonica()` iz `app.js`.
 - **Senka se računa za sve tri staze** — `shade_canopy.py` više ne čita jednu
   liniju nego `data/staze_mreza.geojson`, i računa zaseban profil senke za
@@ -95,7 +105,7 @@ Format prati [Keep a Changelog](https://keepachangelog.com/sr/1.1.0/).
     diže senku u junu sa 8.0 % na 11.6 % — nova osa prolazi bliže drvoredu.
     Provereno puštanjem stare linije kroz novi kod: reprodukuje 8.0 %,
     dakle razlika je geometrijska, ne posledica izmene računa.
-  - `analiza.html` dobija prekidač staza; heat-mapa i tabela prate izbor.
+  - `9.1.shade_and_tree_canopy_coverage.html` dobija prekidač staza; heat-mapa i tabela prate izbor.
     x-osa heat-mape je uvek puna dužina referentne ose, pa se prekidi u
     pešačkim stazama vide kao praznine umesto da se sakriju rastezanjem.
   - CHM keš sada nosi hash uzoraka i sam se poništava kad se skup staza

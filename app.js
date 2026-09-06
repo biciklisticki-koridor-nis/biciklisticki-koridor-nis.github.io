@@ -111,7 +111,7 @@ async function loadStats() {
 function renderShade(s) {
   const sh = s.shade;
   if (!sh) return;
-  // detaljna analiza (stvarna senka po satu, sve tri staze) je na analiza.html;
+  // detaljna analiza (stvarna senka po satu, sve tri staze) je na 9.1.shade_and_tree_canopy_coverage.html;
   // ovde ostaje samo traka kao gruba orijentacija
   renderShadeStrip("shade-strip-total", sh.strip, s.trasa_km);
   renderShadeAxis("shade-strip-axis", s.trasa_km);
