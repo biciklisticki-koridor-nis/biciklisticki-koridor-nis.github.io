@@ -6,6 +6,36 @@ Format prati [Keep a Changelog](https://keepachangelog.com/sr/1.1.0/).
 ## [Neobjavljeno]
 
 ### Dodato
+- **Analiza 9.2 „Buka i kvalitet vazduha"**
+  (`9.2.noise_and_air_quality_exposure.html` + `noise_air.py`, `make noise`)
+  — dva pitanja sa dva izvora, jer se razlikuju po tome šta mogu da kažu.
+  - **Buka je prostorna.** Modelirana iz OSM geometrije puteva (Overpass,
+    3.831 put / 22.103 segmenta, keširano po bbox-u): svaki segment je niz
+    nekoherentnih tačkastih izvora, energija opada sa 1/d², težina je
+    dužina × jačina po klasi puta, korigovana `maxspeed` i `lanes`.
+    Radijus 300 m, korak 10 m, sve tri staze na zajedničkoj km-osi.
+  - **Indeks 0–100, ne decibeli.** Duž keja nema nijednog merenja; skala je
+    relativna na sam koridor, sa fiksnim kotvama u log-prostoru da vrednosti
+    ne skaču kad se OSM promeni. Rangira deonice, ne tvrdi apsolutni nivo.
+  - **Nalaz: Centar je jedina bučna deonica** — prosek 61, *nula* procenata
+    tihog. Ostatak koridora je uglavnom van domašaja saobraćaja: 71.7 %
+    trase nema nijedan glavni put u krugu od 300 m. Donji bedem je najtiša
+    staza (35.6), 13 % tiši od gornjeg — isto rastojanje od ulica koje mu
+    daje duplo više hlada.
+  - **Vazduh nije prostoran** — CAMS preko Open-Meteo ima ćeliju ~11 km,
+    jednu za ceo koridor, pa se prikazuje kao vremenski kontekst.
+    PM2.5 prelazi dnevnu smernicu SZO 45 % dana (godišnji prosek 16.9
+    naspram 5 µg/m³), ali gotovo isključivo zimi: decembar 31.5, jul 9.8.
+    Kej se koristi tačno kada je vazduh najčistiji. Uz polen (breza mart,
+    trave jun, ambrozija avgust).
+  - Namerno izostavljeno: vegetacija kao akustična barijera (drveće
+    zaklanja pogled snažno, zvuk slabo — 1–3 dB na 10 m gustog pojasa) i
+    nasip pod donjim bedemom (SRTM 30 m stavlja 88 % parova gornja/donja
+    staza u istu ćeliju — nije merljivo). Oboje zapisano u dnevniku.
+- **`koridor.py`** — zajednička geometrija koridora (osa, resampling,
+  projekcija na km-osu, deonice) izvučena iz `shade_canopy.py` pre pisanja
+  `noise_air.py`, dok je postojao samo jedan korisnik. Provera: regenerisan
+  `data/shade_canopy.json` je **identičan bajt u bajt** prethodnom.
 - **Stranica „Analize podataka" (`analize.html`)** — rasputnica ka svim
   analizama, grupisana po sekcijama okvira. Za sada je popunjena sekcija
   9 („Kvalitet životne sredine"): 9.1 objavljena, 9.2 i 9.3 najavljene.

@@ -22,6 +22,36 @@
 
     <article class="post">
       <header class="post-head">
+        <time datetime="2026-09-06">6. septembar 2026.</time>
+        <h2>Buka bez merača zvuka: šta se pošteno može reći iz same geometrije puteva</h2>
+      </header>
+      <p class="post-summary">Analiza 9.2 je prva koja nema svoj satelit. Senka je stajala na stvarnim izmerenim visinama krošnji; za buku duž keja ne postoji nijedno merenje, a Niš nema javnu kartu buke. Pitanje nije bilo <em>kako izračunati</em>, nego <em>šta sme da se tvrdi</em>. Rezultat je <a href="9.2.noise_and_air_quality_exposure.html">Analiza 9.2 → Buka i kvalitet vazduha</a>, sa indeksom umesto decibela i sa dva izvora koja odgovaraju na različita pitanja.</p>
+      <div class="post-body">
+        <h3>Zašto indeks, a ne decibeli</h3>
+        <p>Model daje broj; broj u decibelima nosi tvrdnju o apsolutnom nivou koju ništa ne pokriva. Bez ijednog merenja duž trase kalibracija bi bila proizvoljna, a čitalac bi „62 dB" razumeo kao izmereno. Skala je zato <strong>0–100 u odnosu na sam koridor</strong>, sa fiksnim kotvama u log-prostoru (−32 do −1 dB relativne energije) da se vrednosti ne pomeraju kad se OSM promeni. Rangiranje deonica je pouzdano; apsolutni nivo se ne tvrdi.</p>
+        <h3>Model</h3>
+        <p>Putevi dolaze iz OpenStreetMap-a preko Overpass API-ja (3.831 puta, 22.103 segmenta u bbox-u koridora sa 400 m margine; odgovor ~1 s, keširan po bbox-u). Svaki segment je <strong>niz nekoherentnih tačkastih izvora</strong> — energija opada sa 1/d², a težina segmenta je proizvod dužine i jačine izvora. Integral tačkastih izvora duž linije reprodukuje ponašanje linijskog izvora (−10·log10 d), što je fizički ispravna konstrukcija; zbir po samim segmentima bez težine dužinom bi favorizovao puteve iscepkane na mnogo kratkih delova. Jačina izvora je rang po klasi puta (autoput 1.00 → servisna 0.03), pomnožen brzinom iz <code>maxspeed</code> (873 puta ga ima) i brojem traka iz <code>lanes</code> (1.076). Radijus pretrage 300 m, minimalno rastojanje 15 m da se izbegne singularitet gde staza dodiruje put.</p>
+        <h3>Šta je namerno izostavljeno</h3>
+        <ul class="tech-list">
+          <li><strong>Vegetacija.</strong> Prvobitna zamisao je bila da se drvored uračuna kao barijera, ray-marching-om preko istog CHM rastera koji koristi 9.1 — tehnički elegantno, jer bi isti kod pustio zrak ka putu umesto ka suncu. Odbačeno: gust pojas daje reda veličine 1–3 dB na 10 m, a tanak drvored praktično ništa. Drveće zaklanja <em>pogled</em> na saobraćaj snažno i zvuk slabo; uračunati ga značilo bi prodati vizuelni efekat kao akustični.</li>
+          <li><strong>Nasip.</strong> Donji bedem je fizički zaklonjen nasipom i trebalo bi da je tiši nego što model kaže. Provereno da li se to može izmeriti: horizontalno rastojanje između gornje i donje staze je median 17 m, a <strong>88 % parova pada u istu SRTM ćeliju od 30 m</strong> — dobiju identičnu visinu. Visine su uz to celobrojne, a ceo pad je 26 m preko 14 km. SRTM ne razlučuje nasip i terenska barijera otpada dok se ne pojavi finiji visinski model.</li>
+          <li><strong>Dnevni ritam.</strong> OSM nema brojanje saobraćaja, pa podela na špic i van špica nije moguća bez izmišljanja profila protoka. <code>maxspeed</code> pomaže oko jačine izvora, ali ne daje vremensku dimenziju.</li>
+        </ul>
+        <h3>Bug koji je izgledao kao podatak</h3>
+        <p>Kolona „najbliži glavni put" je u prvom prolazu pokazivala 0 m za Medoševac, deonicu koja je inače daleko od saobraćaja. Uzrok: prag za „glavni put" poredio je <em>otežanu</em> vrednost segmenta sa <em>osnovnom</em> težinom klase <code>secondary</code> (0.5). Tercijarni put sa visokom brzinom i četiri trake dolazi na 0.585 i prolazi kao magistrala. Zastavica se sada nosi eksplicitno iz klase puta. Uz to je i sam prikaz promenjen — minimum po deonici je opisivao jednu tačku ukrštanja dok 80 % deonice nema glavni put u 300 m, pa tabela sada prikazuje <em>udeo trase van domašaja saobraćaja</em>.</p>
+        <h3>Vazduh je drugo pitanje sa drugim ograničenjem</h3>
+        <p>Buka je prostorna, vazduh nije. Najbolji besplatan izvor je CAMS preko <a href="https://open-meteo.com/en/docs/air-quality-api" target="_blank" rel="noopener">Open-Meteo</a> (bez API ključa, reanaliza od 2013., satno) — ali evropski domen ima ćeliju od 0.1° ≈ 11 km, dakle jednu vrednost za ceo koridor. Prostorna varijacija duž keja besplatnim podacima nije razlučiva; za to bi trebalo disperziono modeliranje ili sopstveni senzori. Zato se vazduh prikazuje kao vremenski kontekst, a ne kao mapa po kilometru. Odbačena je i ponuda gotovog „free air quality API"-ja koji prima ime grada: jedna vrednost za ceo Niš, bez istorije, bez navedenog izvora podataka, i sa API ključem koji bi na statičnom sajtu završio vidljiv u klijentskom JS-u.</p>
+        <p>Nalaz je bio prijatno iznenađenje. PM2.5 prelazi dnevnu smernicu SZO <strong>45 % dana</strong>, a godišnji prosek je 16.9 µg/m³ naspram smernice od 5 — ali raspodela kroz godinu je oštra: decembar 31.5, januar 26.0, februar 28.0, prema 9.8–10.8 od maja do septembra. To je potpis sezone grejanja. Kej se koristi tačno onda kada je vazduh najčistiji, što je nalaz koji se ne bi video da je prikazan samo godišnji prosek.</p>
+        <h3>Refaktor koji je morao pre, a ne posle</h3>
+        <p>Učitavanje mreže staza, resampling na 10 m, projekcija na zajedničku km-osu i dodela deonica su izvučeni iz <code>shade_canopy.py</code> u <code>koridor.py</code>. Urađeno pre pisanja <code>noise_air.py</code>, dok je postojao samo jedan korisnik tog koda — 9.2 i 9.3 sede na istoj osi, pa bi kopija odmah počela da se razilazi. Provera da refaktor ništa nije pomerio: <code>data/shade_canopy.json</code> regenerisan i upoređen sa prethodnom verzijom, <strong>identičan bajt u bajt</strong>.</p>
+        <p>Keš izlaza nosi otisak koji pokriva i parametre modela, ne samo geometriju — inače izmena težina ili radijusa ne bi ponovo generisala <code>data/noise_air.json</code>. Isti princip kao kod CHM prozora u 9.1.</p>
+        <h3>Šta sledi</h3>
+        <p>Model rangira, ali nije proveren. Petnaestak merenja telefonom tokom nekog od zajedničkih obilazaka bilo bi dovoljno da se vidi da li je redosled deonica tačan — ne kalibriše apsolutne vrednosti, ali odgovara na pitanje da li se modelu uopšte veruje. Vizuelno zaklanjanje pogleda na saobraćaj (za koje CHM <em>jeste</em> dobar) ostaje kao zasebna metrika za kasnije, jasno odvojena od akustike.</p>
+      </div>
+    </article>
+
+    <article class="post">
+      <header class="post-head">
         <time datetime="2026-07-19">19. jul 2026.</time>
         <h2>Senka sat po sat: uspavani eksperiment vaskrsao sa pravim podacima o krošnjama</h2>
       </header>

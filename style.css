@@ -1272,3 +1272,187 @@ footer a:hover { color: #fff; border-bottom-color: rgba(255,255,255,.6); }
   #shade-map { height: 340px; }
   .hour-slider-row { flex-basis: 100%; max-width: none; }
 }
+
+/* ---------- analiza 9.2 (9.2.noise_and_air_quality_exposure.html) ---------- */
+
+/* ključni nalazi — ono što treba zapamtiti i ako se ostalo preskoči */
+.nalazi-section { background: var(--sand-100); padding: 2.4rem 0; border-bottom: 1px solid var(--line); }
+.nalazi {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.1rem;
+}
+.nalaz {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--green-500);
+  border-radius: var(--radius);
+  padding: 1.1rem 1.2rem;
+  box-shadow: var(--shadow);
+}
+.nalaz-warn { border-left-color: var(--warn); }
+.nalaz-broj {
+  margin: 0 0 .3em;
+  font-size: 2.1rem;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--green-700);
+  font-variant-numeric: tabular-nums;
+}
+.nalaz-warn .nalaz-broj { color: var(--warn); }
+.nalaz-tekst { margin: 0; font-size: .93rem; color: var(--ink-700); }
+
+/* izdvojene napomene */
+.callout {
+  border-radius: var(--radius);
+  padding: .95rem 1.15rem;
+  margin: 1.4rem 0;
+  border-left: 4px solid;
+}
+.callout p { margin: 0; font-size: .95rem; }
+.callout-info { background: var(--sand-100); border-left-color: var(--ink-300); color: var(--ink-700); }
+.callout-good { background: var(--green-100); border-left-color: var(--green-500); color: var(--green-900); }
+
+/* profil buke */
+.profil-wrap {
+  position: relative;
+  margin: 1rem 0 .6rem;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: .8rem .6rem .5rem;
+  box-shadow: var(--shadow);
+}
+#buka-profil { display: block; width: 100%; }
+#buka-map {
+  height: 420px;
+  width: 100%;
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+  z-index: 0;
+}
+.idx-pill {
+  display: inline-block;
+  min-width: 2.4em;
+  padding: .12em .45em;
+  border-radius: 999px;
+  color: #fff;
+  font-weight: 700;
+  font-size: .85rem;
+  text-align: center;
+}
+
+/* vazduh */
+.vazduh-section { padding: 3rem 0; border-bottom: 1px solid var(--line); }
+.vazduh-kartice {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
+  margin: 1.4rem 0 2rem;
+}
+.vazduh-kartica {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1.1rem 1.2rem 1.2rem;
+  box-shadow: var(--shadow);
+}
+.vazduh-kartica h4 { margin: 0 0 .5em; font-size: .95rem; color: var(--ink-700); }
+.vk-broj {
+  margin: 0 0 .15em;
+  font-size: 2rem;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--green-700);
+  font-variant-numeric: tabular-nums;
+}
+.vk-broj.warn { color: var(--warn); }
+.vk-jed { font-size: .85rem; font-weight: 600; color: var(--ink-500); }
+.vk-sub { margin: 0 0 .8em; font-size: .85rem; color: var(--ink-700); }
+.vk-bar { height: 6px; background: var(--sand-100); border-radius: 999px; overflow: hidden; }
+.vk-bar span { display: block; height: 100%; background: var(--warn); border-radius: 999px; }
+.vk-note { margin: .45em 0 0; font-size: .8rem; color: var(--ink-500); }
+
+/* mesečni graf — CSS stupci umesto canvasa: čitljivo i dostupno */
+.mesec-graf { margin: 1.2rem 0 .6rem; }
+.mg-plot {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: .3rem;
+  align-items: end;
+  height: 210px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: .9rem .8rem .4rem;
+  box-shadow: var(--shadow);
+}
+/* linija smernice SZO — mera prema kojoj se sve čita */
+.mg-plot::after {
+  content: "";
+  position: absolute;
+  left: .8rem; right: .8rem;
+  bottom: calc(1.9rem + (100% - 3.3rem) * var(--szo) / 100);
+  border-top: 2px dashed var(--warn);
+  pointer-events: none;
+}
+.mg-col { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; }
+.mg-val { font-size: .72rem; color: var(--ink-500); font-variant-numeric: tabular-nums; margin-bottom: .15em; }
+.mg-bar { width: 100%; max-width: 42px; background: var(--green-500); border-radius: 4px 4px 0 0; min-height: 2px; }
+.mg-bar.over { background: var(--warn); }
+.mg-ime { font-size: .72rem; color: var(--ink-500); margin-top: .3em; }
+.mg-legend { font-size: .82rem; color: var(--ink-500); margin: .6rem 0 0; display: flex; align-items: center; gap: .4rem; flex-wrap: wrap; }
+.mg-key { display: inline-block; width: 12px; height: 12px; border-radius: 3px; }
+.mg-key.over { background: var(--warn); }
+.mg-key.ok { background: var(--green-500); margin-left: .8rem; }
+
+/* polen kalendar */
+.polen-kalendar {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1rem 1.1rem .8rem;
+  box-shadow: var(--shadow);
+  margin-top: 1.2rem;
+}
+.pk-red { display: grid; grid-template-columns: 6.5rem 1fr 6.5rem; align-items: center; gap: .7rem; margin-bottom: .5rem; }
+.pk-ime { font-size: .9rem; font-weight: 600; color: var(--ink-900); }
+.pk-traka { display: grid; grid-template-columns: repeat(12, 1fr); gap: 2px; }
+.pk-cel {
+  height: 22px;
+  border-radius: 3px;
+  /* prozirnost nosi intenzitet — jedna boja, bez legende koja traži učenje */
+  background: color-mix(in srgb, var(--earth-500) calc(var(--t) * 100%), var(--sand-100));
+}
+.pk-vrh { font-size: .78rem; color: var(--ink-500); text-align: right; }
+.pk-osa { display: grid; grid-template-columns: repeat(12, 1fr); gap: 2px; margin: .3rem 0 0 7.2rem; padding-right: 7.2rem; }
+.pk-osa span { font-size: .7rem; color: var(--ink-500); text-align: center; }
+
+/* metod */
+.metod-section { padding: 2.8rem 0 3.2rem; }
+.metod-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 1rem;
+  margin: 1.4rem 0;
+}
+.metod-item { background: var(--sand-100); border-radius: var(--radius); padding: 1rem 1.1rem 1.1rem; }
+.metod-item h4 { margin: 0 0 .4em; font-size: .92rem; color: var(--green-900); }
+.metod-item p { margin: 0; font-size: .88rem; color: var(--ink-700); }
+.metod-foot { font-size: .85rem; max-width: 760px; }
+
+@media (max-width: 640px) {
+  .nalaz-broj { font-size: 1.8rem; }
+  #buka-map { height: 340px; }
+  .mg-plot { height: 175px; gap: .15rem; padding: .7rem .5rem .4rem; }
+  .mg-val { display: none; }
+  .mg-ime { font-size: .62rem; }
+  .pk-red { grid-template-columns: 4.6rem 1fr; }
+  .pk-vrh { display: none; }
+  .pk-osa { margin-left: 5.3rem; padding-right: 0; }
+  .pk-osa span { font-size: .58rem; }
+}
+/* reč, ne broj — zaglavlje prati poravnanje sadržaja */
+.senka-table th.tl, .senka-table thead th.tl { text-align: left; }

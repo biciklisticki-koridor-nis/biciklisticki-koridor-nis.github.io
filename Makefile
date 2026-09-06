@@ -6,13 +6,14 @@ KML     := koridor_data.kml
 # Ekstraktuje href iz NetworkLink-a u $(SOURCE) (radi i sa CDATA wrapperom).
 KML_URL  = $(shell grep -oP '<href>\s*(<!\[CDATA\[)?\K[^]<]+' $(SOURCE))
 
-.PHONY: help convert serve fetch analyze clean all venv anketa node-deps shade canopy
+.PHONY: help convert serve fetch analyze clean all venv anketa node-deps shade canopy noise
 
 help:
 	@echo "Dostupni targeti:"
 	@echo "  make venv      - kreira .venv/ i instalira Python zavisnosti (Pillow, numpy, rasterio)"
 	@echo "  make convert   - KML -> GeoJSON + stats.json + slike + visine + land cover (idempotentno)"
 	@echo "  make canopy    - senka od krošnji za sve tri staze (traži convert) -> data/shade_canopy.json"
+	@echo "  make noise     - buka (OSM putevi) + kvalitet vazduha (CAMS) -> data/noise_air.json"
 	@echo "  make anketa    - anonimizuje anketa.csv -> data/anketa.json (samo agregati)"
 	@echo "  make node-deps - instalira Node zavisnosti za shadeMap pre-compute (Puppeteer)"
 	@echo "  make shade     - pre-računa pokrivenost senkom (treba SHADEMAP_API_KEY env)"
@@ -60,7 +61,10 @@ shade:
 canopy:
 	$(PYTHON) shade_canopy.py
 
-all: fetch convert anketa canopy
+noise:
+	$(PYTHON) noise_air.py
+
+all: fetch convert anketa canopy noise
 
 clean:
 	rm -rf data/
