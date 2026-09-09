@@ -106,6 +106,12 @@ Format prati [Keep a Changelog](https://keepachangelog.com/sr/1.1.0/).
   (gornji bedem 1.01 km, donji 1.46 km).
 
 ### Izmenjeno
+- **Bazna karta prebačena sa CartoDB Voyager na OpenStreetMap** —
+  `basemaps.cartocdn.com` od septembra 2026. utiskuje „API KEY REQUIRED"
+  preko pločica. Pogađalo je sve tri mape na sajtu (početna, 9.1, 9.2).
+  Sada `tile.openstreetmap.org`, i dalje bez API ključa. Uklonjeni su
+  `{s}` poddomeni i `{r}` retina sufiks koje OSM ne servira. Slojevi
+  „Mapa (HOT)" i „Satelit" su netaknuti.
 - **`analiza.html` → `9.1.shade_and_tree_canopy_coverage.html`** (i prateći
   `analiza.js`). Stranica više nije „ta jedna analiza" nego prva u nizu, pa
   ime nosi broj sekcije iz okvira. Naslov je sada „9.1 Senka i pokrivenost

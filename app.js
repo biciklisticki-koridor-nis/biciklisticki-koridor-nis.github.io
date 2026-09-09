@@ -574,10 +574,10 @@ async function loadMap() {
   map.on("focus", () => map.scrollWheelZoom.enable());
   map.on("blur",  () => map.scrollWheelZoom.disable());
 
-  // CartoDB Voyager — OSM-bazirani tile-ovi, dozvoljava javni embed bez API ključa
-  const carto = L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
-    attribution: "© <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> · © <a href='https://carto.com/attributions'>CARTO</a>",
-    subdomains: "abcd",
+  // OpenStreetMap standard — bez API ključa. CartoDB Voyager je nekada bio
+  // podrazumevan, ali od septembra 2026. utiskuje „API KEY REQUIRED" u pločice.
+  const osm = L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution: "© <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors",
     maxZoom: 19,
   }).addTo(map);
   const sat = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {
@@ -738,7 +738,7 @@ async function loadMap() {
     "Ostala urbana oprema": ostaloLayer,
   };
   const layersCtrl = L.control.layers(
-    { "Mapa": carto, "Mapa (HOT)": osmHot, "Satelit": sat },
+    { "Mapa": osm, "Mapa (HOT)": osmHot, "Satelit": sat },
     overlays,
     { collapsed: window.innerWidth < 900, position: "topright" }
   ).addTo(map);

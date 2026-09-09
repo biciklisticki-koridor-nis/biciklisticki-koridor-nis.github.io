@@ -323,8 +323,8 @@ function buildMap() {
     (la, i) => bounds.extend([la, s.points.lon[i]])));
   map = L.map("shade-map", { scrollWheelZoom: false });
   map.fitBounds(bounds, { padding: [18, 18] });
-  L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
-    attribution: "© <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> · © <a href='https://carto.com/attributions'>CARTO</a>",
+  L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution: "© <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors",
     maxZoom: 19,
   }).addTo(map);
   shadeLayer = new ShadeCanvasLayer();
