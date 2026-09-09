@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="biciklisticki-koridor / izbor_tacaka.py"
+     xmlns="http://www.topografix.com/GPX/1/1"
+     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd">
+  <metadata>
+    <name>Kalibracija modela buke — Nišavski koridor</name>
+    <desc>18 mernih tačaka, raslojenih po modeliranom indeksu izlozenosti.
+Cilj: regresija dB(A) = a + b * 10*log10(E) i provera rangiranja deonica.
+Uparene tacke (T04–T05, T06–T07, T08–T09, T11–T12) su gornji/donji bedem na istoj kilometrazi — njihova
+razlika meri zaklon nasipa, koji model nema.
+Jedan prolaz, isti vremenski prozor, radnim danom.</desc>
+  </metadata>
+  <wpt lat="43.321860" lon="21.867630">
+    <name>T01 · idx 78</name>
+    <desc>Model indeks 78 (osa · pojas 75–100) | km 0.00 · Medoševac · Biciklistička | Najbliži glavni put: nema u 300 m | LAeq, A-ponderisano, Fast, 3–5 min, mikrofon na 1,5 m.</desc>
+    <sym>Flag</sym>
+  </wpt>
+  <wpt lat="43.324140" lon="21.873270">
+    <name>T02 · idx 24</name>
+    <desc>Model indeks 24 (osa · pojas 12–24) | km 0.53 · Medoševac · Biciklistička | Najbliži glavni put: nema u 300 m | LAeq, A-ponderisano, Fast, 3–5 min, mikrofon na 1,5 m.</desc>
+    <sym>Flag</sym>
+  </wpt>
+  <wpt lat="43.323140" lon="21.884410">
+    <name>T03 · idx 63</name>
+    <desc>Model indeks 63 (osa · pojas 62–74) | km 1.54 · Medoševac · Biciklistička | Najbliži glavni put: nema u 300 m | LAeq, A-ponderisano, Fast, 3–5 min, mikrofon na 1,5 m.</desc>
+    <sym>Flag</sym>
+  </wpt>
+  <wpt lat="43.321110" lon="21.890900">
+    <name>T04 · idx 89</name>
+    <desc>Model indeks 89 (par 4 — gornji) | km 2.17 · Centar · Gornji bedem | Najbliži glavni put: 9 m | UPARENA — druga staza na 11 m. Meriti obe u razmaku od par minuta. | LAeq, A-ponderisano, Fast, 3–5 min, mikrofon na 1,5 m.</desc>
+    <sym>Flag</sym>
+  </wpt>
+  <wpt lat="43.321150" lon="21.891030">
+    <name>T05 · idx 82</name>
+    <desc>Model indeks 82 (par 4 — donji) | km 2.18 · Centar · Donji bedem | Najbliži glavni put: 21 m | UPARENA — druga staza na 11 m. Meriti obe u razmaku od par minuta. | LAeq, A-ponderisano, Fast, 3–5 min, mikrofon na 1,5 m.</desc>
+    <sym>Flag</sym>
+  </wpt>
+  <wpt lat="43.326670" lon="21.902810">
+    <name>T06 · idx 90</name>
+    <desc>Model indeks 90 (par 3 — gornji) | km 3.31 · Centar · Gornji bedem | Najbliži glavni put: 5 m | UPARENA — druga staza na 42 m. Meriti obe u razmaku od par minuta. | LAeq, A-ponderisano, Fast, 3–5 min, mikrofon na 1,5 m.</desc>
+    <sym>Flag</sym>
+  </wpt>
+  <wpt lat="43.326300" lon="21.902720">
+    <name>T07 · idx 89</name>
+    <desc>Model indeks 89 (par 3 — donji) | km 3.32 · Centar · Donji bedem | Najbliži glavni put: 14 m | UPARENA — druga staza na 42 m. Meriti obe u razmaku od par minuta. | LAeq, A-ponderisano, Fast, 3–5 min, mikrofon na 1,5 m.</desc>
+    <sym>Flag</sym>
+  </wpt>
+  <wpt lat="43.326330" lon="21.908850">
+    <name>T08 · idx 88</name>
+    <desc>Model indeks 88 (par 2 — donji) | km 3.88 · Delta - Lidl · Donji bedem | Najbliži glavni put: 254 m | UPARENA — druga staza na 31 m. Meriti obe u razmaku od par minuta. | LAeq, A-ponderisano, Fast, 3–5 min, mikrofon na 1,5 m.</desc>
+    <sym>Flag</sym>
+  </wpt>
+  <wpt lat="43.326060" lon="21.908760">
+    <name>T09 · idx 93</name>
+    <desc>Model indeks 93 (par 2 — gornji) | km 3.89 · Delta - Lidl · Gornji bedem | Najbliži glavni put: 279 m | UPARENA — druga staza na 31 m. Meriti obe u razmaku od par minuta. | LAeq, A-ponderisano, Fast, 3–5 min, mikrofon na 1,5 m.</desc>
+    <sym>Flag</sym>
+  </wpt>
+  <wpt lat="43.324700" lon="21.924440">
+    <name>T10 · idx 50</name>
+    <desc>Model indeks 50 (osa · pojas 50–61) | km 5.29 · Delta - Lidl · Biciklistička | Najbliži glavni put: nema u 300 m | LAeq, A-ponderisano, Fast, 3–5 min, mikrofon na 1,5 m.</desc>
+    <sym>Flag</sym>
+  </wpt>
+  <wpt lat="43.321980" lon="21.937000">
+    <name>T11 · idx 99</name>
+    <desc>Model indeks 99 (par 1 — gornji) | km 6.46 · Delta - Lidl · Gornji bedem | Najbliži glavni put: 10 m | UPARENA — druga staza na 32 m. Meriti obe u razmaku od par minuta. | LAeq, A-ponderisano, Fast, 3–5 min, mikrofon na 1,5 m.</desc>
+    <sym>Flag</sym>
+  </wpt>
+  <wpt lat="43.322230" lon="21.937200">
+    <name>T12 · idx 100</name>
+    <desc>Model indeks 100 (par 1 — donji) | km 6.46 · Delta - Lidl · Donji bedem | Najbliži glavni put: 2 m | UPARENA — druga staza na 32 m. Meriti obe u razmaku od par minuta. | LAeq, A-ponderisano, Fast, 3–5 min, mikrofon na 1,5 m.</desc>
+    <sym>Flag</sym>
+  </wpt>
+  <wpt lat="43.320370" lon="21.951770">
+    <name>T13 · idx 29</name>
+    <desc>Model indeks 29 (osa · pojas 25–37) | km 7.78 · Brzi Brod · Biciklistička | Najbliži glavni put: nema u 300 m | LAeq, A-ponderisano, Fast, 3–5 min, mikrofon na 1,5 m.</desc>
+    <sym>Flag</sym>
+  </wpt>
+  <wpt lat="43.315790" lon="21.965160">
+    <name>T14 · idx 11</name>
+    <desc>Model indeks 11 (osa · pojas 0–11) | km 8.99 · Brzi Brod · Biciklistička | Najbliži glavni put: nema u 300 m | LAeq, A-ponderisano, Fast, 3–5 min, mikrofon na 1,5 m.</desc>
+    <sym>Flag</sym>
+  </wpt>
+  <wpt lat="43.311610" lon="21.982080">
+    <name>T15 · idx 36</name>
+    <desc>Model indeks 36 (osa · pojas 25–37) | km 10.54 · Niška Banja · Biciklistička | Najbliži glavni put: nema u 300 m | LAeq, A-ponderisano, Fast, 3–5 min, mikrofon na 1,5 m.</desc>
+    <sym>Flag</sym>
+  </wpt>
+  <wpt lat="43.307620" lon="21.985520">
+    <name>T16 · idx 82</name>
+    <desc>Model indeks 82 (osa · pojas 75–100) | km 11.08 · Niška Banja · Biciklistička | Najbliži glavni put: nema u 300 m | LAeq, A-ponderisano, Fast, 3–5 min, mikrofon na 1,5 m.</desc>
+    <sym>Flag</sym>
+  </wpt>
+  <wpt lat="43.304770" lon="21.997270">
+    <name>T17 · idx 8</name>
+    <desc>Model indeks 8 (osa · pojas 0–11) | km 12.10 · Niška Banja · Biciklistička | Najbliži glavni put: nema u 300 m | LAeq, A-ponderisano, Fast, 3–5 min, mikrofon na 1,5 m.</desc>
+    <sym>Flag</sym>
+  </wpt>
+  <wpt lat="43.302610" lon="22.016090">
+    <name>T18 · idx 49</name>
+    <desc>Model indeks 49 (osa · pojas 38–49) | km 13.81 · Niška Banja · Biciklistička | Najbliži glavni put: 114 m | LAeq, A-ponderisano, Fast, 3–5 min, mikrofon na 1,5 m.</desc>
+    <sym>Flag</sym>
+  </wpt>
+  <rte>
+    <name>Redosled obilaska T01–T18</name>
+    <rtept lat="43.321860" lon="21.867630"><name>T01</name></rtept>
+    <rtept lat="43.324140" lon="21.873270"><name>T02</name></rtept>
+    <rtept lat="43.323140" lon="21.884410"><name>T03</name></rtept>
+    <rtept lat="43.321110" lon="21.890900"><name>T04</name></rtept>
+    <rtept lat="43.321150" lon="21.891030"><name>T05</name></rtept>
+    <rtept lat="43.326670" lon="21.902810"><name>T06</name></rtept>
+    <rtept lat="43.326300" lon="21.902720"><name>T07</name></rtept>
+    <rtept lat="43.326330" lon="21.908850"><name>T08</name></rtept>
+    <rtept lat="43.326060" lon="21.908760"><name>T09</name></rtept>
+    <rtept lat="43.324700" lon="21.924440"><name>T10</name></rtept>
+    <rtept lat="43.321980" lon="21.937000"><name>T11</name></rtept>
+    <rtept lat="43.322230" lon="21.937200"><name>T12</name></rtept>
+    <rtept lat="43.320370" lon="21.951770"><name>T13</name></rtept>
+    <rtept lat="43.315790" lon="21.965160"><name>T14</name></rtept>
+    <rtept lat="43.311610" lon="21.982080"><name>T15</name></rtept>
+    <rtept lat="43.307620" lon="21.985520"><name>T16</name></rtept>
+    <rtept lat="43.304770" lon="21.997270"><name>T17</name></rtept>
+    <rtept lat="43.302610" lon="22.016090"><name>T18</name></rtept>
+  </rte>
+</gpx>

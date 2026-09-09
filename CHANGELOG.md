@@ -6,6 +6,23 @@ Format prati [Keep a Changelog](https://keepachangelog.com/sr/1.1.0/).
 ## [Neobjavljeno]
 
 ### Dodato
+- **`docs/` — materijali za terenski rad** koji ne idu na sajt. Prvi je
+  `docs/9.2-kalibracija-buke/`: protokol za jedan izlazak kojim se model
+  buke prevodi iz indeksa 0–100 u decibele.
+  - **18 tačaka, jedan prolaz od 13 km, 2,5–3 h.** Kalibracija je regresija
+    sa dva parametra (`dB(A) = a + b · 10·log10(E)`), pa je bitan raspon
+    prediktora a ne količina merenja — tačke su raslojene po indeksu
+    (8–100), a ne ravnomerno po kilometraži. Nespojene tačke su međusobno
+    udaljene bar 350 m.
+  - **Četiri uparene tačke** gornji/donji bedem na istoj kilometraži
+    (11–42 m razmaka, sve u zonama indeksa ≥ 40). Njihova razlika meri
+    **zaklon nasipa** — jedinu veličinu koja se ne može dobiti doterivanjem
+    modela, jer SRTM na 30 m stavlja 88 % parova u istu ćeliju.
+  - `izbor_tacaka.py` regeneriše `tacke.gpx` i `tacke.csv` iz
+    `data/noise_air.json`; CSV ima prazne kolone za upis na terenu.
+  - Preporučena oprema sa ocenama: Class 2 merač (~40 €) + NoiseCapture
+    kao provera. Generičke „Sound Meter" aplikacije su izričito odbačene —
+    ne traže `UNPROCESSED` audio izvor, pa im AGC izravna signal.
 - **Analiza 9.2 „Buka i kvalitet vazduha"**
   (`9.2.noise_and_air_quality_exposure.html` + `noise_air.py`, `make noise`)
   — dva pitanja sa dva izvora, jer se razlikuju po tome šta mogu da kažu.

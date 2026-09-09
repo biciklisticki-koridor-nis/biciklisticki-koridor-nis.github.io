@@ -1,0 +1,19 @@
+id;km;staza;deonica;lat;lon;model_indeks;najblizi_glavni_put_m;uloga;izmereno_LAeq_dBA;izmereno_LA90_dBA;vreme;napomena
+T01;0.00;Biciklistička;Medoševac;43.321860;21.867630;78;;osa · pojas 75–100;;;;
+T02;0.53;Biciklistička;Medoševac;43.324140;21.873270;24;;osa · pojas 12–24;;;;
+T03;1.54;Biciklistička;Medoševac;43.323140;21.884410;63;;osa · pojas 62–74;;;;
+T04;2.17;Gornji bedem;Centar;43.321110;21.890900;89;9;par 4 — gornji;;;;
+T05;2.18;Donji bedem;Centar;43.321150;21.891030;82;21;par 4 — donji;;;;
+T06;3.31;Gornji bedem;Centar;43.326670;21.902810;90;5;par 3 — gornji;;;;
+T07;3.32;Donji bedem;Centar;43.326300;21.902720;89;14;par 3 — donji;;;;
+T08;3.88;Donji bedem;Delta - Lidl;43.326330;21.908850;88;254;par 2 — donji;;;;
+T09;3.89;Gornji bedem;Delta - Lidl;43.326060;21.908760;93;279;par 2 — gornji;;;;
+T10;5.29;Biciklistička;Delta - Lidl;43.324700;21.924440;50;;osa · pojas 50–61;;;;
+T11;6.46;Gornji bedem;Delta - Lidl;43.321980;21.937000;99;10;par 1 — gornji;;;;
+T12;6.46;Donji bedem;Delta - Lidl;43.322230;21.937200;100;2;par 1 — donji;;;;
+T13;7.78;Biciklistička;Brzi Brod;43.320370;21.951770;29;;osa · pojas 25–37;;;;
+T14;8.99;Biciklistička;Brzi Brod;43.315790;21.965160;11;;osa · pojas 0–11;;;;
+T15;10.54;Biciklistička;Niška Banja;43.311610;21.982080;36;;osa · pojas 25–37;;;;
+T16;11.08;Biciklistička;Niška Banja;43.307620;21.985520;82;;osa · pojas 75–100;;;;
+T17;12.10;Biciklistička;Niška Banja;43.304770;21.997270;8;;osa · pojas 0–11;;;;
+T18;13.81;Biciklistička;Niška Banja;43.302610;22.016090;49;114;osa · pojas 38–49;;;;
