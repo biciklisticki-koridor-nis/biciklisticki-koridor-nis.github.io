@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>9.2 Buka i kvalitet vazduha — Nišavski biciklistički koridor</title>
+  <meta name="description" content="Analiza 9.2: koliko saobraćajne buke stiže do koridora, deonica po deonica, i kakav je vazduh nad Nišavom kroz godinu." />
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<header class="hero page-hero">
+  <div class="container">
+    <p class="eyebrow"><a href="index.html">Nišavski biciklistički koridor</a> · <a href="analize.html">Analize</a> · 9. Kvalitet životne sredine</p>
+    <h1>9.2 Buka i kvalitet vazduha</h1>
+    <p class="subtitle">Koliko saobraćaj prodire do keja — i kakav je vazduh iznad njega kroz godinu.</p>
+  </div>
+</header>
+
+<!-- ── ključni nalazi ─────────────────────────────────────────── -->
+<section class="nalazi-section">
+  <div class="container">
+    <div class="nalazi">
+      <div class="nalaz">
+        <p class="nalaz-broj">1,7 km</p>
+        <p class="nalaz-tekst">Centar je jedina bučna deonica — <strong>ni jedan jedini metar</strong> nije tih. Preostalih 12 km je uglavnom van domašaja saobraćaja.</p>
+      </div>
+      <div class="nalaz">
+        <p class="nalaz-broj">−13 %</p>
+        <p class="nalaz-tekst">Donji bedem je <strong>najtiša od tri staze</strong> — toliko tiši od gornjeg. Isto to rastojanje od ulica daje mu i duplo više hlada.</p>
+      </div>
+      <div class="nalaz nalaz-warn">
+        <p class="nalaz-broj">45 %</p>
+        <p class="nalaz-tekst">dana u godini vazduh prelazi dnevnu smernicu SZO za PM2.5 — <strong>ali gotovo isključivo zimi</strong>, van sezone korišćenja keja.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── BUKA ───────────────────────────────────────────────────── -->
+<section id="buka" class="zelenilo-section">
+  <div class="container">
+    <h2>Buka</h2>
+    <p class="lead">Za svaku tačku duž koridora, na svakih 10 m, sabran je doprinos svih puteva u krugu od 300 m — svaki po svojoj kategoriji, brzini i broju traka, oslabljen rastojanjem. Rezultat pokazuje <strong>gde je kej miran, a gde saobraćaj ulazi u njega</strong>.</p>
+
+    <div class="callout callout-info">
+      <p><strong>Ovo nisu decibeli.</strong> Duž keja nema nijednog merenja buke, pa bi svaka brojka u dB bila izmišljena preciznost. Skala je <strong>0–100 u odnosu na sam koridor</strong>, gde je 100 njegova najizloženija tačka. Kaže koja je deonica tiša od koje — ne koliko je glasna.</p>
+    </div>
+
+    <div class="chip-filters" id="staza-pills" role="tablist" aria-label="Staza"></div>
+
+    <div class="shade-stats" id="buka-stats"></div>
+
+    <h3>Duž cele trase</h3>
+    <p class="muted">Svaka kolona je 10 m. Pređi mišem (ili dodirni) za detalje o tački.</p>
+
+    <div class="profil-wrap" id="profil-wrap">
+      <canvas id="buka-profil" aria-label="Profil izloženosti buci duž trase"></canvas>
+      <div class="heatmap-tooltip" id="profil-tooltip" hidden>
+        <div class="tt-state"></div>
+        <div class="tt-meta"></div>
+      </div>
+    </div>
+    <div class="heatmap-legend" id="band-legend"></div>
+
+    <h3>Na mapi</h3>
+    <p class="muted">Trasa je obojena istom skalom. Tiši delovi su zeleni, izloženi crveni.</p>
+    <div id="buka-map" aria-label="Mapa izloženosti buci"></div>
+
+    <h3>Po deonicama</h3>
+    <div class="table-scroll">
+      <table class="senka-table" id="buka-table">
+        <caption class="sr-only">Izloženost buci po deonici</caption>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ── VAZDUH ─────────────────────────────────────────────────── -->
+<section id="vazduh" class="vazduh-section">
+  <div class="container">
+    <h2>Vazduh</h2>
+    <p class="lead">Vazduh se, za razliku od buke, <strong>ne može prikazati po kilometru</strong>. Najbolji besplatan izvor ima ćeliju od oko 11 km — jednu za ceo koridor. Ono što se može pokazati jeste kako se menja <strong>kroz godinu</strong>, a to ispada važnije nego što zvuči.</p>
+
+    <div class="vazduh-kartice" id="vazduh-kartice"></div>
+
+    <h3>Kroz godinu</h3>
+    <p class="muted">Prosečna dnevna koncentracija PM2.5 po mesecu, uprosečeno kroz tri godine. Crvena linija je dnevna smernica SZO.</p>
+    <div class="mesec-graf" id="pm-mesecno"></div>
+
+    <div class="callout callout-good">
+      <p><strong>Sezone se ne poklapaju — i to je dobra vest.</strong> Vazduh je najgori u decembru, januaru i februaru, kada se grad greje. Od maja do septembra, kada se kej zapravo koristi, koncentracije padaju ispod smernice. Koridor se koristi tačno onda kada je vazduh najčistiji.</p>
+    </div>
+
+    <h3>Polen</h3>
+    <p class="muted">Za rekreativnu stazu uz reku polen je praktično pitanje — kada je šetnja neprijatna i kome.</p>
+    <div class="polen-kalendar" id="polen-kalendar"></div>
+  </div>
+</section>
+
+<!-- ── metod ──────────────────────────────────────────────────── -->
+<section class="metod-section">
+  <div class="container">
+    <h2>Kako čitati ove brojeve</h2>
+    <div class="metod-grid">
+      <div class="metod-item">
+        <h4>Buka je modelirana, ne merena</h4>
+        <p>Izvedena je iz geometrije puteva i njihove kategorije. Pouzdano rangira deonice; ne daje apsolutne vrednosti. Provera merenjem na terenu tek predstoji.</p>
+      </div>
+      <div class="metod-item">
+        <h4>Drvored ne ulazi u račun</h4>
+        <p>Drveće snažno zaklanja pogled na saobraćaj, ali zvuk zaustavlja slabo. Uračunati ga značilo bi obećati tišinu koje nema.</p>
+      </div>
+      <div class="metod-item">
+        <h4>Vazduh je gradski, ne kejski</h4>
+        <p>Vrednosti opisuju Niš kao celinu. Razlika između keja i ulice postoji, ali je besplatnim podacima nemoguće razlučiti.</p>
+      </div>
+      <div class="metod-item">
+        <h4>Nasip nije uračunat</h4>
+        <p>Donji bedem je zaklonjen nasipom, što bi ga činilo još tišim nego što piše. Dostupni visinski podaci su pregrubi da se to izmeri.</p>
+      </div>
+    </div>
+    <p class="muted metod-foot">Puni tehnički opis — izvori, formule, ograničenja i šta je odbačeno — nalazi se u <a href="dnevnik.html">tehničkom dnevniku</a>. Podaci o putevima: OpenStreetMap (ODbL). Vazduh: CAMS preko Open-Meteo (CC BY 4.0).</p>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <p>Podaci: terensko mapiranje 2026. · Putevi: OpenStreetMap · Vazduh: CAMS / Open-Meteo · Mapa: Leaflet.js</p>
+    <p class="muted">Nišavski biciklistički koridor — inicijativa zajednice, Niš</p>
+    <p class="muted footer-meta">
+      <a href="index.html">Početna</a>
+      <span class="footer-sep">·</span>
+      <a href="analize.html">Sve analize</a>
+      <span class="footer-sep">·</span>
+      <a href="dnevnik.html">Tehnički dnevnik</a>
+      <span class="footer-sep">·</span>
+      Otvoreni kod pod <a href="LICENSE" target="_blank" rel="noopener">GPL 3.0</a> licencom
+      <span class="footer-sep">·</span>
+      <a href="https://github.com/biciklisticki-koridor-nis/biciklisticki-koridor-nis.github.io" target="_blank" rel="noopener">GitHub</a>
+    </p>
+  </div>
+</footer>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="9.2.noise_and_air_quality_exposure.js"></script>
+
+</body>
+</html>

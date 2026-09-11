@@ -6,6 +6,88 @@ Format prati [Keep a Changelog](https://keepachangelog.com/sr/1.1.0/).
 ## [Neobjavljeno]
 
 ### Dodato
+- **Sadržaj na vrhu `analize.html`** — sekcije i njihove analize sa
+  linkovima: sekcija skače na sebe na stranici, objavljene analize otvaraju
+  svoju stranicu, a one u pripremi su navedene bez linka. Sadržaj se gradi
+  iz kartica na stranici, pa nova sekcija ne traži posebno održavanje.
+  Kartice sekcije su sada iznad tabele pokazatelja.
+- **Tabela pokazatelja sekcije 9 na `analize.html`** — po jedan broj za svaku
+  od tri staze, za pokazatelje iz okvira analize. Najbolja staza je
+  podebljana; na telefonu opis mere prelazi ispod naziva da bi brojevi stali
+  bez skrolovanja.
+  - Kontinuitet senke: % dužine u neprekidnoj *stvarnoj* senci od bar
+    30 m, 21. jun 12–16 h — 4.8 / 1.9 / 14.9 %. Prva verzija je brojala
+    nizove drvoreda i za donji bedem davala 45 % uz 81 % izloženosti suncu:
+    leti u podne stablo od 10 m baca senku od 3,8 m, pa drvored pored staze
+    ne zaseni stazu. Prag od 30 m je najniži koji podaci trpe za senku
+    (prelom u raspodeli dužina nizova između 20 i 30 m).
+  - Krošnje 27.3 / 27.6 / 50.3 %, sunce 21. jun 12–16 h 92.4 / 95.0 /
+    81.0 %, pogled na reku 58.7 / 61.5 / 56.3 %, izloženost buci 28.4 /
+    30.5 / 22.9 %. Termalni komfor je u pripremi (9.3).
+  - Žarišta zagađenja vazduha su namerno izostavljena: CAMS ćelija od
+    11 km ne razlučuje prostor, a glavni problem (PM2.5, zima) nije
+    saobraćajni.
+  - `indikatori.py` + `make indikatori` → `data/indikatori.json` (1,4 KB),
+    da stranica ne bi učitavala 500 KB podataka po tački.
+- **`river_views.py` + `make views` → `data/river_views.json`** — pogled na
+  Nišavu: 72 zraka po tački preko CHM rastera, do 250 m, pogled ako se voda
+  vidi u uglu od bar 10°. Voda iz OSM-a: poligoni zapadno od km 5, članovi
+  multipoligon relacija istočno (sa adama), linija toka kao osigurač.
+  Konzervativna i optimistična granica (vidi li se ispod visokog drveća) se
+  razlikuju za 0.3–3.3 poena. Bez rastinja pogled bi imalo 100 % dužine, pa
+  je sav gubitak pogleda rastinje: zapad 76–100 %, šumoviti istok 23–35 %.
+  Gornji bedem je potcenjen jer teren nije modeliran.
+- **`docs/` — materijali za terenski rad** koji ne idu na sajt. Prvi je
+  `docs/9.2-kalibracija-buke/`: protokol za jedan izlazak kojim se model
+  buke prevodi iz indeksa 0–100 u decibele.
+  - **18 tačaka, jedan prolaz od 13 km, 2,5–3 h.** Kalibracija je regresija
+    sa dva parametra (`dB(A) = a + b · 10·log10(E)`), pa je bitan raspon
+    prediktora a ne količina merenja — tačke su raslojene po indeksu
+    (8–100), a ne ravnomerno po kilometraži. Nespojene tačke su međusobno
+    udaljene bar 350 m.
+  - **Četiri uparene tačke** gornji/donji bedem na istoj kilometraži
+    (11–42 m razmaka, sve u zonama indeksa ≥ 40). Njihova razlika meri
+    **zaklon nasipa** — jedinu veličinu koja se ne može dobiti doterivanjem
+    modela, jer SRTM na 30 m stavlja 88 % parova u istu ćeliju.
+  - `izbor_tacaka.py` regeneriše `tacke.gpx` i `tacke.csv` iz
+    `data/noise_air.json`; CSV ima prazne kolone za upis na terenu.
+  - Preporučena oprema sa ocenama: Class 2 merač (~40 €) + NoiseCapture
+    kao provera. Generičke „Sound Meter" aplikacije su izričito odbačene —
+    ne traže `UNPROCESSED` audio izvor, pa im AGC izravna signal.
+- **Analiza 9.2 „Buka i kvalitet vazduha"**
+  (`9.2.noise_and_air_quality_exposure.html` + `noise_air.py`, `make noise`)
+  — dva pitanja sa dva izvora, jer se razlikuju po tome šta mogu da kažu.
+  - **Buka je prostorna.** Modelirana iz OSM geometrije puteva (Overpass,
+    3.831 put / 22.103 segmenta, keširano po bbox-u): svaki segment je niz
+    nekoherentnih tačkastih izvora, energija opada sa 1/d², težina je
+    dužina × jačina po klasi puta, korigovana `maxspeed` i `lanes`.
+    Radijus 300 m, korak 10 m, sve tri staze na zajedničkoj km-osi.
+  - **Indeks 0–100, ne decibeli.** Duž keja nema nijednog merenja; skala je
+    relativna na sam koridor, sa fiksnim kotvama u log-prostoru da vrednosti
+    ne skaču kad se OSM promeni. Rangira deonice, ne tvrdi apsolutni nivo.
+  - **Nalaz: Centar je jedina bučna deonica** — prosek 61, *nula* procenata
+    tihog. Ostatak koridora je uglavnom van domašaja saobraćaja: 71.7 %
+    trase nema nijedan glavni put u krugu od 300 m. Donji bedem je najtiša
+    staza (35.6), 13 % tiši od gornjeg — isto rastojanje od ulica koje mu
+    daje duplo više hlada.
+  - **Vazduh nije prostoran** — CAMS preko Open-Meteo ima ćeliju ~11 km,
+    jednu za ceo koridor, pa se prikazuje kao vremenski kontekst.
+    PM2.5 prelazi dnevnu smernicu SZO 45 % dana (godišnji prosek 16.9
+    naspram 5 µg/m³), ali gotovo isključivo zimi: decembar 31.5, jul 9.8.
+    Kej se koristi tačno kada je vazduh najčistiji. Uz polen (breza mart,
+    trave jun, ambrozija avgust).
+  - Namerno izostavljeno: vegetacija kao akustična barijera (drveće
+    zaklanja pogled snažno, zvuk slabo — 1–3 dB na 10 m gustog pojasa) i
+    nasip pod donjim bedemom (SRTM 30 m stavlja 88 % parova gornja/donja
+    staza u istu ćeliju — nije merljivo). Oboje zapisano u dnevniku.
+- **`koridor.py`** — zajednička geometrija koridora (osa, resampling,
+  projekcija na km-osu, deonice) izvučena iz `shade_canopy.py` pre pisanja
+  `noise_air.py`, dok je postojao samo jedan korisnik. Provera: regenerisan
+  `data/shade_canopy.json` je **identičan bajt u bajt** prethodnom.
+- **Stranica „Analize podataka" (`analize.html`)** — rasputnica ka svim
+  analizama, grupisana po sekcijama okvira. Za sada je popunjena sekcija
+  9 („Kvalitet životne sredine"): 9.1 objavljena, 9.2 i 9.3 najavljene.
+  Link je u futeru početne strane i u futeru svake analize.
 - **Parser sloja „Definirane staze" → `data/staze_mreza.geojson`** — koridor
   više nije jedna linija nego tri paralelne mreže: biciklistička staza,
   pešačka na gornjem i pešačka na donjem bedemu.
@@ -27,9 +109,10 @@ Format prati [Keep a Changelog](https://keepachangelog.com/sr/1.1.0/).
     na km 1.69–2.13 (450 m) i km 13.23–14.03 (810 m).
   - Ostatak pipeline-a je netaknut: `trasa_km` je i dalje 14.67 km sa stare
     „Indicaciones" linije. Prelazak sajta na novu osu je zaseban korak.
-- **Stranica „Analiza podataka" (`analiza.html`) sa sekcijom „Pokrivenost
-  senkom"** — senka od krošnji izračunata sat po sat za 4 referentna dana
-  (solsticiji + ravnodnevnice), na 10 m koraku duž trase (1.469 tačaka):
+- **Stranica „9.1 Senka i pokrivenost krošnjama"
+  (`9.1.shade_and_tree_canopy_coverage.html`)** — senka od krošnji izračunata
+  sat po sat za 4 referentna dana (solsticiji + ravnodnevnice), na 10 m
+  koraku duž trase (1.469 tačaka):
   - Toplotna mapa km × sat (canvas, tabovi po dobu godine, hover tooltip
     sa visinom krošnje, granice deonica).
   - Mapa sa trasom obojenom po stanju sunce/senka u izabranom satu
@@ -65,19 +148,30 @@ Format prati [Keep a Changelog](https://keepachangelog.com/sr/1.1.0/).
 - **Kontinuitet drvoreda po stazi** — `shade_canopy.py` računa najduži
   neprekidan deo uz drvored, najdužu rupu i broj prelaza, iz CHM podataka
   (1 m) umesto dosadašnjeg WorldCover proksija (10 m). Prikazano kao dve nove
-  stat kartice i kolona u tabeli na `analiza.html`. Rupe u samoj stazi
+  stat kartice i kolona u tabeli na `9.1.shade_and_tree_canopy_coverage.html`. Rupe u samoj stazi
   prekidaju niz, da se odsustvo staze ne bi računalo kao odsustvo drvoreda.
   Najduži deo biciklističke staze bez ijednog drveta uz nju: **3.13 km**
   (gornji bedem 1.01 km, donji 1.46 km).
 
 ### Izmenjeno
+- **Bazna karta prebačena sa CartoDB Voyager na OpenStreetMap** —
+  `basemaps.cartocdn.com` od septembra 2026. utiskuje „API KEY REQUIRED"
+  preko pločica. Pogađalo je sve tri mape na sajtu (početna, 9.1, 9.2).
+  Sada `tile.openstreetmap.org`, i dalje bez API ključa. Uklonjeni su
+  `{s}` poddomeni i `{r}` retina sufiks koje OSM ne servira. Slojevi
+  „Mapa (HOT)" i „Satelit" su netaknuti.
+- **`analiza.html` → `9.1.shade_and_tree_canopy_coverage.html`** (i prateći
+  `analiza.js`). Stranica više nije „ta jedna analiza" nego prva u nizu, pa
+  ime nosi broj sekcije iz okvira. Naslov je sada „9.1 Senka i pokrivenost
+  krošnjama", a putanja do nje ide preko `analize.html`. Stara adresa vraća
+  404 — stranica je bila javna nekoliko dana, bez spoljnih linkova.
 - **Sekcija senke na početnoj svedena na traku + link** — dosad su tu stajale
   stat kartice i kartice po deonicama izvedene iz ESA WorldCover klasifikacije
   zemljišta (10 m), pod imenom „senka". To je odgovaralo na drugo pitanje
-  („ima li ovde drveća kao klase zemljišta") nego `analiza.html`
+  („ima li ovde drveća kao klase zemljišta") nego `9.1.shade_and_tree_canopy_coverage.html`
   („da li je staza stvarno u senci u 14h"), a brojevi se nisu slagali.
   Sada na početnoj ostaje traka kao gruba orijentacija, preimenovana u
-  „Drvored duž cele trase", a stvarna senka i kontinuitet su na `analiza.html`.
+  „Drvored duž cele trase", a stvarna senka i kontinuitet su na `9.1.shade_and_tree_canopy_coverage.html`.
   Uklonjeni `renderShadeStats()` i `renderShadeByDeonica()` iz `app.js`.
 - **Senka se računa za sve tri staze** — `shade_canopy.py` više ne čita jednu
   liniju nego `data/staze_mreza.geojson`, i računa zaseban profil senke za
@@ -95,7 +189,7 @@ Format prati [Keep a Changelog](https://keepachangelog.com/sr/1.1.0/).
     diže senku u junu sa 8.0 % na 11.6 % — nova osa prolazi bliže drvoredu.
     Provereno puštanjem stare linije kroz novi kod: reprodukuje 8.0 %,
     dakle razlika je geometrijska, ne posledica izmene računa.
-  - `analiza.html` dobija prekidač staza; heat-mapa i tabela prate izbor.
+  - `9.1.shade_and_tree_canopy_coverage.html` dobija prekidač staza; heat-mapa i tabela prate izbor.
     x-osa heat-mape je uvek puna dužina referentne ose, pa se prekidi u
     pešačkim stazama vide kao praznine umesto da se sakriju rastezanjem.
   - CHM keš sada nosi hash uzoraka i sam se poništava kad se skup staza

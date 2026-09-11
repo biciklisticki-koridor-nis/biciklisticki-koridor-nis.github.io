@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Analize podataka — Nišavski biciklistički koridor</title>
+  <meta name="description" content="Pregled svih analiza koridora: senka i krošnje, buka i kvalitet vazduha, termalni komfor i druge teme koje se izvode iz mapiranih podataka." />
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<header class="hero page-hero">
+  <div class="container">
+    <p class="eyebrow"><a href="index.html">Nišavski biciklistički koridor</a> · Analize</p>
+    <h1>Analize podataka</h1>
+    <p class="subtitle">.</p>
+  </div>
+</header>
+
+<main class="analize-main">
+  <div class="container">
+
+    <nav class="sadrzaj" id="sadrzaj" aria-label="Sadržaj" hidden>
+      <h2 class="sadrzaj-naslov">Sadržaj</h2>
+      <ol class="sadrzaj-lista" id="sadrzaj-lista"></ol>
+    </nav>
+
+    <p class="lead">Analize su grupisane po temama. Svaka se računa iz istih izvora kao i mapa — terenskog mapiranja i otvorenih satelitskih podataka — i svaka ima ispisan metod i ograničenja, da se brojevi mogu proveriti i osporiti.</p>
+
+    <section class="analiza-grupa" id="s9">
+      <h2>9. Kvalitet životne sredine</h2>
+      <p class="muted grupa-lead">Koliko je boravak na koridoru prijatan i zdrav — hlad, buka, vazduh, toplota.</p>
+
+      <div class="analiza-list">
+
+        <a href="9.1.shade_and_tree_canopy_coverage.html" class="analiza-card analiza-card-live">
+          <div class="analiza-card-head">
+            <span class="analiza-num">9.1</span>
+            <span class="analiza-status status-live">Objavljeno</span>
+          </div>
+          <h3>Senka i pokrivenost krošnjama</h3>
+          <p>Gde i kada ima hlada. Za svaku tačku na 10 m izračunato je da li je u senci drveća, za svaki sat i četiri doba godine, posebno za sve tri staze.</p>
+          <p class="analiza-nalaz"><strong>Nalaz:</strong> donji bedem ima duplo više hlada od biciklističke staze — 23.8 % prema 11.6 % vremena u senci u junu, iako su staze na svega ~9 m jedna od druge.</p>
+          <span class="analiza-cta">Otvori analizu →</span>
+        </a>
+
+        <a href="9.2.noise_and_air_quality_exposure.html" class="analiza-card analiza-card-live">
+          <div class="analiza-card-head">
+            <span class="analiza-num">9.2</span>
+            <span class="analiza-status status-live">Objavljeno</span>
+          </div>
+          <h3>Buka i kvalitet vazduha</h3>
+          <p>Koliko saobraćaj sa okolnih ulica prodire do keja, deonica po deonica — i kakav je vazduh nad Nišavom kroz godinu.</p>
+          <p class="analiza-nalaz"><strong>Nalaz:</strong> Centar je jedina bučna deonica i u njoj nema nijednog tihog metra; ostalih 12 km je van domašaja saobraćaja. Vazduh je loš 45 % dana, ali skoro isključivo zimi.</p>
+          <span class="analiza-cta">Otvori analizu →</span>
+        </a>
+
+        <div class="analiza-card analiza-card-plan">
+          <div class="analiza-card-head">
+            <span class="analiza-num">9.3</span>
+            <span class="analiza-status status-plan">U pripremi</span>
+          </div>
+          <h3>Termalni komfor i kvalitet predela</h3>
+          <p>Spaja senku, blizinu vode, podlogu i vetar u ocenu koliko je deonica podnošljiva po letnjoj vrućini — i koliko je, prosto, lepa.</p>
+        </div>
+
+      </div>
+
+      <div class="pokazatelji" id="s9-pokazatelji">
+        <h3>Pokazatelji po stazi</h3>
+        <div class="table-scroll">
+          <table class="senka-table pokazatelji-table" id="pokazatelji">
+            <caption class="sr-only">Pokazatelji kvaliteta životne sredine za tri staze koridora</caption>
+          </table>
+        </div>
+        <p class="muted pokazatelji-nota" id="pokazatelji-nota"></p>
+      </div>
+    </section>
+
+    <section class="analiza-grupa analiza-grupa-najava">
+      <h2>Ostale sekcije</h2>
+      <p class="muted">U izradi...</p>
+    </section>
+
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    <p>Podaci: terensko mapiranje 2026. · Krošnje: Meta/WRI Canopy Height (CC BY 4.0) · Mapa: Leaflet.js</p>
+    <p class="muted">Nišavski biciklistički koridor — inicijativa zajednice, Niš</p>
+    <p class="muted footer-meta">
+      <a href="index.html">Početna</a>
+      <span class="footer-sep">·</span>
+      <a href="dnevnik.html">Tehnički dnevnik</a>
+      <span class="footer-sep">·</span>
+      <a href="https://chat.whatsapp.com/HYK0lrtDDGF2l2MHmeKPf1" target="_blank" rel="noopener">WhatsApp grupa</a>
+      <span class="footer-sep">·</span>
+      Otvoreni kod pod <a href="LICENSE" target="_blank" rel="noopener">GPL 3.0</a> licencom
+      <span class="footer-sep">·</span>
+      <a href="https://github.com/biciklisticki-koridor-nis/biciklisticki-koridor-nis.github.io" target="_blank" rel="noopener">GitHub</a>
+    </p>
+  </div>
+</footer>
+
+<script src="analize.js"></script>
+
+</body>
+</html>

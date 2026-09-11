@@ -29,11 +29,13 @@ Pipeline:
 Izvor: https://registry.opendata.aws/dataforgood-fb-forests/ (CC BY 4.0,
 Maxar snimci 2018–2020 — novije sadnje/seče se ne vide).
 """
-import hashlib
 import json
 import math
 import os
 import sys
+
+from koridor import (DEONICE_FILE, LAT0, LON0, MREZA_FILE, PROJ_MAX_M, ROOT,
+                     STAZE, STEP_M, axis_km, merc_xy, prepare, samples_hash)
 
 try:
     import numpy as np
@@ -44,9 +46,6 @@ try:
 except ImportError:
     HAS_DEPS = False
 
-ROOT = os.path.dirname(os.path.abspath(__file__))
-MREZA_FILE = os.path.join(ROOT, "data", "staze_mreza.geojson")
-DEONICE_FILE = os.path.join(ROOT, "data", "deonice.geojson")
 OUT_FILE = os.path.join(ROOT, "data", "shade_canopy.json")
 CACHE_DIR = os.path.join(ROOT, "data", ".cache", "canopy")
 
@@ -56,14 +55,6 @@ CHM_URL = ("https://dataforgood-fb-data.s3.amazonaws.com/forests/v1/"
 
 CANOPY_SCHEMA = 3   # 3: tri staze (bici + oba bedema) na zajedničkoj km-osi
 
-STAZE = [
-    ("bici",           "Biciklistička staza"),
-    ("pesacki_gornji", "Pešačka staza — gornji bedem"),
-    ("pesacki_donji",  "Pešačka staza — donji bedem"),
-]
-PROJ_MAX_M = 40.0        # dalje od ose = prilaz, ne deo koridora
-
-STEP_M = 10.0            # korak uzorkovanja trase
 OBSERVER_H = 1.5         # visina bicikliste (m)
 MAX_TREE_H = 26.0        # iznad ovoga ne tražimo krošnje (max u koridoru: 22 m)
 RAY_STEP_M = 1.2         # ≈ rezolucija CHM grida
@@ -73,11 +64,6 @@ BUFFER_PX = 8            # ±9.5 m prozor za visinu krošnje kod tačke
 TREE_MIN_H = 3.0         # prag „ovo je drvo" za pokrivenost krošnjama
 CHM_PAD_PX = 300         # margina CHM prozora za duge senke (~360 m)
 
-LAT0 = 43.315            # centar trase — za solarne formule i metar/stepen
-LON0 = 21.92
-M_PER_DEG_LAT = 111320.0
-M_PER_DEG_LON = M_PER_DEG_LAT * math.cos(math.radians(LAT0))
-
 # Referentni dani kao u shade_real.py: DOY + UTC offset (mart/dec su CET).
 DATES = [
     {"key": "mar21", "label": "Prolećna ravnodnevnica (21. mart)", "doy": 80, "tz": 1},
@@ -86,140 +72,6 @@ DATES = [
     {"key": "dec21", "label": "Zimski solsticij (21. decembar)", "doy": 355, "tz": 1},
 ]
 HOURS = list(range(5, 21))  # lokalni sati 05..20
-
-
-# ---------- trasa ----------
-
-def load_mreza():
-    """Vraća (osa_coords, {tip: [lanac, ...]}) iz staze_mreza.geojson."""
-    with open(MREZA_FILE) as f:
-        gj = json.load(f)
-    axis = None
-    chains = {tip: [] for tip, _ in STAZE}
-    for feat in gj["features"]:
-        p = feat["properties"]
-        coords = feat["geometry"]["coordinates"]
-        if p["uloga"] == "osa":
-            axis = coords
-        elif p["tip"] in chains and p["tip"] != "bici":
-            chains[p["tip"]].append(coords)
-    if axis is None:
-        raise SystemExit("! staze_mreza.geojson nema lanac sa uloga=\"osa\"")
-    chains["bici"] = [axis]   # krakovi biciklističke mreže nisu deo koridora
-    return axis, chains
-
-
-def resample_line(coords):
-    """Tačke na svakih STEP_M duž linije, sa kumulativnom dužinom u metrima."""
-    out = []
-    acc = 0.0
-    next_m = 0.0
-    for (lo1, la1), (lo2, la2) in zip(
-            [(c[0], c[1]) for c in coords[:-1]],
-            [(c[0], c[1]) for c in coords[1:]]):
-        dx = (lo2 - lo1) * M_PER_DEG_LON
-        dy = (la2 - la1) * M_PER_DEG_LAT
-        seg = math.hypot(dx, dy)
-        while seg > 0 and next_m <= acc + seg:
-            f = (next_m - acc) / seg
-            out.append((lo1 + (lo2 - lo1) * f, la1 + (la2 - la1) * f, next_m))
-            next_m += STEP_M
-        acc += seg
-    return out
-
-
-def build_samples(axis, chains):
-    """Uzorci po stazi, svaki sa km projektovanim na referentnu osu.
-
-    Zajednička km-osa je jedino što tri staze čini uporedivim: one imaju
-    različite sopstvene dužine i različite početke, pa bi sopstvena
-    kilometraža poredila neuporedive tačke.
-    """
-    axis_pts = resample_line(axis)
-    cell = PROJ_MAX_M
-    grid = {}
-    for lon, lat, m in axis_pts:
-        x, y = lon * M_PER_DEG_LON, lat * M_PER_DEG_LAT
-        grid.setdefault((int(x // cell), int(y // cell)), []).append((x, y, m))
-
-    def project_km(lon, lat):
-        x, y = lon * M_PER_DEG_LON, lat * M_PER_DEG_LAT
-        cx, cy = int(x // cell), int(y // cell)
-        best, best_m = PROJ_MAX_M, None
-        for dx in (-1, 0, 1):
-            for dy in (-1, 0, 1):
-                for px, py, m in grid.get((cx + dx, cy + dy), ()):
-                    d = math.hypot(px - x, py - y)
-                    if d < best:
-                        best, best_m = d, m
-        return best_m
-
-    by_tip = {}
-    for tip, _ in STAZE:
-        samples = []
-        dropped = 0
-        for ci, ch in enumerate(chains[tip]):
-            for lon, lat, _ in resample_line(ch):
-                m = project_km(lon, lat)
-                if m is None:
-                    dropped += 1
-                    continue
-                samples.append({"km": m / 1000.0, "lon": lon, "lat": lat,
-                                "chain": ci})
-        samples.sort(key=lambda s: s["km"])
-        by_tip[tip] = samples
-        extra = f", {dropped} van koridora" if dropped else ""
-        print(f"  {tip}: {len(samples)} tačaka{extra}")
-    return by_tip
-
-
-def samples_hash(samples):
-    h = hashlib.sha1()
-    for s in samples:
-        h.update(f"{s['km']:.3f},{s['lat']:.6f},{s['lon']:.6f}|".encode())
-    return h.hexdigest()[:16]
-
-
-def _point_in_poly(lon, lat, ring):
-    """Ray-casting test (isti pristup kao classify_deonica u convert.py)."""
-    inside = False
-    j = len(ring) - 1
-    for i in range(len(ring)):
-        xi, yi = ring[i][0], ring[i][1]
-        xj, yj = ring[j][0], ring[j][1]
-        if (yi > lat) != (yj > lat):
-            x_cross = (xj - xi) * (lat - yi) / (yj - yi) + xi
-            if lon < x_cross:
-                inside = not inside
-        j = i
-    return inside
-
-
-def assign_deonice(samples):
-    """Deonica preko point-in-polygon testa na meta_deonice poligonima.
-
-    Tačke van svih poligona nasleđuju deonicu prethodne tačke duž trase
-    (isti smoothing princip kao u convert.py).
-    """
-    with open(DEONICE_FILE) as f:
-        deonice = json.load(f)
-    polys = [(feat["properties"]["name"], feat["geometry"]["coordinates"][0])
-             for feat in deonice["features"]]
-    last = None
-    for s in samples:
-        name = next((n for n, ring in polys
-                     if _point_in_poly(s["lon"], s["lat"], ring)), None)
-        if name is None:
-            name = last
-        s["deonica"] = name
-        last = name
-    # vodeće tačke pre prvog pogotka
-    first = next((s["deonica"] for s in samples if s["deonica"]), None)
-    for s in samples:
-        if s["deonica"] is None:
-            s["deonica"] = first
-        else:
-            break
 
 
 # ---------- CHM ----------
@@ -254,12 +106,6 @@ def load_chm(samples, key):
     np.savez_compressed(cache, arr=arr, origin=np.array([x0, y0]), res=res,
                         key=np.array(key))
     return arr, np.array([x0, y0]), res
-
-
-def merc_xy(lon, lat):
-    R = 6378137.0
-    return (math.radians(lon) * R,
-            R * math.log(math.tan(math.pi / 4 + math.radians(lat) / 2)))
 
 
 # ---------- sunce ----------
@@ -436,20 +282,7 @@ def main():
                   file=sys.stderr)
             return 1
 
-    axis, chains = load_mreza()
-    by_tip = build_samples(axis, chains)
-    for samples in by_tip.values():
-        assign_deonice(samples)
-
-    # zajednički redosled deonica — po kilometraži referentne ose
-    deon_order = []
-    for s in by_tip["bici"]:
-        if s["deonica"] not in deon_order:
-            deon_order.append(s["deonica"])
-    for samples in by_tip.values():
-        for s in samples:
-            if s["deonica"] not in deon_order:
-                deon_order.append(s["deonica"])
+    axis, by_tip, deon_order = prepare()
 
     flat = [s for tip, _ in STAZE for s in by_tip[tip]]
     cur_hash = samples_hash(flat)
@@ -497,7 +330,7 @@ def main():
         "samples_hash": cur_hash,
         "source": "Meta/WRI Global Canopy Height (1 m, CC BY 4.0, 2018-2020)",
         "step_m": STEP_M,
-        "osa_km": round(resample_line(axis)[-1][2] / 1000.0, 2),
+        "osa_km": round(axis_km(axis), 2),
         "hours": HOURS,
         "dates": [{"key": d["key"], "label": d["label"],
                    "daylight": daylight[d["key"]]} for d in DATES],
