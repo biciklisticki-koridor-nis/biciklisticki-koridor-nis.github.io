@@ -915,6 +915,12 @@ p  { margin: 0 0 1em; color: var(--ink-700); }
   box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
 }
 .cta-card-wa h3 { color: var(--green-900); }
+.cta-card-wa p { margin-bottom: .5rem; }
+.cta-list { margin: 0; padding-left: 1.1rem; }
+.cta-list li { margin-bottom: .45rem; color: var(--ink-700); }
+.cta-list li:last-child { margin-bottom: 0; }
+.cta-list li::marker { color: #25d366; }
+.cta-list strong { color: var(--green-900); }
 
 /* ---------- dnevnik (poseban article layout) ---------- */
 .dnevnik-body { background: var(--sand-50); }
