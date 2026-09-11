@@ -1,0 +1,86 @@
+{
+ "staze": [
+  {
+   "tip": "bici",
+   "label": "Biciklistička staza"
+  },
+  {
+   "tip": "pesacki_gornji",
+   "label": "Pešačka staza — gornji bedem"
+  },
+  {
+   "tip": "pesacki_donji",
+   "label": "Pešačka staza — donji bedem"
+  }
+ ],
+ "parametri": {
+  "kontinuitet_min_m": 30.0,
+  "krosnje_min_h_m": 3.0,
+  "sunce_datum": "jun21",
+  "sunce_sati": [
+   12,
+   16
+  ],
+  "buka_min_indeks": 50,
+  "pogled_min_ugao": 10,
+  "pogled_max_m": 250.0
+ },
+ "redovi": [
+  {
+   "key": "kontinuitet_senke",
+   "izvor": "9.1",
+   "bolje": "vece",
+   "vrednosti": {
+    "bici": 4.8,
+    "pesacki_gornji": 1.9,
+    "pesacki_donji": 14.9
+   }
+  },
+  {
+   "key": "krosnje",
+   "izvor": "9.1",
+   "bolje": "vece",
+   "vrednosti": {
+    "bici": 27.3,
+    "pesacki_gornji": 27.6,
+    "pesacki_donji": 50.3
+   }
+  },
+  {
+   "key": "sunce",
+   "izvor": "9.1",
+   "bolje": "manje",
+   "vrednosti": {
+    "bici": 92.4,
+    "pesacki_gornji": 95.0,
+    "pesacki_donji": 81.0
+   }
+  },
+  {
+   "key": "pogled_na_reku",
+   "izvor": "9.3",
+   "bolje": "vece",
+   "vrednosti": {
+    "bici": 58.7,
+    "pesacki_gornji": 61.5,
+    "pesacki_donji": 56.3
+   }
+  },
+  {
+   "key": "buka",
+   "izvor": "9.2",
+   "bolje": "manje",
+   "vrednosti": {
+    "bici": 28.4,
+    "pesacki_gornji": 30.5,
+    "pesacki_donji": 22.9
+   }
+  },
+  {
+   "key": "termalni_komfor",
+   "izvor": "9.3",
+   "bolje": null,
+   "vrednosti": null
+  }
+ ]
+}

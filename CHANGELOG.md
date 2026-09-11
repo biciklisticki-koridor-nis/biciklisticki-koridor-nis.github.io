@@ -6,6 +6,37 @@ Format prati [Keep a Changelog](https://keepachangelog.com/sr/1.1.0/).
 ## [Neobjavljeno]
 
 ### Dodato
+- **Sadržaj na vrhu `analize.html`** — sekcije i njihove analize sa
+  linkovima: sekcija skače na sebe na stranici, objavljene analize otvaraju
+  svoju stranicu, a one u pripremi su navedene bez linka. Sadržaj se gradi
+  iz kartica na stranici, pa nova sekcija ne traži posebno održavanje.
+  Kartice sekcije su sada iznad tabele pokazatelja.
+- **Tabela pokazatelja sekcije 9 na `analize.html`** — po jedan broj za svaku
+  od tri staze, za pokazatelje iz okvira analize. Najbolja staza je
+  podebljana; na telefonu opis mere prelazi ispod naziva da bi brojevi stali
+  bez skrolovanja.
+  - Kontinuitet senke: % dužine u neprekidnoj *stvarnoj* senci od bar
+    30 m, 21. jun 12–16 h — 4.8 / 1.9 / 14.9 %. Prva verzija je brojala
+    nizove drvoreda i za donji bedem davala 45 % uz 81 % izloženosti suncu:
+    leti u podne stablo od 10 m baca senku od 3,8 m, pa drvored pored staze
+    ne zaseni stazu. Prag od 30 m je najniži koji podaci trpe za senku
+    (prelom u raspodeli dužina nizova između 20 i 30 m).
+  - Krošnje 27.3 / 27.6 / 50.3 %, sunce 21. jun 12–16 h 92.4 / 95.0 /
+    81.0 %, pogled na reku 58.7 / 61.5 / 56.3 %, izloženost buci 28.4 /
+    30.5 / 22.9 %. Termalni komfor je u pripremi (9.3).
+  - Žarišta zagađenja vazduha su namerno izostavljena: CAMS ćelija od
+    11 km ne razlučuje prostor, a glavni problem (PM2.5, zima) nije
+    saobraćajni.
+  - `indikatori.py` + `make indikatori` → `data/indikatori.json` (1,4 KB),
+    da stranica ne bi učitavala 500 KB podataka po tački.
+- **`river_views.py` + `make views` → `data/river_views.json`** — pogled na
+  Nišavu: 72 zraka po tački preko CHM rastera, do 250 m, pogled ako se voda
+  vidi u uglu od bar 10°. Voda iz OSM-a: poligoni zapadno od km 5, članovi
+  multipoligon relacija istočno (sa adama), linija toka kao osigurač.
+  Konzervativna i optimistična granica (vidi li se ispod visokog drveća) se
+  razlikuju za 0.3–3.3 poena. Bez rastinja pogled bi imalo 100 % dužine, pa
+  je sav gubitak pogleda rastinje: zapad 76–100 %, šumoviti istok 23–35 %.
+  Gornji bedem je potcenjen jer teren nije modeliran.
 - **`docs/` — materijali za terenski rad** koji ne idu na sajt. Prvi je
   `docs/9.2-kalibracija-buke/`: protokol za jedan izlazak kojim se model
   buke prevodi iz indeksa 0–100 u decibele.

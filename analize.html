@@ -21,6 +21,11 @@
 <main class="analize-main">
   <div class="container">
 
+    <nav class="sadrzaj" id="sadrzaj" aria-label="Sadržaj" hidden>
+      <h2 class="sadrzaj-naslov">Sadržaj</h2>
+      <ol class="sadrzaj-lista" id="sadrzaj-lista"></ol>
+    </nav>
+
     <p class="lead">Analize su grupisane po temama. Svaka se računa iz istih izvora kao i mapa — terenskog mapiranja i otvorenih satelitskih podataka — i svaka ima ispisan metod i ograničenja, da se brojevi mogu proveriti i osporiti.</p>
 
     <section class="analiza-grupa" id="s9">
@@ -61,6 +66,16 @@
         </div>
 
       </div>
+
+      <div class="pokazatelji" id="s9-pokazatelji">
+        <h3>Pokazatelji po stazi</h3>
+        <div class="table-scroll">
+          <table class="senka-table pokazatelji-table" id="pokazatelji">
+            <caption class="sr-only">Pokazatelji kvaliteta životne sredine za tri staze koridora</caption>
+          </table>
+        </div>
+        <p class="muted pokazatelji-nota" id="pokazatelji-nota"></p>
+      </div>
     </section>
 
     <section class="analiza-grupa analiza-grupa-najava">
@@ -88,6 +103,8 @@
     </p>
   </div>
 </footer>
+
+<script src="analize.js"></script>
 
 </body>
 </html>
