@@ -22,6 +22,42 @@
 
     <article class="post">
       <header class="post-head">
+        <time datetime="2026-09-14">14. septembar 2026.</time>
+        <h2>Bezbednosni audit: tri kategorije, bez novih podataka</h2>
+      </header>
+      <p class="post-summary">Analiza 8 — infrastrukturna bezbednost, lična bezbednost i saobraćajni konflikti — u potpunosti je izvedena iz GeoJSON fajlova koji su nastali terenskim mapiranjem. Nije povučen nijedan novi API poziv. Sve računate veličine — tamne zone, gustina stepenica, parking konflikti — dobijene su projekcijom tačaka na zajedničku km-osu koridora, istom geometrijskom infrastrukturom koju koriste analize 9.1–9.3. Rezultat je <a href="8.safety_audit.html">Analiza 8 → Bezbednosni audit</a>.</p>
+      <div class="post-body">
+        <h3>Podaci i šta od čega dolazi</h3>
+        <p>Četiri GeoJSON fajla hrane analizu, svi generisani iz <code>koridor_data.kml</code> kroz <code>convert.py</code>:</p>
+        <ul class="tech-list">
+          <li><strong>stanja.geojson</strong> — 14 zapisa o stanju površina i infrastrukture duž trase (loše, srednje, dobro, deponija). Svaki zapis je ručno zabeležen na terenu, ne izveden iz satelita.</li>
+          <li><strong>osvetljenje.geojson</strong> — 130 svetiljki projektovanih na biciklističku osu. Svetiljke su između sebe daleko 0 do 6.550 m; sve praznine veće od 200 m proglašavaju se tamnim zonama.</li>
+          <li><strong>prekidi.geojson</strong> — 52 tačke prekida u kretanju. Subset se klasifikuje kao parking konflikti (regex: <code>parking|koso park|rampa za park|divo park</code>) ili saobraćajni prelazi (<code>prelaz|nema peš|most</code>), ostatak se ignoriše jer ne pripada analizi 8.</li>
+          <li><strong>stepenice.geojson</strong> — 81 stepenica, raspoređena po deonicama i histogramu gustine na 500 m segmentima.</li>
+        </ul>
+        <h3>Tamne zone: kako se računa 68 %</h3>
+        <p>Svaka svetiljka se projektuje na biciklističku osu (prostorni grid sa ćelijom PROJ_MAX_M, isti kod kao u 9.2). Od 130 svetiljki, sve ulaze u projekciju — prag rastojanja nije problem jer su svetiljke neposredno uz stazu. Sortirani km položaji svetiljki dele osu na intervale. Svaki interval duži od 200 m postaje tamna zona. Prvih 0 km i posle poslednje svetiljke do kraja trase (km 14.02) računaju se kao tamne ako su duže od praga, jer „počinje mrak" pre prve i posle poslednje lampe. Rezultat: 3 zone, 9.560 m, 68,1 %. Najduža zona je 6.550 m — od Brzog Broda prema Niškoj Banji, bez ijedne svetiljke na celoj deonici.</p>
+        <p>Prag od 200 m je radni kriterijum, ne standard. Zona može biti bezbedna i bez svetla ako je osvetljena iz okolnih izvora (kafane, prodavnice). Konzervativni prag je odabran svesno.</p>
+        <h3>Stepenice: projection challenge</h3>
+        <p>Prva verzija koda koristila je samo biciklističku osu sa pragom 40 m (PROJ_MAX_M) — isti kao u svim ostalim analizama. Rezultat: 39 od 81 stepenice su propale projekciju. Razlog je fizički: stepenice na Gabrovačkoj Reci stoje na starom bedemskom zidu, 40–80 m od biciklističke staze. U 9.1–9.3 taj prag štiti od lažnih projekcija udaljenih objekata na osu, ali ovde nas košta tačne podatke.</p>
+        <p>Rešenje: za stepenice se gradi poseban prostorni index nad sirovim uzorcima <em>svih</em> staza (biciklistička + oba pešačka bedema), a projekcija na bici-osu se radi bez gornje granice rastojanja (brute-force po flat listi, bez cell filtera). Svaka stepenica se prvo projicira na najbližu tačku bilo koje staze, a odatle se km koordinata prenosi na bici-osu. Krajnji rezultat: 0 propuštenih stepenica.</p>
+        <h3>Gabrovačka Reka: artefakt geometrije</h3>
+        <p>37 stepenica na Gabrovačkoj Reci projektuje se u histogram gotovo sve u isti bin oko km 5.0. Razlog: bedemski zid Gabrovačke Reke ide <em>poprečno</em> na biciklističku osu — sve stepenice su raspoređene po kratkom pojasu koji se, gledano duž km-ose, kolapsira u nekoliko stotina metara. Stepenice postoje fizički na celoj vertikalnoj visini bedema, ali km-osa ih ne razlikuje. Ograničenje je dokumentovano, ne pokušavamo da ga ispravimo jer bi zahtevalo drugu km-osu za samu Gabrovačku Reku.</p>
+        <h3>Vizualizacije</h3>
+        <p>Tri tipa prikaza nisu bili deo prethodnih analiza i dodati su kao novi CSS + canvas komponente:</p>
+        <ul class="tech-list">
+          <li><strong>Pin timeline</strong> (CSS, apsolutno pozicioniranje) — svaka tačka stanja se ispisuje kao pin na procentualnoj poziciji duž trake. Pređi mišem → tooltip sa imenom i tipom. Alternativa linijskom stripu — prikladnija za sparse podatke (14 tačaka na 14 km).</li>
+          <li><strong>Canvas histogram gustine stepenica</strong> — 500 m binovi bojeni po gustini (zeleno ≤ 2, narandžasto 3–5, crveno ≥ 6), hover tooltip pokazuje opseg km i broj stepenica. Odabrana umesto scatter mape jer vizualizuje <em>koncentraciju</em>, ne samo lokacije.</li>
+          <li><strong>Lighting strip</strong> — isti princip kao shade strip u 9.1, ali boji se po izlaznom objektu, ne po keširanom JSON-u po tački. Segment je žut ako mu je km unutar opsega neke svetiljke ± pola praga, inače tamnosiv.</li>
+        </ul>
+        <p>Leaflet mapa u sekciji 8.3 koristi isti <code>L.Layer.extend</code> canvas overlay kao 9.1, ali boji trasu po osvetljenosti (tamne zone/osvetljeno) umesto po satima senke, i dodaje kružne markere za parking konflikte i prelaze.</p>
+        <h3>Šta nije obuhvaćeno</h3>
+        <p>Slepi uglovi i podvožnjaci nisu bili deo terenskog protokola, pa nedostaju iz analize 8. Privremene prepreke (gradnja, parking na stazi koji nije ručno unesen) su delimično obuhvaćene kroz prekidi.geojson, ali nisu sistematski maprane. Ove kategorije treba dodati u sledećoj iteraciji terenskog mapiranja.</p>
+      </div>
+    </article>
+
+    <article class="post">
+      <header class="post-head">
         <time datetime="2026-09-11">11. septembar 2026.</time>
         <h2>Pokazatelji sekcije 9: najniži prag koji podaci trpe, i pogled na reku</h2>
       </header>
