@@ -6,7 +6,7 @@ KML     := koridor_data.kml
 # Ekstraktuje href iz NetworkLink-a u $(SOURCE) (radi i sa CDATA wrapperom).
 KML_URL  = $(shell grep -oP '<href>\s*(<!\[CDATA\[)?\K[^]<]+' $(SOURCE))
 
-.PHONY: help convert serve fetch analyze clean all venv anketa node-deps shade canopy noise views indikatori
+.PHONY: help convert serve fetch analyze clean all venv anketa node-deps shade canopy noise views indikatori safety
 
 help:
 	@echo "Dostupni targeti:"
@@ -22,7 +22,8 @@ help:
 	@echo "  make serve     - pokrece lokalni HTTP server na portu $(PORT)"
 	@echo "  make fetch     - preuzima sveže podatke sa Google MyMaps (-> $(KML))"
 	@echo "  make analyze   - prikazuje pregled KML strukture (analyze.py)"
-	@echo "  make all       - fetch + convert + anketa + canopy + noise + views + indikatori"
+	@echo "  make safety    - bezbednosni audit: tamne zone, stanja, konflikti -> data/safety.json"
+	@echo "  make all       - fetch + convert + anketa + canopy + noise + views + indikatori + safety"
 	@echo "  make clean     - briše data/ (GeoJSON + slike) i preuzeti KML"
 
 venv:
@@ -72,7 +73,10 @@ views:
 indikatori:
 	$(PYTHON) indikatori.py
 
-all: fetch convert anketa canopy noise views indikatori
+safety:
+	$(PYTHON) safety.py
+
+all: fetch convert anketa canopy noise views indikatori safety
 
 clean:
 	rm -rf data/
