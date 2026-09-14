@@ -1,0 +1,496 @@
+{
+  "schema": 1,
+  "osa_km": 14.04,
+  "tamne_zone": {
+    "prag_m": 200.0,
+    "ukupno_tamnih_m": 9560,
+    "tamno_pct": 68.1,
+    "najduza_zona_m": 6550,
+    "broj_zona": 3,
+    "zone": [
+      {
+        "km_od": 0.0,
+        "km_do": 1.9,
+        "duzina_m": 1900,
+        "deonica": "Medoševac"
+      },
+      {
+        "km_od": 2.53,
+        "km_do": 3.64,
+        "duzina_m": 1110,
+        "deonica": "Centar"
+      },
+      {
+        "km_od": 7.49,
+        "km_do": 14.04,
+        "duzina_m": 6550,
+        "deonica": "Niška Banja"
+      }
+    ]
+  },
+  "stanja": {
+    "ukupno": 14,
+    "po_tipu": {
+      "loše": 5,
+      "srednje": 1,
+      "dobro": 1,
+      "deponija": 4,
+      "ostalo": 3
+    },
+    "po_deonici": {
+      "Centar": {
+        "loše": 2,
+        "srednje": 0,
+        "dobro": 1,
+        "deponija": 0,
+        "ostalo": 1
+      },
+      "Delta - Lidl": {
+        "loše": 3,
+        "srednje": 1,
+        "dobro": 0,
+        "deponija": 0,
+        "ostalo": 1
+      },
+      "Medoševac": {
+        "loše": 0,
+        "srednje": 0,
+        "dobro": 0,
+        "deponija": 4,
+        "ostalo": 0
+      }
+    },
+    "tacke": [
+      {
+        "stanje": "loše",
+        "name": "loshe stanje",
+        "lon": 21.9058413,
+        "lat": 43.3264023,
+        "km": 3.64,
+        "deonica": "Centar"
+      },
+      {
+        "stanje": "srednje",
+        "name": "srednje stanje",
+        "lon": 21.9105496,
+        "lat": 43.3260069,
+        "km": 4.12,
+        "deonica": "Delta - Lidl"
+      },
+      {
+        "stanje": "dobro",
+        "name": "dobro stanje",
+        "lon": 21.8998127,
+        "lat": 43.3252221,
+        "km": 3.05,
+        "deonica": "Centar"
+      },
+      {
+        "stanje": "loše",
+        "name": "loše stanje kaldrme",
+        "lon": 21.9004912,
+        "lat": 43.3255531,
+        "km": 3.11,
+        "deonica": "Centar",
+        "images": [
+          "images/26522b25ba02c2a4.jpg"
+        ]
+      },
+      {
+        "stanje": "ostalo",
+        "name": "stanje ispod mosta",
+        "lon": 21.9088287,
+        "lat": 43.3262975,
+        "km": 3.88,
+        "deonica": "Delta - Lidl",
+        "images": [
+          "images/1334e8d3a026bc9f.jpg"
+        ]
+      },
+      {
+        "stanje": "deponija",
+        "name": "deponija",
+        "lon": 21.8843717,
+        "lat": 43.3234164,
+        "km": 1.51,
+        "deonica": "Medoševac",
+        "images": [
+          "images/33d7d069c6c8a00f.jpg"
+        ]
+      },
+      {
+        "stanje": "deponija",
+        "name": "Deponija",
+        "lon": 21.8817454,
+        "lat": 43.324875,
+        "km": 1.23,
+        "deonica": "Medoševac",
+        "images": [
+          "images/25696ed07872ba7c.jpg",
+          "images/528207e4aed89d71.jpg"
+        ]
+      },
+      {
+        "stanje": "ostalo",
+        "name": "Stepenice",
+        "lon": 21.9058451,
+        "lat": 43.3264221,
+        "km": 3.64,
+        "deonica": "Centar"
+      },
+      {
+        "stanje": "loše",
+        "name": "Lose stanje",
+        "lon": 21.9120779,
+        "lat": 43.3261222,
+        "km": 4.24,
+        "deonica": "Delta - Lidl"
+      },
+      {
+        "stanje": "loše",
+        "name": "lose stanje",
+        "lon": 21.915252,
+        "lat": 43.3263105,
+        "km": 4.5,
+        "deonica": "Delta - Lidl"
+      },
+      {
+        "stanje": "loše",
+        "name": "lose stanje",
+        "lon": 21.9163277,
+        "lat": 43.3260917,
+        "km": 4.59,
+        "deonica": "Delta - Lidl"
+      },
+      {
+        "stanje": "deponija",
+        "name": "DEPONIJA",
+        "lon": 21.8755413,
+        "lat": 43.324497,
+        "km": 0.72,
+        "deonica": "Medoševac",
+        "images": [
+          "images/a0414b45faefda8b.jpg",
+          "images/6000308c38f6e9a2.jpg",
+          "images/68f2066b32d026b1.jpg",
+          "images/59e922083ad419fa.jpg",
+          "images/0887736a2750561a.jpg"
+        ],
+        "duzina_m": 978.5
+      },
+      {
+        "stanje": "deponija",
+        "name": "DEPONIJA",
+        "lon": 21.8765029,
+        "lat": 43.3243305,
+        "km": null,
+        "deonica": "Medoševac",
+        "duzina_m": 71.5
+      },
+      {
+        "stanje": "ostalo",
+        "name": "Otpadne vode",
+        "lon": 21.8822692,
+        "lat": 43.32543,
+        "km": null,
+        "deonica": null,
+        "images": [
+          "images/7224fbf7d3c3b58d.jpg"
+        ]
+      }
+    ]
+  },
+  "konflikti": {
+    "ukupno_parking": 6,
+    "ukupno_prelaza": 6,
+    "po_deonici": {
+      "Niška Banja": {
+        "parking": 1,
+        "prelaz": 3
+      },
+      "Medoševac": {
+        "parking": 4,
+        "prelaz": 1
+      },
+      "Gabrovačka Reka": {
+        "parking": 1,
+        "prelaz": 0
+      },
+      "Brzi Brod": {
+        "parking": 0,
+        "prelaz": 2
+      }
+    },
+    "parking": [
+      {
+        "name": "Koriste kao parking ",
+        "tip": "ostalo",
+        "lon": 22.0164121,
+        "lat": 43.3026756,
+        "deonica": "Niška Banja",
+        "konflikt_tip": "parking"
+      },
+      {
+        "name": "Rampa za parking ",
+        "tip": "ostalo",
+        "lon": 21.8850434,
+        "lat": 43.3223408,
+        "deonica": "Medoševac",
+        "konflikt_tip": "parking"
+      },
+      {
+        "name": "Privremeni parking, trotoar sa zemljom shirine 3m",
+        "tip": "ostalo",
+        "lon": 21.8874771,
+        "lat": 43.3211173,
+        "deonica": "Medoševac",
+        "images": [
+          "images/5d8c3daaeccf6d32.jpg"
+        ],
+        "konflikt_tip": "parking"
+      },
+      {
+        "name": "Asfaltirani trotoar, oznachili su kao parking zona 2m",
+        "tip": "ostalo",
+        "lon": 21.8883235,
+        "lat": 43.3209905,
+        "deonica": "Medoševac",
+        "konflikt_tip": "parking"
+      },
+      {
+        "name": "Trotoar 5 m, iskoristen za koso parkiranje",
+        "tip": "ostalo",
+        "lon": 21.8890374,
+        "lat": 43.3209513,
+        "deonica": "Medoševac",
+        "images": [
+          "images/d7cb76c007145e9f.jpg",
+          "images/2107b5be3187b724.jpg"
+        ],
+        "konflikt_tip": "parking"
+      },
+      {
+        "name": "prekid u kretanju zbog divo parkiranje na javni prostor",
+        "tip": "ostalo",
+        "lon": 21.9252963,
+        "lat": 43.3191602,
+        "deonica": "Gabrovačka Reka",
+        "konflikt_tip": "parking"
+      }
+    ],
+    "prelazi": [
+      {
+        "name": "Prekid u kretanju Zemljen put ka nishavi",
+        "tip": "promena_puta",
+        "lon": 21.9847208,
+        "lat": 43.3069825,
+        "deonica": "Niška Banja",
+        "konflikt_tip": "prelaz"
+      },
+      {
+        "name": "Prekid u kretanju neophodno da se peogje na most",
+        "tip": "most_prelaz",
+        "lon": 21.984155,
+        "lat": 43.3072436,
+        "deonica": "Niška Banja",
+        "konflikt_tip": "prelaz"
+      },
+      {
+        "name": "Prekid kretanja - nema peshachki prelaz",
+        "tip": "ostalo",
+        "lon": 21.8906652,
+        "lat": 43.3210785,
+        "deonica": "Medoševac",
+        "images": [
+          "images/b3206e2fbf76aea7.jpg"
+        ],
+        "konflikt_tip": "prelaz"
+      },
+      {
+        "name": "zemljena prikljucna staza (privremena)",
+        "tip": "promena_puta",
+        "lon": 21.9662751,
+        "lat": 43.3152989,
+        "deonica": "Brzi Brod",
+        "konflikt_tip": "prelaz"
+      },
+      {
+        "name": "Zemljen iskop, ",
+        "tip": "promena_puta",
+        "lon": 21.966924,
+        "lat": 43.3149346,
+        "deonica": "Brzi Brod",
+        "konflikt_tip": "prelaz"
+      },
+      {
+        "name": "prekid u kretanju zbog nepostojenje mosta preko kutinska reka",
+        "tip": "most_prelaz",
+        "lon": 21.9847689,
+        "lat": 43.3080144,
+        "deonica": "Niška Banja",
+        "images": [
+          "images/41a578f36f6fe6d1.jpg"
+        ],
+        "konflikt_tip": "prelaz"
+      }
+    ]
+  },
+  "stepenice_po_deonici": {
+    "po_deonici": {
+      "Delta - Lidl": 14,
+      "Centar": 26,
+      "Medoševac": 2,
+      "Niška Banja": 2,
+      "Gabrovačka Reka": 37
+    },
+    "histogram": [
+      {
+        "km_od": 0.0,
+        "km_do": 0.5,
+        "count": 0
+      },
+      {
+        "km_od": 0.5,
+        "km_do": 1.0,
+        "count": 0
+      },
+      {
+        "km_od": 1.0,
+        "km_do": 1.5,
+        "count": 0
+      },
+      {
+        "km_od": 1.5,
+        "km_do": 2.0,
+        "count": 1
+      },
+      {
+        "km_od": 2.0,
+        "km_do": 2.5,
+        "count": 7
+      },
+      {
+        "km_od": 2.5,
+        "km_do": 3.0,
+        "count": 10
+      },
+      {
+        "km_od": 3.0,
+        "km_do": 3.5,
+        "count": 9
+      },
+      {
+        "km_od": 3.5,
+        "km_do": 4.0,
+        "count": 1
+      },
+      {
+        "km_od": 4.0,
+        "km_do": 4.5,
+        "count": 3
+      },
+      {
+        "km_od": 4.5,
+        "km_do": 5.0,
+        "count": 5
+      },
+      {
+        "km_od": 5.0,
+        "km_do": 5.5,
+        "count": 43
+      },
+      {
+        "km_od": 5.5,
+        "km_do": 6.0,
+        "count": 0
+      },
+      {
+        "km_od": 6.0,
+        "km_do": 6.5,
+        "count": 0
+      },
+      {
+        "km_od": 6.5,
+        "km_do": 7.0,
+        "count": 0
+      },
+      {
+        "km_od": 7.0,
+        "km_do": 7.5,
+        "count": 0
+      },
+      {
+        "km_od": 7.5,
+        "km_do": 8.0,
+        "count": 0
+      },
+      {
+        "km_od": 8.0,
+        "km_do": 8.5,
+        "count": 0
+      },
+      {
+        "km_od": 8.5,
+        "km_do": 9.0,
+        "count": 0
+      },
+      {
+        "km_od": 9.0,
+        "km_do": 9.5,
+        "count": 0
+      },
+      {
+        "km_od": 9.5,
+        "km_do": 10.0,
+        "count": 0
+      },
+      {
+        "km_od": 10.0,
+        "km_do": 10.5,
+        "count": 0
+      },
+      {
+        "km_od": 10.5,
+        "km_do": 11.0,
+        "count": 0
+      },
+      {
+        "km_od": 11.0,
+        "km_do": 11.5,
+        "count": 2
+      },
+      {
+        "km_od": 11.5,
+        "km_do": 12.0,
+        "count": 0
+      },
+      {
+        "km_od": 12.0,
+        "km_do": 12.5,
+        "count": 0
+      },
+      {
+        "km_od": 12.5,
+        "km_do": 13.0,
+        "count": 0
+      },
+      {
+        "km_od": 13.0,
+        "km_do": 13.5,
+        "count": 0
+      },
+      {
+        "km_od": 13.5,
+        "km_do": 14.0,
+        "count": 0
+      },
+      {
+        "km_od": 14.0,
+        "km_do": 14.04,
+        "count": 0
+      }
+    ],
+    "bin_m": 500,
+    "missed": 0
+  }
+}
