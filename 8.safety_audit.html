@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>8. Bezbednosni audit — Nišavski biciklistički koridor</title>
+  <meta name="description" content="Analiza 8: infrastrukturna bezbednost, lična bezbednost i saobraćajni konflikti duž keja Nišave." />
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<header class="hero page-hero">
+  <div class="container">
+    <p class="eyebrow"><a href="index.html">Nišavski biciklistički koridor</a> · <a href="analize.html">Analize</a> · 8. Bezbednosni audit</p>
+    <h1>8. Bezbednosni audit</h1>
+    <p class="subtitle">Gde je koridor bezbedan — i gde nije. Sve izvedeno iz terenskog mapiranja, bez dodatnih izvora.</p>
+  </div>
+</header>
+
+<!-- ── ključni nalazi ─────────────────────────────────────────── -->
+<section class="nalazi-section">
+  <div class="container">
+    <div class="nalazi" id="nalazi"></div>
+  </div>
+</section>
+
+<!-- ── 8.1 Infrastrukturna bezbednost ────────────────────────── -->
+<section id="s8-1" class="zelenilo-section">
+  <div class="container">
+    <h2>8.1 Infrastrukturna bezbednost</h2>
+    <p class="lead">Stanje površina i infrastrukture mapiranog na terenu — od oštećenih kaldrmi do ilegalnih deponija. Stepenice su posebno navedene jer direktno blokiraju prolaz biciklistima.</p>
+
+    <h3>Stanja duž trase</h3>
+    <p class="muted">Svaka tačka je zabeležena na terenu. Pređi mišem (ili dodirni) za detalje.</p>
+    <div class="heatmap-legend" style="margin-bottom:.75rem;" id="stanja-legenda"></div>
+    <div class="stanja-timeline-wrap">
+      <div class="stanja-pins" id="stanja-pins"></div>
+      <div class="stanja-track"></div>
+      <div class="stanja-timeline-axis" id="stanja-axis"></div>
+    </div>
+
+    <h3 style="margin-top:1.5rem;">Po deonici</h3>
+    <p class="muted">Deponija = ilegalno odlaganje otpada na stazi ili neposrednoj blizini.</p>
+    <div class="table-scroll">
+      <table class="senka-table" id="stanja-table">
+        <caption class="sr-only">Stanja infrastrukture po deonici</caption>
+      </table>
+    </div>
+
+    <h3 style="margin-top: 2rem;">Stepenice — prepreka za bicikle</h3>
+    <p class="muted">Broj stepenica na svakih 500 m trase. Pređi mišem za detalje.</p>
+    <div class="heatmap-legend" style="margin-bottom:.6rem;">
+      <span class="hl-item"><span class="hl-swatch" style="background:#7fa05c"></span> malo (1–2)</span>
+      <span class="hl-item"><span class="hl-swatch" style="background:#e0a03a"></span> umereno (3–5)</span>
+      <span class="hl-item"><span class="hl-swatch" style="background:#c0392b"></span> mnogo (6+)</span>
+    </div>
+    <div id="stepenice-histogram-wrap" style="position:relative;">
+      <canvas id="stepenice-histogram" aria-label="Histogram gustine stepenica duž trase"></canvas>
+      <div class="heatmap-tooltip" id="stepenice-tooltip" hidden>
+        <div class="tt-state"></div>
+        <div class="tt-meta"></div>
+      </div>
+    </div>
+
+    <h4 style="margin-top:1.5rem; margin-bottom:.6rem; color:var(--ink-700); font-size:.95rem;">Po deonici</h4>
+    <div class="bars" id="bars-stepenice"></div>
+
+    <div class="callout callout-info" style="margin-top: 1.5rem;">
+      <p><strong>Gabrovačka Reka dominira</strong> sa 37 stepenica od ukupno 81 — više od duplo nego Centar koji je drugi. Ova deonica je strukturno najnepogodnija za bicikliste bez ikakvih intervencija.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── 8.2 Lična bezbednost ──────────────────────────────────── -->
+<section id="s8-2" class="vazduh-section">
+  <div class="container">
+    <h2>8.2 Lična bezbednost</h2>
+    <p class="lead">Osvetljenost trase određuje da li je koridor upotrebljiv i bezbedан noću. Računato je: gde između dve uzastopne svetiljke postoji razmak veći od 200 m — to je tamna zona.</p>
+
+    <div class="shade-stats" id="tamne-stats"></div>
+
+    <h3 style="margin-top: 1.5rem;">Osvetljenost duž trase</h3>
+    <div class="heatmap-legend">
+      <span class="hl-item"><span class="hl-swatch" style="background:#d8a93a"></span> osvetljeno</span>
+      <span class="hl-item"><span class="hl-swatch" style="background:#2c2c2c"></span> tamna zona (razmak između svetiljki > 200 m)</span>
+    </div>
+    <div class="shade-strip-wrap">
+      <div class="shade-strip" id="tamne-strip"></div>
+      <div class="shade-strip-axis" id="tamne-axis"></div>
+    </div>
+
+    <div class="callout callout-info" style="margin-top: 1.5rem;">
+      <p><strong>68 % trase nema adekvatno osvetljenje noću.</strong> Najduža tamna zona je 6.5 km — od Brzi Broda ka Niškoj Banji, gde nema ni jedne svetiljke. Centar i Delta–Lidl su jedini dobro osvetljeni delovi koridora.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── 8.3 Saobraćajni konflikti ─────────────────────────────── -->
+<section id="s8-3" class="zelenilo-section">
+  <div class="container">
+    <h2>8.3 Saobraćajni konflikti</h2>
+    <p class="lead">Tačke gde je kretanje pešaka i biciklista u direktnom sukobu sa vozilima — parkiranje na stazi, rampe koje presijecaju put, ili mesta gde nema pešačkog prelaza.</p>
+
+    <div class="shade-stats" id="konflikti-stats"></div>
+
+    <h3 style="margin-top: 1.5rem;">Po tipu i deonici</h3>
+    <div class="table-scroll">
+      <table class="senka-table" id="konflikti-table">
+        <caption class="sr-only">Saobraćajni konflikti po deonici</caption>
+      </table>
+    </div>
+
+    <h3 style="margin-top: 2rem;">Na mapi</h3>
+    <div class="heatmap-legend" style="margin-bottom:.5rem;">
+      <span class="hl-item"><span class="hl-swatch" style="background:#d8a93a"></span> osvetljeno</span>
+      <span class="hl-item"><span class="hl-swatch" style="background:#2c2c2c"></span> tamna zona</span>
+      <span class="hl-item"><span class="hl-swatch" style="background:#e76f1f; border-radius:50%"></span> parking konflikt</span>
+      <span class="hl-item"><span class="hl-swatch" style="background:#c0392b; border-radius:50%"></span> prelaz / ukrštanje</span>
+    </div>
+    <div id="safety-map" aria-label="Mapa bezbednosnog audita" style="margin-top: 1rem;"></div>
+    <p class="muted" style="margin-top:.5rem; font-size:.85rem;">Osnova: OpenStreetMap · terenski podaci 2026.</p>
+  </div>
+</section>
+
+<!-- ── metod ──────────────────────────────────────────────────── -->
+<section class="metod-section">
+  <div class="container">
+    <h2>Kako čitati ove podatke</h2>
+    <div class="metod-grid">
+      <div class="metod-item">
+        <h4>Tamne zone nisu apsolutna mera</h4>
+        <p>Prag od 200 m između svetiljki je radni kriterijum — ne standard. Zona može biti bezbedna i bez svetla ako je dobro vidljiva iz okolnih izvora (kafane, prodavnice). Prag je konzervativna granica za analizu.</p>
+      </div>
+      <div class="metod-item">
+        <h4>Konflikti su maprani, ne izvedeni</h4>
+        <p>Svaki parking konflikt i prelaz je ručno zabeležen na terenu. Nisu računati iz OSM podataka ni satelitskih snimaka — terenac je vidio i uneo. Greška je greška mapiranja, ne modela.</p>
+      </div>
+      <div class="metod-item">
+        <h4>Slepi uglovi i podvožnjaci nisu mapirani</h4>
+        <p>Ove kategorije iz standarda bezbednosnog audita nisu bile deo terenskog protokola. Nedostaju iz analize i treba ih dodati u sledećoj iteraciji mapiranja.</p>
+      </div>
+      <div class="metod-item">
+        <h4>Stepenice ≠ sve prepreke</h4>
+        <p>Mapirane su samo fiksne stepenice. Privremene prepreke (gradnja, parking na stazi) su deo analize konflikata, ali nisu sve uhvaćene.</p>
+      </div>
+    </div>
+    <p class="muted metod-foot">Podaci: terensko mapiranje 2026.</p>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <p>Podaci: terensko mapiranje 2026. · Mapa: Leaflet.js · OpenStreetMap</p>
+    <p class="muted">Nišavski biciklistički koridor — inicijativa zajednice, Niš</p>
+    <p class="muted footer-meta">
+      <a href="index.html">Početna</a>
+      <span class="footer-sep">·</span>
+      <a href="analize.html">Sve analize</a>
+      <span class="footer-sep">·</span>
+      <a href="dnevnik.html">Tehnički dnevnik</a>
+      <span class="footer-sep">·</span>
+      Otvoreni kod pod <a href="LICENSE" target="_blank" rel="noopener">GPL 3.0</a> licencom
+      <span class="footer-sep">·</span>
+      <a href="https://github.com/biciklisticki-koridor-nis/biciklisticki-koridor-nis.github.io" target="_blank" rel="noopener">GitHub</a>
+    </p>
+  </div>
+</footer>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="8.safety_audit.js"></script>
+
+</body>
+</html>
