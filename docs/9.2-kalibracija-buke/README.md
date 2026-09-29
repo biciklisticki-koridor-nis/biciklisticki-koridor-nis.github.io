@@ -4,13 +4,22 @@ Uputstvo za jedan terenski izlazak koji model buke iz analize 9.2 prevodi iz
 relativnog indeksa 0–100 u decibele, i proverava da li uopšte ispravno rangira
 deonice.
 
-**Fajlovi:** [`tacke.gpx`](tacke.gpx) (18 waypoint-a + redosled obilaska) ·
-[`tacke.csv`](tacke.csv) (tabela za popunjavanje na terenu) ·
-[`izbor_tacaka.py`](izbor_tacaka.py) (regeneriše oba iz `data/noise_air.json`)
+**Za teren:** [`obrazac.pdf`](obrazac.pdf) — **odštampaj ovo i ponesi**.
+Jedan list sa svih 18 tačaka i praznim kolonama za upis, plus uputstvo na
+poleđini. U zaglavlju su dva QR koda: GPX za aplikaciju za mape i CSV za unos.
+
+**Ostali fajlovi:** [`tacke.gpx`](tacke.gpx) (18 waypoint-a + redosled obilaska) ·
+[`tacke.csv`](tacke.csv) (tabela za popunjavanje) ·
+[`obrazac.html`](obrazac.html) (izvor za PDF; može i da se štampa direktno iz
+pregledača) · [`izbor_tacaka.py`](izbor_tacaka.py) (regeneriše sve iz
+`data/buka.json`) · [`napravi_pdf.js`](napravi_pdf.js) (HTML → PDF)
 
 ```
-.venv/bin/python docs/9.2-kalibracija-buke/izbor_tacaka.py
+make teren        # tacke.gpx, tacke.csv, obrazac.html, data/merne_tacke.json
+make teren-pdf    # + obrazac.pdf
 ```
+
+Tačke se vide i na mapi u [analizi 9.2](../../9.2.noise_and_air_quality_exposure.html).
 
 ---
 
@@ -84,6 +93,21 @@ Sa 3–5 minuta po tački, ukupno **2,5–3 sata**.
 - odmaknuti se od lokalnih izvora: šetača, pasa, dece na igralištu
 - **bez kiše, bez vetra jačeg od ~5 m/s**; pena na mikrofonu obavezna
 - zapisati vreme svakog merenja u `tacke.csv`
+- **jedan telefon i jedna aplikacija za ceo prolaz.** Svaki mikrofon nosi svoj
+  stalni pomeraj; u regresiji on upada u odsečak i sam se poništi — ali samo
+  ako je isti na svim tačkama. Menjanje uređaja usred obilaska pokvarilo bi
+  ceo izlazak.
+
+### Dve kolone koje ne služe buci
+
+`podloga` i `klupe` u CSV-u pripadaju analizi 9.3 (termalni komfor), ne 9.2.
+Tip podloge nam nedostaje jer ga OpenStreetMap za staze uz Nišavu skoro ne
+beleži, a klupe su osnov za „mesta predaha". Pošto se ionako prelazi celih
+13 km, beleže se usput — drugi obilazak samo zbog toga bio bi traćenje istog puta.
+
+- **podloga:** asfalt, beton, behaton, tucanik, zemlja, trava
+- **klupe:** koliko ih ima u dvadesetak metara oko tačke i ima li hlada nad
+  njima (npr. `2, u hladu`)
 
 ## Oprema
 
@@ -144,6 +168,6 @@ put na svega par metara). Proveriti pristupačnost i bezbednost pre merenja.
    fali struktura — najverovatnije baš zaklon — i zna se šta se sledeće
    popravlja.
 4. Razlika unutar parova → empirijska konstanta zaklona nasipa, koja se vraća
-   u `noise_air.py`.
+   u `buka.py`.
 5. Objaviti i sam dijagram rasipanja izmereno-naspram-modelirano, u duhu
    ostatka sajta: pokazati gde se slaže i gde ne.
