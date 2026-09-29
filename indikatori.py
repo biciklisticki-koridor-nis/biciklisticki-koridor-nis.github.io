@@ -6,7 +6,7 @@ da bi prikazala petnaest brojeva. Ovaj skript ih izvodi jednom, pri build-u,
 iz već izračunatih izlaza:
 
   shade_canopy.json  -> pokrivenost krošnjama, kontinuitet senke, sunce
-  noise_air.json     -> izloženost buci
+  buka.json     -> izloženost buci
   river_views.json   -> pogled na reku
 
 i piše data/indikatori.json (~2 KB). Termalni komfor je analiza 9.3 i za
@@ -94,7 +94,7 @@ def load(name):
 
 def main():
     shade = load("shade_canopy.json")
-    noise = load("noise_air.json")
+    noise = load("buka.json")
     views = load("river_views.json")
     by = {name: {s["tip"]: s for s in d["staze"]}
           for name, d in (("shade", shade), ("noise", noise), ("views", views))}
