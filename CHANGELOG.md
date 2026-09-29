@@ -6,6 +6,101 @@ Format prati [Keep a Changelog](https://keepachangelog.com/sr/1.1.0/).
 ## [Neobjavljeno]
 
 ### Dodato
+- **Analiza 9.3 — termalni komfor i kvalitet predela**, u stepenima a ne u
+  oceni od 0 do 100. Predlog je bio da se senka, voda, vegetacija, podloga,
+  sunce, otvorenost i izgrađenost saberu u jedinstven indeks; to bi izgledalo
+  kao sedam faktora a ponašalo se kao jedan, pa se umesto toga računa fizika i
+  izlazi **UTCI**, sa priznatom skalom toplotnog stresa. Činioci ostaju na
+  stranici, ali kao objašnjenje zašto je negde toplije, ne kao ulaz u ocenu.
+  - **93 %** biciklističke staze je u *jakom toplotnom stresu* vrelog
+    popodneva; potpuno ugodnog dela nema nijedan metar.
+  - Krošnja spušta zračenje na telo (Tmrt) za **21,9 °C** — 53,1 prema
+    31,2 — što je jedna cela kategorija stresa manje.
+  - Medoševac, Centar i Delta–Lidl imaju **0,0 sati senke** u prozoru 12–17 h.
+  - Vrh nije u podne nego u **15 h**: kad je Sunce visoko, na uspravno telo
+    pada manji deo snopa.
+  - Scenario je vruć vedar dan (77 najtoplijih od 310 dana oko solsticija,
+    2016–2025), a ne prosek leta — kišni dani bi razblažili ono što se meri.
+- **9.3.1 Mesta predaha** — potezi od bar 30 m koji ostaju u senci bar 5 od
+  6 sati. Biciklistička staza ih ima 10 (4,8 % dužine), gornji bedem 6,
+  donji bedem 26 (14,9 %). Najduži potez bez ijednog na biciklističkoj stazi
+  je **8,84 km**.
+  - **33 od 36 mapiranih klupa nema nijedan sat senke**, prosečan UTCI na
+    klupi je 36,3 °C. Senka se računa na koordinati same klupe, ne u najbližoj
+    tački staze.
+- **Kvalitet predela** na istoj stranici, od ranije izračunatog pogleda na
+  reku koji do sada nije imao gde da stoji. Spoj dva dela daje nalaz koji
+  nijedan ne daje sam: zapadne deonice vide reku sa ~100 % trase i imaju
+  0,0 sati senke, istočne je vide sa 28 % i imaju 0,9 sati. Pošto je
+  geometrijski reka vidljiva sa cele trase, sav gubitak pogleda otpada na
+  zelenilo — isto ono koje pravi hlad.
+- **`utci.py`** — UTCI polinom (211 članova) bez ijedne spoljne biblioteke,
+  jer numba nema wheel za Python 3.14. Programski izvučen iz
+  `pythermalcomfort` 4.6.0 (MIT), ne prekucan. Nosi samoproveru
+  (`python utci.py`) i proveren je protiv originala na 840 kombinacija —
+  najveće odstupanje 0,000 °C.
+- **`termalni.py` + `make termalni`** → `data/termalni.json` (191 KB).
+- **Termalni komfor u tabeli pokazatelja** na `analize.html`: 36,3 / 36,4 /
+  35,7 °C. Tabela sada nosi jedinicu po redu, jer nije sve u procentima.
+
+### Popravljeno
+- **Grafikon po satu** je crtao stubiće od tik ispod minimuma, pa je razlika
+  od 1,6 °C izgledala petostruko. Sada počinju od granice kategorije, i to
+  piše ispod grafikona.
+- **Oznaka poslednjeg kilometra** na profilu sekla se o desnu ivicu platna
+  (i na 9.2 i na 9.3).
+
+### Izmenjeno
+- **Kvalitet vazduha u analizi 9.2 više nije procena nego merenje.** Izvor su
+  validirani časovni podaci zvaničnih mernih stanica (SEPA preko EEA, bez
+  ključa), umesto CAMS-a preko Open-Meteo. Poređen sa stanicom na istim danima,
+  CAMS daje PM2.5 1,58×, PM10 1,98× i NO₂ 4,05× niže, a za NO₂ dnevno nema
+  veštinu (r = 0,29). Brojevi na stranici bili su zato pogrešni:
+  - PM2.5 godišnje 24,7 umesto 16,9 µg/m³ (smernica SZO je 5), 52 % dana preko
+    dnevne smernice umesto 45 %.
+  - NO₂ 22,8 umesto 5,7 µg/m³; preko dnevne smernice 28 % dana, a ne 0,1 %.
+  - PM10 prelazi zakonsku dnevnu granicu 76 dana godišnje kod keja, uz
+    dopuštenih 35. Saobraćajna stanica prekoračuje **svake godine od 2013**,
+    između 53 i 106 dana.
+  - Polen ostaje na CAMS-u — stanice ga ne mere, a regionalna je pojava.
+- **`noise_air.py` → `buka.py`**, `data/noise_air.json` → `data/buka.json`
+  (schema 2). Vazduh je izašao iz tog modula čim je dobio sopstvenu prostornu
+  logiku, pa je staro ime počelo da laže.
+
+### Dodato
+- **Procena NO₂ po deonicama (9.2)**, za maj–septembar: Niška Banja i Brzi Brod
+  8,8–9,3, Medoševac 9,5–11,7, Delta–Lidl 11,0–11,5, Centar 14,5–15,5 µg/m³.
+  Donji bedem je dosledno najčistiji. Ne interpolira se između stanica — dve
+  urbane su 400 m jedna od druge, pa bi svaki gradijent preko 13 km bio
+  artefakt njihovog položaja. Umesto toga se izmerena razlika između
+  saobraćajne i pozadinske stanice raspoređuje modelom blizine puteva
+  (eksponencijalno opadanje, L = 60 m), a regionalni i urbani član su merenja.
+  - Sidro je **letnje**, ne godišnje: zimi pozadinska stanica ima viši NO₂ od
+    saobraćajne (41,7 prema 25,2 u januaru) jer stoji u naselju sa
+    individualnim grejanjem. Godišnja razlika je +2,8 µg/m³, letnja +9,6.
+  - Čestice se po deonicama ne prikazuju: letnja razlika između te dve stanice
+    je +3,6 za PM2.5 i −3,7 za PM10, pa nije saobraćajna.
+- **Mapa mernih stanica** sa isprekidanim potezom do najbliže tačke trase, i
+  grafikon prekoračenja zakonske granice po godini.
+- **`vazduh.py` + `make vazduh`** → `data/vazduh.json` (10 KB). Pošto pyarrow
+  nema wheel za Python 3.14, korak se vrti kroz
+  `uv run --python 3.13 --with pyarrow` ako `uv` postoji.
+- **Obrazac za teren (`obrazac.pdf`)** — A4 landscape, svih 18 mernih tačaka sa
+  koordinatama na jednom listu i praznim kolonama za upis, uputstvo na
+  poleđini. U zaglavlju dva QR koda, ka GPX-u i CSV-u na sajtu; provereni
+  modul po modul na rasterizaciji od 300 dpi. `make teren-pdf`.
+- **Tačke merenja na mapi buke** u analizi 9.2, iz `data/merne_tacke.json`.
+- **Kolone `podloga` i `klupe` u `tacke.csv`** — pripadaju analizi 9.3, ali se
+  beleže na istom izlasku, da se 13 km ne prelazi dvaput.
+
+### Popravljeno
+- **Linija smernice SZO na mesečnom grafikonu nikada se nije prikazivala na
+  pravom mestu**: vrednost je prosleđivana kao `--szo: 26%`, pa je
+  `calc(dužina × procenat)` nevalidan i linija je padala na dno okvira.
+- **Dugački URL-ovi i putanje u dnevniku** razvlačili su stranicu na telefonu
+  (`overflow-wrap` na inline `code`).
+
+### Dodato
 - **Sadržaj na vrhu `analize.html`** — sekcije i njihove analize sa
   linkovima: sekcija skače na sebe na stranici, objavljene analize otvaraju
   svoju stranicu, a one u pripremi su navedene bez linka. Sadržaj se gradi

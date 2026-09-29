@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>9.3 Termalni komfor i kvalitet predela — Nišavski biciklistički koridor</title>
+  <meta name="description" content="Analiza 9.3: koliko je na keju zaista vruće letnjeg popodneva, u stepenima, gde ima mesta da se stane u hlad — i koliko se reke uopšte vidi." />
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<header class="hero page-hero">
+  <div class="container">
+    <p class="eyebrow"><a href="index.html">Nišavski biciklistički koridor</a> · <a href="analize.html">Analize</a> · 9. Kvalitet životne sredine</p>
+    <h1>9.3 Termalni komfor i kvalitet predela</h1>
+    <p class="subtitle">Koliko je na keju vruće letnjeg popodneva, gde ima gde da se stane u hlad — i koliko se reke uopšte vidi.</p>
+  </div>
+</header>
+
+<!-- ── ključni nalazi ─────────────────────────────────────────── -->
+<section class="nalazi-section">
+  <div class="container">
+    <div class="nalazi" id="nalazi"></div>
+  </div>
+</section>
+
+<!-- ── KOLIKO JE VRUĆE ────────────────────────────────────────── -->
+<section id="vrucina" class="zelenilo-section">
+  <div class="container">
+    <h2>Koliko je vruće</h2>
+    <p class="lead">Ovo nije ocena od 0 do 100. <strong>UTCI je temperatura u stepenima</strong> — kaže na koliko bi stepeni u mirnom i zaklonjenom okruženju čovek osećao isto što oseća na ovom mestu. Ima priznatu skalu, pa se ne mora verovati našem izboru težina: „jak toplotni stres" je definicija, a ne naša procena.</p>
+
+    <div class="callout callout-info" id="scenario-callout"></div>
+
+    <div class="chip-filters" id="staza-pills" role="tablist" aria-label="Staza"></div>
+
+    <div class="shade-stats" id="termo-stats"></div>
+
+    <h3>Šta senka radi</h3>
+    <p class="muted">Ista trasa, isti sat, isto vreme — razlika je samo u tome da li iznad tačke ima krošnje.</p>
+    <div class="uporedba" id="uporedba"></div>
+
+    <h3>Duž cele trase</h3>
+    <p class="muted">Svaka kolona je 10 m. Boja je kategorija toplotnog stresa. Pređi mišem (ili dodirni) za detalje o tački.</p>
+    <div class="profil-wrap" id="profil-wrap">
+      <canvas id="termo-profil" aria-label="Profil termalnog komfora duž trase"></canvas>
+      <div class="heatmap-tooltip" id="profil-tooltip" hidden>
+        <div class="tt-state"></div>
+        <div class="tt-meta"></div>
+      </div>
+    </div>
+    <div class="heatmap-legend" id="kat-legend"></div>
+
+    <h3>Na mapi</h3>
+    <p class="muted">Trasa je obojena istom skalom. Crni krugovi su mesta predaha — potezi koji ostaju u senci ceo vreli deo dana.</p>
+    <div id="termo-map" aria-label="Mapa termalnog komfora"></div>
+
+    <h3>Kroz popodne</h3>
+    <p class="muted">Najgore nije u podne. Sunce je tada najviše, pa čoveku pada manje zračenja na telo nego kad je koso.</p>
+    <div class="sat-graf" id="sat-graf"></div>
+
+    <h3>Po deonicama</h3>
+    <div class="table-scroll">
+      <table class="senka-table" id="termo-table">
+        <caption class="sr-only">Termalni komfor po deonici</caption>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ── ZAŠTO ──────────────────────────────────────────────────── -->
+<section id="zasto" class="vazduh-section">
+  <div class="container">
+    <h2>Zašto je negde toplije</h2>
+    <p class="lead">Broj iznad je fizika. Ovo su činioci koji ga objašnjavaju — nisu sabrani u indeks, jer bi tako pet puta ušla ista stvar. Stoje odvojeno, da se vidi šta se gde može promeniti.</p>
+    <div class="cinioci" id="cinioci"></div>
+  </div>
+</section>
+
+<!-- ── 9.3.1 MESTA PREDAHA ────────────────────────────────────── -->
+<section id="predasi" class="zelenilo-section">
+  <div class="container">
+    <h2>9.3.1 Mesta predaha</h2>
+    <p class="lead">Mesto predaha je potez koji ostaje <strong>u senci ceo vreli deo dana</strong>, dovoljno dug da se na njemu stane. Ne traži se hladno mesto — na vruć dan ga na koridoru nema — nego hladnije, i to dovoljno dugo.</p>
+
+    <div class="shade-stats" id="predah-stats"></div>
+
+    <div class="callout callout-warn" id="klupe-callout"></div>
+
+    <h3>Gde su</h3>
+    <p class="muted">Poređano po kilometraži. Prikazuje se izabrana staza.</p>
+    <div class="table-scroll">
+      <table class="senka-table" id="predah-table">
+        <caption class="sr-only">Mesta predaha duž trase</caption>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ── KVALITET PREDELA ───────────────────────────────────────── -->
+<section id="predeo" class="vazduh-section">
+  <div class="container">
+    <h2>Kvalitet predela</h2>
+    <p class="lead">Koridor postoji zbog reke. Pitanje je koliko se te reke sa staze zaista vidi — i ispada da odgovor stoji u neposrednoj vezi sa prethodnim delom ove analize.</p>
+
+    <div class="shade-stats" id="predeo-stats"></div>
+
+    <div class="table-scroll">
+      <table class="senka-table" id="predeo-table">
+        <caption class="sr-only">Pogled na reku po deonici</caption>
+      </table>
+    </div>
+
+    <div class="callout callout-info" id="predeo-callout"></div>
+  </div>
+</section>
+
+<!-- ── metod ──────────────────────────────────────────────────── -->
+<section class="metod-section">
+  <div class="container">
+    <h2>Kako čitati ove brojeve</h2>
+    <div class="metod-grid">
+      <div class="metod-item">
+        <h4>Stepeni su modelovani, ne izmereni</h4>
+        <p>Zračenje i senka se računaju iz mape visine krošnji i položaja Sunca; vreme dolazi iz reanalize. Apsolutna vrednost nosi oko ±2 °C nesigurnosti. Razlika između sunca i senke je mnogo pouzdanija od samog nivoa.</p>
+      </div>
+      <div class="metod-item">
+        <h4>Asfalt je topliji nego što piše</h4>
+        <p>Za temperaturu tla uzeta je prirodna podloga, jer tip podloge duž Nišave nije zabeležen. Na asfaltu je zapravo toplije, pa su vrednosti na popločanim delovima <strong>potcenjene</strong>. Podloga se upisuje na terenskom izlasku.</p>
+      </div>
+      <div class="metod-item">
+        <h4>Zgrade ne ulaze u račun</h4>
+        <p>Kej je nasip uz reku, ne ulični kanjon: samo 3,7 % trase ima zgradu bliže od 20 m. Na tim rastojanjima zgrada ne zaklanja Sunce koje je u ovom prozoru uvek visoko.</p>
+      </div>
+      <div class="metod-item">
+        <h4>Vetar je onaj sa otvorenog</h4>
+        <p>UTCI po definiciji koristi brzinu vetra na 10 m visine. Među drvoredom je slabiji, pa je stvarno hlađenje strujanjem nešto manje nego u računu.</p>
+      </div>
+    </div>
+    <p class="muted metod-foot">Puni tehnički opis — formule, pretpostavke, provera osetljivosti i šta je odbačeno — nalazi se u <a href="dnevnik.html">tehničkom dnevniku</a>. Krošnje: Meta/WRI Global Canopy Height (CC BY 4.0). Vreme: ERA5 preko Open-Meteo (CC BY 4.0).</p>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <p>Podaci: terensko mapiranje 2026. · Krošnje: Meta/WRI · Vreme: ERA5 / Open-Meteo · Mapa: Leaflet.js</p>
+    <p class="muted">Nišavski biciklistički koridor — inicijativa zajednice, Niš</p>
+    <p class="muted footer-meta">
+      <a href="index.html">Početna</a>
+      <span class="footer-sep">·</span>
+      <a href="analize.html">Sve analize</a>
+      <span class="footer-sep">·</span>
+      <a href="dnevnik.html">Tehnički dnevnik</a>
+      <span class="footer-sep">·</span>
+      Otvoreni kod pod <a href="LICENSE" target="_blank" rel="noopener">GPL 3.0</a> licencom
+      <span class="footer-sep">·</span>
+      <a href="https://github.com/biciklisticki-koridor-nis/biciklisticki-koridor-nis.github.io" target="_blank" rel="noopener">GitHub</a>
+    </p>
+  </div>
+</footer>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="9.3.thermal_comfort_and_landscape_quality.js"></script>
+
+</body>
+</html>

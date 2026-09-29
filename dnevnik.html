@@ -22,6 +22,153 @@
 
     <article class="post">
       <header class="post-head">
+        <time datetime="2026-09-29">29. septembar 2026.</time>
+        <h2>Analiza 9.3: termalni komfor u stepenima, a ne u oceni od 0 do 100</h2>
+      </header>
+      <p class="post-summary">Predlog je bio da se senka, blizina vode, vegetacija, podloga, izloženost suncu, otvorenost i izgrađenost saberu u jedinstven „Thermal Comfort Index". To nije urađeno, jer bi takav indeks izgledao kao sedam faktora a ponašao se kao jedan — sve sem podloge i vode je ista promenljiva merena iz više uglova, a vrednost bi zavisila od težina koje bismo mi izabrali. Umesto toga se računa fizika i izlazi u stepenima: <strong>UTCI</strong>, sa priznatom skalom stresa. Rezultat: 93 % biciklističke staze je u jakom toplotnom stresu vrelog popodneva, krošnja spušta zračenje na telo za 21,9 °C, a 33 od 36 mapiranih klupa nema nijedan sat senke.</p>
+      <div class="post-body">
+        <h3>Zašto UTCI a ne sopstveni indeks</h3>
+        <p>Indeks od 0 do 100 se koristi u 9.2 zato što za buku nema merila — nijedno merenje duž keja ne postoji. Za toplotu merilo postoji. UTCI je ekvivalentna temperatura: kaže na koliko bi stepeni u mirnom, zaklonjenom i umereno vlažnom okruženju čovek osećao isto što oseća ovde. Granice kategorija („umeren toplotni stres" 26–32, „jak" 32–38, „vrlo jak" 38–46) su deo definicije, pa niko ne mora da veruje našem izboru pragova.</p>
+        <p>Bojanini činioci nisu odbačeni — premešteni su iz ulaza u <em>objašnjenje</em>. Stranica prvo kaže koliko je stepeni, pa onda zašto: koliko je nebo otvoreno, koliko sati ima senke, koliko zračenja pada na telo.</p>
+
+        <h3>UTCI bez numbe</h3>
+        <p>Referentna implementacija <code>pythermalcomfort</code> traži numba i scipy, a numba nema wheel za Python 3.14 koji projekat koristi. Sam polinom je, međutim, čista aritmetika — <strong>211 članova</strong> po četiri promenljive, bez ijedne biblioteke.</p>
+        <p>Polinom je preuzet iz <code>pythermalcomfort</code> 4.6.0 (MIT licenca), funkcija <code>_utci_optimized</code>. Nije prekucan nego <strong>programski izvučen iz izvornog koda</strong> — 211 koeficijenata je previše da se prepisuju rukom bez greške. Modul <code>utci.py</code> nosi i samoproveru koja se pokreće sa <code>python utci.py</code>, a koja poredi sa vrednostima iz testova samog paketa.</p>
+        <p>Uz to je urađena unakrsna provera: naša implementacija protiv originalne, na mreži od <strong>840 kombinacija</strong> (temperatura 20–36 °C, Tmrt−Ta od −5 do +45, vetar 0,5–8 m/s, vlažnost 20–80 %). Najveće odstupanje: <strong>0,000 °C</strong>. Van granica važenja modela (Tmrt−Ta preko 70 °C, vetar ispod 0,5 m/s) funkcija vraća <code>None</code>, a ne približnu vrednost.</p>
+
+        <h3>Srednja radijantna temperatura</h3>
+        <p>Tmrt je veličina koju senka zapravo menja. Temperatura vazduha se duž 13 km praktično ne menja; Tmrt se između sunca i senke razlikuje za preko 20 °C. Bilans po tački i satu:</p>
+        <ul class="tech-list">
+          <li><strong>Direktno zračenje</strong> — <code>f<sub>p</sub>(h) · DNI</code>, samo ako maska senke iz 9.1 kaže da snop stiže do tačke.</li>
+          <li><strong>Difuzno sa neba</strong> — <code>0,5 · SVF · D</code>. Faktor 0,5 jer telo nebo vidi iz jedne polusfere.</li>
+          <li><strong>Odbijeno od tla</strong> — <code>0,5 · albedo · (ono što na tlo stiže na tom mestu)</code>. Bitno je „na tom mestu": u senci je i tlo u senci, pa odbija višestruko manje.</li>
+          <li><strong>Dugotalasno</strong> — gornja polusfera je nebo (udeo SVF) i prepreke (1−SVF), donja je tlo. Emisivnost neba po Brutsaertu, sa korekcijom na oblačnost.</li>
+        </ul>
+        <p>Faktor projektovane površine <code>f<sub>p</sub></code> nije uzet iz tabele nego izveden: čovek je uspravan valjak 1,75 × 0,35 m, bočna strana se projektuje kao <code>D·H·cos h</code>, gornja osnova kao <code>(πD²/4)·sin h</code>, sve podeljeno ukupnom površinom. Daje 0,29 na horizontu i 0,05 u zenitu, što se slaže sa objavljenim vrednostima za uspravnog čoveka — ali se može proveriti iz geometrije, bez verovanja na reč.</p>
+        <p>Faktor vidljivosti neba se računa zracima u 36 pravaca preko mape visine krošnji, do 150 m: <code>SVF = 1 − ⟨sin²β⟩</code>, gde je β najveći ugao zaklona u tom pravcu.</p>
+
+        <h3>Greška koju je otkrio prvi rezultat</h3>
+        <p>Prvo pokretanje dalo je UTCI u rasponu 32,7–38,5 °C, sa razlikom sunce/senka od svega 5,8 °C. To je premalo — literatura daje 7 do 10. Uzrok su bile dve stvari u bilansu: difuzno zračenje je ulazilo bez faktora 0,5 (telo ga prima iz polusfere, ne iz cele sfere), a odbijeno od tla se računalo iz globalnog zračenja i u senci, kao da je i tamo tlo obasjano. Obe greške naduvavaju vrednosti u senci i time <em>gutaju kontrast</em>. Posle ispravke: Tmrt 52,1 na suncu prema 31,4 u senci, razlika <strong>20,7 °C</strong>.</p>
+
+        <h3>Scenario: vruć dan, ne prosečan</h3>
+        <p>Geometrija Sunca je za 21. jun, jer su maske senke iz 9.1 računate za taj datum. Meteorologija je prosek <strong>77 najtoplijih od 310 dana</strong> u prozoru od ±15 dana oko solsticija, kroz 2016–2025, za sate 12–17. Prosek preko svih letnjih dana bio bi pogrešan izbor: kišni i oblačni dani spuštaju i sunce i Tmrt, a senka se ne sadi zbog njih. Dobijeni uslovi: vazduh 32,0–33,3 °C, tlo 30,8–33,2 °C, vlažnost 33–38 %, vetar 1,9–2,5 m/s, direktno zračenje 525–791 W/m².</p>
+        <p>Vrh nije u podne nego u <strong>15 h</strong>. Razlog je faktor projekcije: kad je Sunce visoko, na uspravno telo pada manji deo snopa nego kad je koso. U podne je UTCI 35,5, u 15 h 37,1 °C.</p>
+
+        <h3>Koliko se ovim brojevima sme verovati</h3>
+        <p>Urađena je provera osetljivosti na sve pretpostavke koje nisu izmerene:</p>
+        <table class="tech-table">
+          <thead><tr><th>Pretpostavka</th><th>Opseg</th><th>ΔUTCI na suncu</th></tr></thead>
+          <tbody>
+            <tr><td>Albedo tla</td><td>0,08–0,30</td><td>−0,7 do +1,4 °C</td></tr>
+            <tr><td>Apsorpcija tela</td><td>0,6–0,8</td><td>−0,8 do +0,8 °C</td></tr>
+            <tr><td>Prečnik valjka</td><td>0,25–0,45 m</td><td>−0,2 do +0,1 °C</td></tr>
+            <tr><td>Tlo toplije (asfalt)</td><td>+20 °C</td><td>+2,0 °C</td></tr>
+          </tbody>
+        </table>
+        <p>Dakle: apsolutni nivo nosi oko <strong>±2 °C</strong>, a razlika sunce/senka ostaje između 17,7 i 26,2 °C pri svim izborima — nikad ne nestaje. Zato se na stranici razlika naglašava više od nivoa. Pošto su sve pretpostavke o tlu na strani prirodne podloge, vrednosti na asfaltu su <strong>potcenjene</strong>, ne precenjene.</p>
+
+        <h3>Zgrade: izostavljene, ali izmereno koliko to košta</h3>
+        <p>U OSM-u oko koridora ima 38.297 zgrada, ali samo 12 ima tag <code>height</code>, a 401 <code>building:levels</code> — <strong>99 % nema nijedan podatak o visini</strong>. Umesto da im se visina izmisli, izmereno je koliko bi uopšte značile: samo 3,7 % tačaka trase ima zgradu bliže od 20 m, a medijana rastojanja je 43 m u Centru do 97 m na Delti. Zgrada na 43 m sa 15 m visine zaklanja nebo do 19°, a Sunce je u prozoru 12–17 h uvek iznad 30°. Ne zaklanja snop niti bitno menja SVF. Kej je nasip uz reku, ne ulični kanjon.</p>
+
+        <h3>Mesta predaha (9.3.1)</h3>
+        <p>Prag u apsolutnim stepenima ne bi radio: na vruć dan je cela trasa iznad granice „bez toplotnog stresa", pa bi spisak bio prazan. Ono što se traži nije hladno mesto nego hladnije, i to dovoljno dugo. Definicija: neprekidan potez od bar 30 m u kome je tačka u senci bar 5 od 6 sati prozora.</p>
+        <p>Rezultat po stazama: biciklistička 10 predaha (680 m, 4,8 %), gornji bedem 6 (290 m, 1,9 %), donji bedem <strong>26 (1.870 m, 14,9 %)</strong>. Najduži potez bez ijednog predaha na biciklističkoj stazi je <strong>8,84 km</strong> — od početka trase do Brzog Broda.</p>
+        <p>Senka na klupama i letnjikovcima se ne čita iz najbliže tačke staze nego se računa <em>na samoj koordinati objekta</em>, istim zracima. Razlika je bitna jer klupa ume da stoji dvadesetak metara od staze, u sasvim drugim uslovima. Ispalo je 33 od 36 klupa bez ijednog sata senke, prosečan UTCI na klupi 36,3 °C.</p>
+        <p>Za letnjikovce je dodata napomena u samom izlazu: mapa visine krošnji vidi drveće, ne građevine, pa „nema senke od krošnji" kod letnjikovca ne znači da je na suncu — on ima sopstveni krov. Bez te napomene broj bi se čitao naopako.</p>
+
+        <h3>Kvalitet predela i jedna neprijatna veza</h3>
+        <p>Druga polovina sekcije po okviru je „landscape quality"; podaci o pogledu na reku postojali su od ranije ali nisu imali stranicu, nego su samo stajali kao broj u tabeli pokazatelja koja je upućivala na 9.3. Sada su na svom mestu.</p>
+        <p>Spoj dva dela daje nalaz koji nijedan od njih ne daje sam: zapadne deonice (Medoševac, Centar) vide reku sa skoro 100 % trase i imaju <strong>0,0 sati senke</strong>; istočne (Brzi Brod, Niška Banja) vide je sa 28 % i imaju 0,9 sati. Pošto je geometrijski reka vidljiva sa <em>cele</em> trase — potencijal je 100 % — sav gubitak pogleda otpada na zelenilo. Isto drveće. Odluka gde se seče i gde se sadi zato nije popravka jednog bez cene po drugo.</p>
+
+        <h3>Sitnice</h3>
+        <ul class="tech-list">
+          <li>Grafikon po satu prvo je crtao stubiće od tik ispod minimuma, pa je razlika od 1,6 °C izgledala petostruko. Sada počinju od granice kategorije (32 °C), i to piše ispod grafikona.</li>
+          <li>Oznaka poslednjeg kilometra na profilu sekla se o desnu ivicu platna. Ista greška postojala je i na 9.2; popravljena na oba mesta.</li>
+          <li><code>#termo-map</code> je u prvoj verziji bio bez pravila u CSS-u, pa je mapa imala nultu visinu — uhvaćeno tako što snimak elementa nije mogao da se napravi.</li>
+        </ul>
+
+        <h3>Šta nedostaje</h3>
+        <p>Tip podloge. Asfalt na suncu je i 20 °C topliji od prirodne podloge, a OpenStreetMap ga za staze uz Nišavu skoro ne beleži. Upisuje se na terenskom izlasku za 9.2, u koloni <code>podloga</code>, i ulazi ovde kad stigne. Isto važi i za klupe: terenski popis će pokazati koliko ih je stvarno i gde, pošto je mapiranih 36 verovatno nepotpuno.</p>
+      </div>
+    </article>
+
+    <article class="post">
+      <header class="post-head">
+        <time datetime="2026-09-29">29. septembar 2026.</time>
+        <h2>Vazduh prestaje da bude procena: satelitski model zamenjen mernim stanicama</h2>
+      </header>
+      <p class="post-summary">Analiza 9.2 je za kvalitet vazduha koristila CAMS preko Open-Meteo, ćeliju od ~11 km. Poređen sa zvaničnom mernom stanicom na istim danima, CAMS daje PM2.5 1,58×, PM10 1,98× i NO₂ <strong>4,05×</strong> niže od izmerenog, a za NO₂ na dnevnom nivou praktično nema veštinu (r = 0,29). Brojevi na stranici bili su zato pogrešni, a najgore u pravcu koji umiruje. Zamenjeni su validiranim časovnim merenjima tri stanice, od kojih jedna stoji 288 m od staze. Uz to je dodata raspodela NO₂ po deonicama, ukotvljena u izmerenu razliku između stanica, i <code>noise_air.py</code> je razdvojen na <code>buka.py</code> i <code>vazduh.py</code>.</p>
+      <div class="post-body">
+        <h3>Odakle podaci: EEA, jer SEPA nije dostupna</h3>
+        <p>Domaći izvori su probani prvi i ne rade: <code>sepa.gov.rs</code>, <code>amskv.sepa.gov.rs</code> i <code>data.sepa.gov.rs</code> ne odgovaraju (HTTP 000). OpenAQ v3 traži API ključ. Stari EEA CSV servis <code>AQData_Extract.fmw</code> je ugašen (HTTP 401). Ono što radi jeste novi EEA download servis: Srbija je među 39 zemalja koje izveštavaju, pa se isti SEPA podaci dohvataju bez ključa i bez registracije.</p>
+        <ul class="tech-list">
+          <li><strong>Metapodaci</strong> — <code>discomap.eea.europa.eu/map/fme/metadata/PanEuropean_metadata.csv</code>, 26 MB, tab-separated. Nosi koordinate, tip stanice (<em>traffic</em>/<em>background</em>/<em>industrial</em>), tip okruženja (<em>urban</em>/<em>rural</em>) i spisak polutanata po mernom mestu. Srbija ima 35 stanica.</li>
+          <li><strong>Merenja</strong> — <code>POST /ParquetFile/urls</code> na <code>eeadmz1-downloads-api-appservice.azurewebsites.net</code> vraća javne Azure blob URL-ove, jedan parquet po mernom mestu. <code>dataset: 2</code> su validirani podaci (E1a); nevalidirani skorašnji (1) se ne koriste. Šifre polutanata su iz EIONET rečnika: 5 = PM10, 8 = NO₂, 6001 = PM2.5.</li>
+        </ul>
+        <p>Kolone u parquet-u: <code>Start</code>, <code>End</code>, <code>Value</code>, <code>Validity</code>, <code>Verification</code>, <code>AggType</code>. Uzimaju se samo redovi sa <code>Validity == 1</code>. Dnevni prosek traži bar 18 validnih sati, godina traži bar 300 takvih dana — inače ne ulazi u izlaz. Saobraćajna stanica ima 105.191 validan časovni zapis za NO₂, od 1. januara 2013.</p>
+
+        <h3>Tri stanice, tri uloge</h3>
+        <p>Od 35 srpskih stanica, tri su u krugu od 15 km od ose koridora. Rastojanje se meri do najbliže tačke ose, ne do centra grada:</p>
+        <ul class="tech-list">
+          <li><strong>RS0033A</strong> — <em>urban background</em>, <strong>288 m</strong> od staze. Reprezentativna: svi nivoi na stranici dolaze odavde. Pozadinski tip je ovde tačan izbor jer kej nije ulica.</li>
+          <li><strong>RS0030A</strong> — <em>urban traffic</em>, 1.054 m. Služi samo za razliku prema pozadinskoj, koja daje veličinu saobraćajnog doprinosa.</li>
+          <li><strong>RS0005R</strong> — <em>rural background</em>, 8.848 m severno. Daje regionalni član — koliko zagađenja ima i pre ulaska u Niš.</li>
+        </ul>
+        <p>Sledeća po redu je 56 km daleko, pa nema dileme oko izbora.</p>
+
+        <h3>Zašto se ne interpolira između stanica, iako je to bio predlog</h3>
+        <p>Predlog je bio da se napravi prostorni indikator sa težinama po relevantnosti stanica, pa da se dobije procena po deonicama. To ne radi: dve urbane stanice su međusobno udaljene 400 m i obe su kod centra koridora. Interpolacija između njih preko 13 km trase ne bi izvlačila prostornu informaciju — ta informacija u podacima ne postoji — nego bi oblikovala gradijent koji je artefakt toga gde su stanice postavljene. To je ista greška zbog koje buka nije u decibelima, samo obrnuta: prave jedinice, izmišljena geografija.</p>
+        <p>Ono što par stanica <em>jeste</em> izmerio je razlika između dve lokacije. Ona se koristi kao veličina, a raspodela duž trase dolazi iz modela blizine puteva:</p>
+        <p><code>C(tačka) = C_regionalno + C_urbano + k · P(tačka)</code></p>
+        <p>Regionalni član je izmeren na ruralnoj stanici, urbani je ostatak na pozadinskoj posle oduzimanja regionalnog i saobraćajnog dela, a <code>k</code> je ukotvljeno tako da razlika <code>P</code> između dve stanice reprodukuje izmerenu razliku koncentracija. Modelirana je samo raspodela; dva od tri člana su merenja.</p>
+
+        <h3>Jezgro opadanja nije isto kao za zvuk</h3>
+        <p>Model deli iste segmente puteva sa <code>buka.py</code>, ali ne i fiziku. Zvuk od linijskog izvora pada sa <code>1/d²</code> po tačkastom doprinosu; NO₂ uz put pada približno eksponencijalno, sa karakterističnom dužinom od 50–150 m u gradskim uslovima. Uzeto je <code>L = 60 m</code>, svesno na donjoj granici: brže opadanje daje manju razliku između deonica, pa se efekat izbora staze pre potceni nego preceni. Poluprečnik je 400 m (<code>exp(−400/60) ≈ 0,001</code>), segmenti se dele na emitere na svakih 10 m, a bbox za Overpass pokriva i stanice, ne samo osu — bez puteva oko stanica nema sidra.</p>
+        <p>Dobijeno: <code>P</code> = 127,3 kod saobraćajne i 45,7 kod pozadinske stanice, <code>ΔP</code> = 81,6. Ako <code>ΔP</code> ne bi bilo pozitivno, sidro ne bi važilo i raspodela bi se preskočila — to je provereno u kodu, ne pretpostavljeno.</p>
+
+        <h3>Greška koju su podaci otkrili: sidro mora da bude letnje</h3>
+        <p>Prva verzija je uzela godišnju razliku saobraćajne i pozadinske stanice: <strong>+2,8 µg/m³</strong> NO₂. Provera mesečnog hoda pokazala je zašto je to pogrešno. Pozadinska stanica u januaru ima <strong>41,7</strong> µg/m³ NO₂, a saobraćajna <strong>25,2</strong> — pozadinska je zimi prljavija od saobraćajne. Razlog je da stoji u naselju sa individualnim grejanjem; saobraćajna stanica ima gotovo ravan godišnji hod (25,2 u januaru, 21,3 u junu), jer saobraćaj ne poznaje sezonu.</p>
+        <p>Godišnja razlika između te dve stanice dakle meša saobraćaj sa dimnjacima i potcenjuje saobraćajni deo. U toploj polovini godine grejanja nema, pa razlika ostaje ono što tvrdimo da jeste — blizina puta. Za maj–septembar ona iznosi <strong>+9,6 µg/m³</strong>, tri i po puta više. Sidro, urbani i regionalni član sada se svi računaju iz istog, toplog perioda; mešanje sezonskog sidra sa godišnjim nivoom dalo bi broj koji ne opisuje nijedan stvarni period.</p>
+        <p>Isti test diskvalifikuje čestice kao pokazatelj saobraćaja. Letnja razlika saobraćajne i pozadinske stanice je <strong>+3,6</strong> za PM2.5 i <strong>−3,7</strong> za PM10 — negativna. Godišnje su te razlike +8,7 i +3,6, sa vrhom u 16–20 h, što je grejanje a ne špic. Zato se po deonicama prikazuje samo NO₂, a ključevi u izlazu se zovu <code>saobracajna_minus_pozadina</code>, ne „saobraćajni doprinos": ime govori šta je izmereno, tumačenje dolazi posle.</p>
+
+        <h3>Periodi se ne smeju mešati</h3>
+        <p>NO₂ postoji od 2013, PM2.5 tek od 2024. Bez pravila bi se na istoj stranici poredio trinaestogodišnji prosek sa dvogodišnjim. Glavni brojevi se zato računaju iz poslednje tri godine koje <em>sve</em> stanice za taj polutant imaju: NO₂ 2023–2025, PM2.5 i PM10 2024–2025. Cela istorija po godinama ostaje u izlazu, za grafikon prekoračenja.</p>
+
+        <h3>Šta je ispalo</h3>
+        <table class="tech-table">
+          <thead><tr><th>Polutant</th><th>Stanica</th><th>CAMS</th><th>Odnos</th><th>r</th></tr></thead>
+          <tbody>
+            <tr><td>PM2.5</td><td>24,7</td><td>15,6</td><td>1,58×</td><td>0,72</td></tr>
+            <tr><td>PM10</td><td>36,7</td><td>18,6</td><td>1,98×</td><td>0,65</td></tr>
+            <tr><td>NO₂</td><td>22,8</td><td>5,6</td><td>4,05×</td><td><strong>0,29</strong></td></tr>
+          </tbody>
+        </table>
+        <p class="muted" style="font-size:.85rem;margin-top:-.5em">Vrednosti su µg/m³ na reprezentativnoj stanici i u CAMS-u na istim danima; <em>r</em> je Pirsonova korelacija dnevnih vrednosti.</p>
+        <p>Za čestice CAMS pogađa <em>oblik</em> krive (r ≈ 0,7) ali ne nivo — korisan je i dalje za sezonski hod polena, koji stanice ne mere. Za NO₂ je ćelija od 11 km jednostavno preširoka da vidi grad: r = 0,29 znači da dnevna vrednost iz modela ne nosi informaciju o dnevnoj vrednosti na stanici. Stranica je do sada tvrdila da NO₂ prelazi dnevnu smernicu SZO u 0,1 % dana; izmereno je 28 % na pozadinskoj i 45 % na saobraćajnoj stanici.</p>
+        <p>Zakonski deo je najoštriji. Granična vrednost za PM10 je 50 µg/m³ kao dnevni prosek, uz dopuštenih 35 prekoračenja godišnje. Saobraćajna stanica ih ima u <em>svakoj</em> od devet godina sa dovoljno merenja, od 53 (2013) do 106 (2020); 2025. je 103, uz godišnji prosek 44,4 — i preko godišnje granice od 40. Pozadinska stanica, ona kod keja, ima 81 i 72 dana u dve godine koje meri.</p>
+        <p>Raspodela po deonicama (NO₂, maj–septembar, µg/m³): Niška Banja i Brzi Brod 8,8–9,3, Medoševac 9,5–11,7, Delta–Lidl 11,0–11,5, Centar 14,5–15,5. Donji bedem je dosledno najčistiji, u Medoševcu za 19 % u odnosu na gornji. Ali raspon između najčistije i najizloženije tačke je 6,7 µg/m³, dok 9,1 nosi grad podjednako svuda — izbor staze menja malo, grejna sezona menja sve.</p>
+
+        <h3>Podela modula i sitnice</h3>
+        <ul class="tech-list">
+          <li><code>noise_air.py</code> je preimenovan u <code>buka.py</code> i iz njega je izbačen ceo blok o vazduhu; <code>data/noise_air.json</code> je sada <code>data/buka.json</code>, schema podignuta na 2. Ime je počelo da laže čim je vazduh dobio sopstvenu prostornu logiku.</li>
+          <li><code>vazduh.py</code> uvozi samo standardnu biblioteku, <code>koridor.py</code> i <code>buka.py</code> — namerno bez numpy. Razlog: pyarrow nema wheel za Python 3.14 koji projekat koristi (ni duckdb ga nema), pa se taj korak vrti kroz <code>uv run --python 3.13 --with pyarrow</code>, a izolovano okruženje tako ne mora ništa više da instalira. <code>make vazduh</code> sam bira <code>uv</code> ako postoji.</li>
+          <li>Isprekidana linija smernice na mesečnom grafikonu nikada nije radila: vrednost je prosleđivana kao <code>--szo: 26%</code>, pa je <code>calc(dužina × procenat)</code> nevalidan i linija je padala na dno okvira. Vrednost je sada bezdimenziona. Ista greška bi se ponovila na novom grafikonu po godinama.</li>
+          <li>Grafikon prekoračenja iscrtava ceo raspon godina, sa praznim mestima gde merenja nema. Prva verzija je preskakala 2015, 2016, 2018 i 2019 i izgledala kao neprekidan niz.</li>
+          <li>Mapa stanica isključuje ruralnu iz okvira (8,8 km je dovoljno da se koridor svede na crticu) i crta isprekidan potez od svake stanice do najbliže tačke trase — to je odgovor na pitanje zašto baš ta stanica.</li>
+        </ul>
+
+        <h3>Terenski materijali</h3>
+        <p><code>izbor_tacaka.py</code> sada, pored GPX-a i CSV-a, pravi i <code>obrazac.html</code> za štampu (A4 landscape, svih 18 tačaka na jednom listu, uputstvo na poleđini) i <code>data/merne_tacke.json</code> da se tačke vide na mapi u analizi. PDF se pravi kroz Puppeteer, ne kroz PDF biblioteku: obrazac ima dijakritike (č, ć, š, ž, đ), a lake PDF biblioteke za njih traže ručno ugrađen font, dok pregledač to već ume — a usput isti HTML može i da se odštampa direktno.</p>
+        <p>U zaglavlju su dva QR koda, ka GPX-u i CSV-u na sajtu, generisana kao inline SVG (<code>qrcode</code>, ERROR_CORRECT_M, zona tišine 2 modula). Provereni su modul po modul: obrazac je rasterizovan na 300 dpi i svih 1.369 modula oba koda poređeno sa očekivanom matricom — nula odstupanja, veličina modula 0,63 mm.</p>
+        <p>CSV je dobio kolone <code>podloga</code> i <code>klupe</code>, koje ne služe buci nego analizi 9.3. Tip podloge nam nedostaje jer ga OpenStreetMap za staze uz Nišavu skoro ne beleži, a klupe su osnov za „mesta predaha". Pošto se ionako prelazi 13 km, beleže se usput.</p>
+
+        <h3>Šta i dalje nije rešeno</h3>
+        <p>Nijedna stanica ne stoji <em>na</em> keju — najbliža je 288 m i to je rečeno na stranici. Razlika između gornjeg i donjeg bedema u NO₂ izvedena je iz istog modela blizine puteva, pa nosi njegove pretpostavke, ne nezavisnu proveru. Žarišta zagađenja i dalje se ne prikazuju: za njih bi trebalo merenje duž same trase, a ne ekstrapolacija sa dve gradske stanice.</p>
+      </div>
+    </article>
+
+    <article class="post">
+      <header class="post-head">
         <time datetime="2026-09-14">14. septembar 2026.</time>
         <h2>Bezbednosni audit: tri kategorije, bez novih podataka</h2>
       </header>

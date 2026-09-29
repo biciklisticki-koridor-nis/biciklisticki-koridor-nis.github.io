@@ -11,4 +11,4 @@ Direktorijumi se imenuju po analizi kojoj pripadaju, kao i stranice na sajtu.
 
 | Direktorijum | Šta je unutra |
 |---|---|
-| [`9.2-kalibracija-buke/`](9.2-kalibracija-buke/) | Terenska merenja kojima se model buke prevodi iz indeksa 0–100 u decibele: 18 tačaka, GPX, protokol i preporučena oprema. Jedan izlazak, 13 km. |
+| [`9.2-kalibracija-buke/`](9.2-kalibracija-buke/) | Terenska merenja kojima se model buke prevodi iz indeksa 0–100 u decibele: 18 tačaka, GPX, obrazac za štampu sa QR kodovima, protokol i preporučena oprema. Jedan izlazak, 13 km. |

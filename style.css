@@ -986,11 +986,35 @@ p  { margin: 0 0 1em; color: var(--ink-700); }
   border-radius: 3px;
   font-size: .88em;
   font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  /* dugačke putanje i URL-ovi inače razvuku stranicu na telefonu */
+  overflow-wrap: anywhere;
 }
 .post-body a { color: var(--green-700); }
 .post-body a:hover { color: var(--green-900); }
 .tech-list { padding-left: 1.4em; margin: 0 0 .9em; }
 .tech-list li { margin-bottom: .4em; }
+
+/* mala tabela unutar unosa u dnevniku */
+.tech-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0 0 1em;
+  font-size: .9rem;
+  font-variant-numeric: tabular-nums;
+}
+.tech-table th, .tech-table td {
+  border-bottom: 1px solid var(--line);
+  padding: .4em .6em;
+  text-align: right;
+}
+.tech-table th:first-child, .tech-table td:first-child { text-align: left; }
+.tech-table thead th {
+  border-bottom-width: 2px;
+  font-size: .78rem;
+  text-transform: uppercase;
+  letter-spacing: .03em;
+  color: var(--ink-500);
+}
 
 .dnevnik-footer {
   background: var(--green-900);
@@ -1414,7 +1438,9 @@ footer a:hover { color: #fff; border-bottom-color: rgba(255,255,255,.6); }
   box-shadow: var(--shadow);
 }
 #buka-profil { display: block; width: 100%; }
-#buka-map {
+#buka-map,
+#vazduh-map,
+#termo-map {
   height: 420px;
   width: 100%;
   border-radius: var(--radius);
@@ -1535,7 +1561,9 @@ footer a:hover { color: #fff; border-bottom-color: rgba(255,255,255,.6); }
 
 @media (max-width: 640px) {
   .nalaz-broj { font-size: 1.8rem; }
-  #buka-map { height: 340px; }
+  #buka-map,
+  #vazduh-map,
+  #termo-map { height: 340px; }
   .mg-plot { height: 175px; gap: .15rem; padding: .7rem .5rem .4rem; }
   .mg-val { display: none; }
   .mg-ime { font-size: .62rem; }
@@ -1560,7 +1588,8 @@ footer a:hover { color: #fff; border-bottom-color: rgba(255,255,255,.6); }
   letter-spacing: .01em;
 }
 .pokazatelji-table .pk-mera { color: var(--ink-700); font-size: .88rem; }
-.pokazatelji-table td.pk-best { font-weight: 800; color: var(--green-700); }
+.pokazatelji-table td.pk-best,
+.senka-table td.pk-best { font-weight: 800; color: var(--green-700); }
 .pokazatelji-table tr.pk-plan td { background: var(--sand-50); }
 .pokazatelji-nota { font-size: .85rem; margin-top: .7rem; max-width: 760px; }
 .pokazatelji-table .pk-short,
@@ -1636,3 +1665,225 @@ footer a:hover { color: #fff; border-bottom-color: rgba(255,255,255,.6); }
   margin-left: .45rem;
 }
 .sd-extra a { font-style: italic; }
+
+/* ── merne stanice (9.2) ───────────────────────────────────────── */
+.stanice-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+  margin: 1.2rem 0 1.4rem;
+}
+.st-kartica {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1rem 1.1rem 1.1rem;
+  box-shadow: var(--shadow);
+}
+/* stanica koja predstavlja kej nosi sve nivoe na stranici, pa se i vidi */
+.st-kartica.glavna { border-color: var(--green-500); border-width: 2px; }
+.st-znak {
+  display: inline-block;
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .03em;
+  text-transform: uppercase;
+  color: var(--ink-500);
+  background: var(--sand-100);
+  border-radius: 999px;
+  padding: .25em .7em;
+  margin-bottom: .7em;
+}
+.st-kartica.glavna .st-znak { color: #fff; background: var(--green-700); }
+.st-d {
+  margin: 0 0 .1em;
+  font-size: 1.6rem;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--green-700);
+  font-variant-numeric: tabular-nums;
+}
+.st-d-sub { font-size: .8rem; font-weight: 600; color: var(--ink-500); }
+.st-tip { margin: 0 0 .6em; font-size: .85rem; font-weight: 600; color: var(--ink-700); }
+.st-opis { margin: 0 0 .7em; font-size: .88rem; color: var(--ink-700); }
+.st-meta { margin: 0; font-size: .76rem; color: var(--ink-500); }
+
+.vk-zakon {
+  margin: .5em 0 0;
+  font-size: .78rem;
+  font-weight: 700;
+  color: var(--warn);
+}
+
+/* ── prekoračenja po godini (9.2) ──────────────────────────────── */
+.godine-graf { margin: 1.2rem 0 .6rem; }
+.gg-plot {
+  position: relative;
+  display: flex;
+  align-items: end;
+  gap: .35rem;
+  height: 230px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: .9rem 5.4rem .4rem .9rem;
+  box-shadow: var(--shadow);
+}
+/* linija dopuštenog broja dana — sve iznad nje je prekoračenje zakona */
+.gg-plot::after {
+  content: "";
+  position: absolute;
+  left: .9rem; right: 5.4rem;
+  bottom: calc(1.6rem + (100% - 3rem) * var(--dop) / 100);
+  border-top: 2px dashed var(--warn);
+  pointer-events: none;
+}
+.gg-dop-oznaka {
+  position: absolute;
+  right: .7rem;
+  bottom: calc(1.6rem + (100% - 3rem) * var(--dop) / 100);
+  transform: translateY(50%);
+  font-size: .72rem;
+  font-weight: 700;
+  line-height: 1.15;
+  color: var(--warn);
+  width: 4.2rem;
+}
+.gg-col { flex: 1 1 0; display: flex; flex-direction: column; justify-content: flex-end; height: 100%; min-width: 0; }
+.gg-stupci { display: flex; align-items: end; justify-content: center; gap: 2px; height: 100%; }
+.gg-bar {
+  position: relative;
+  flex: 1 1 0;
+  max-width: 18px;
+  border-radius: 3px 3px 0 0;
+  min-height: 2px;
+}
+.gg-saob { background: var(--warn); }
+.gg-poz  { background: var(--earth-500); }
+.gg-val {
+  position: absolute;
+  top: -1.05em; left: 50%;
+  transform: translateX(-50%);
+  font-size: .65rem;
+  color: var(--ink-500);
+  font-variant-numeric: tabular-nums;
+}
+.gg-ime { font-size: .72rem; color: var(--ink-500); text-align: center; margin-top: .3em; }
+.gg-key-saob { background: var(--warn); }
+.gg-key-poz { background: var(--earth-500); margin-left: .8rem; }
+.gg-praznine { margin-left: .8rem; font-style: italic; }
+.gg-vek { color: var(--ink-300); }
+
+/* ── raspodela NO₂ na delove (9.2) ─────────────────────────────── */
+.raspodela {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1.1rem 1.2rem 1rem;
+  box-shadow: var(--shadow);
+  margin: 1.2rem 0 1.4rem;
+}
+.rp-red { display: grid; grid-template-columns: 11rem 1fr 5.2rem; align-items: center; gap: .8rem; margin-bottom: .8rem; }
+.rp-ime { font-size: .88rem; font-weight: 700; color: var(--ink-900); line-height: 1.25; }
+.rp-ime-sub { display: block; font-size: .76rem; font-weight: 500; color: var(--ink-500); }
+.rp-traka { display: flex; height: 20px; border-radius: 5px; overflow: hidden; background: var(--sand-100); }
+.rp-seg { display: block; height: 100%; }
+.rp-reg { background: var(--ink-300); }
+.rp-urb { background: var(--earth-500); }
+.rp-saob { background: var(--warn); }
+.rp-suma { font-size: 1.05rem; font-weight: 800; color: var(--ink-900); text-align: right; font-variant-numeric: tabular-nums; }
+.rp-jed { font-size: .7rem; font-weight: 600; color: var(--ink-500); }
+.rp-key-reg { background: var(--ink-300); }
+.rp-key-urb { background: var(--earth-500); margin-left: .8rem; }
+.rp-key-saob { background: var(--warn); margin-left: .8rem; }
+.rp-nota { margin: .7rem 0 0; font-size: .85rem; }
+
+@media (max-width: 640px) {
+  .tech-table { font-size: .82rem; }
+  .tech-table th, .tech-table td { padding: .35em .3em; }
+  .gg-plot { height: 190px; gap: .15rem; padding: .8rem 3.5rem .4rem .5rem; }
+  .gg-plot::after { right: 3.5rem; }
+  .gg-val { display: none; }
+  .gg-ime { font-size: .62rem; }
+  .gg-vek { display: none; }
+  .gg-dop-oznaka { font-size: .62rem; right: .35rem; width: 3rem; }
+  .gg-praznine { display: none; }
+  .rp-red { grid-template-columns: 1fr 4.6rem; gap: .5rem .7rem; }
+  .rp-ime { grid-column: 1 / -1; }
+  .st-d { font-size: 1.35rem; }
+}
+
+.mapa-nota { margin: .5rem 0 1.6rem; font-size: .82rem; }
+
+/* ── sunce protiv senke (9.3) ──────────────────────────────────── */
+.uporedba {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1.2rem 1.3rem 1rem;
+  box-shadow: var(--shadow);
+  margin: 1.2rem 0 2rem;
+}
+.up-red { display: grid; grid-template-columns: 9rem 1fr 5.4rem 11rem; align-items: center; gap: .9rem; margin-bottom: .8rem; }
+.up-ime { font-size: .92rem; font-weight: 700; color: var(--ink-900); }
+.up-traka { height: 22px; border-radius: 5px; background: var(--sand-100); overflow: hidden; }
+.up-traka span { display: block; height: 100%; border-radius: 5px; }
+.up-broj { font-size: 1.25rem; font-weight: 800; color: var(--ink-900); text-align: right; font-variant-numeric: tabular-nums; }
+.up-jed { font-size: .72rem; font-weight: 600; color: var(--ink-500); }
+.up-kat { font-size: .82rem; color: var(--ink-700); }
+.up-nota { margin: .9rem 0 0; font-size: .88rem; }
+
+/* ── sat po sat (9.3) ──────────────────────────────────────────── */
+.sat-graf { margin: 1.2rem 0 .6rem; }
+.sg-plot {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: .5rem;
+  align-items: end;
+  height: 180px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: .9rem 1rem .4rem;
+  box-shadow: var(--shadow);
+}
+.sg-col { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; }
+.sg-val { font-size: .74rem; color: var(--ink-700); font-variant-numeric: tabular-nums; margin-bottom: .2em; }
+.sg-bar { width: 100%; max-width: 54px; border-radius: 5px 5px 0 0; min-height: 3px; }
+.sg-ime { font-size: .76rem; color: var(--ink-500); margin-top: .35em; }
+
+/* ── činioci (9.3) ─────────────────────────────────────────────── */
+.cinioci {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 1rem;
+  margin: 1.3rem 0 0;
+}
+.cinilac {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1rem 1.1rem 1.1rem;
+  box-shadow: var(--shadow);
+}
+.ci-broj {
+  font-size: 1.7rem;
+  font-weight: 800;
+  line-height: 1.05;
+  color: var(--green-700);
+  font-variant-numeric: tabular-nums;
+}
+.ci-sub { font-size: .9rem; font-weight: 700; color: var(--ink-500); }
+.ci-naslov { margin: .25em 0 .5em; font-size: .88rem; font-weight: 600; color: var(--ink-700); }
+.ci-opis { margin: 0; font-size: .85rem; color: var(--ink-500); }
+
+@media (max-width: 640px) {
+  .up-red { grid-template-columns: 1fr 5rem; gap: .4rem .7rem; }
+  .up-ime { grid-column: 1 / -1; }
+  .up-kat { grid-column: 1 / -1; font-size: .78rem; margin-top: -.2rem; }
+  .sg-plot { height: 150px; gap: .25rem; padding: .8rem .5rem .4rem; }
+  .sg-val { font-size: .66rem; }
+  .sg-ime { font-size: .68rem; }
+  .ci-broj { font-size: 1.4rem; }
+}
