@@ -6,6 +6,13 @@ Format prati [Keep a Changelog](https://keepachangelog.com/sr/1.1.0/).
 ## [Neobjavljeno]
 
 ### Dodato
+- **Treća strana terenskog obrasca — „Pre izlaska: šta instalirati".** QR
+  kodovi ka Play Store-u za NoiseCapture (merenje zvuka), OsmAnd i Organic
+  Maps (mapa), plus zaseban QR ka `tacke.gpx`. Uz to uputstvo kako se GPX
+  ubacuje u mapu i kontrolna lista pre polaska. Postojeće dve strane su
+  netaknute — provereno poređenjem izvučenog teksta.
+  - Identifikatori paketa su provereni na Play Store-u, a svih šest QR kodova
+    u obrascu dekodirano iz SVG izvora i upoređeno modul po modul.
 - **Analiza 9.3 — termalni komfor i kvalitet predela**, u stepenima a ne u
   oceni od 0 do 100. Predlog je bio da se senka, voda, vegetacija, podloga,
   sunce, otvorenost i izgrađenost saberu u jedinstven indeks; to bi izgledalo

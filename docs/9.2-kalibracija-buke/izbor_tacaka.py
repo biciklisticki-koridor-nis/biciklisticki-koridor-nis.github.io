@@ -40,6 +40,16 @@ WEB = os.path.join(ROOT, "data", "merne_tacke.json")
 SITE = "https://biciklisticki-koridor-nis.github.io"
 DOCS_URL = f"{SITE}/docs/9.2-kalibracija-buke/"
 
+# Aplikacije na trećoj strani obrasca. Identifikatori paketa su provereni na
+# Play Store-u — pogrešan QR u odštampanom dokumentu je gori nego nijedan.
+PLAY = "https://play.google.com/store/apps/details?id="
+APLIKACIJE = [
+    ("NoiseCapture", "org.noise_planet.noisecapture",
+     "merenje zvuka", "obavezno", True),
+    ("OsmAnd", "net.osmand", "mapa sa tačkama", "preporučeno", False),
+    ("Organic Maps", "app.organicmaps", "mapa sa tačkama", "jednostavnija", False),
+]
+
 N_PAIRS = 4              # uparenih lokacija gornji/donji bedem
 MIN_SEP_M = 350.0        # nespojene tačke moraju biti nezavisne
 PAIR_MIN_IDX = 40        # ispod ovoga nema signala za razliku staza
@@ -293,6 +303,40 @@ def write_form(pts, path):
 
   .belezke-naslov {{ font-size: 10pt; margin: 5mm 0 2mm; }}
   .belezke span {{ display: block; border-bottom: .4pt solid #999; height: 8mm; }}
+
+  /* treća strana: aplikacije i QR kodovi */
+  .app-red {{ display: flex; gap: 6mm; margin: 4mm 0 5mm; }}
+  .app {{
+    flex: 0 0 auto; margin: 0; text-align: center;
+    border: .5pt solid #111; border-radius: 1.5mm; padding: 2.5mm 3mm 2mm;
+  }}
+  .app-fajl {{ border-width: 1.2pt; }}
+  .app svg {{ display: block; margin: 0 auto; }}
+  .app figcaption {{ margin-top: 1.2mm; line-height: 1.25; }}
+  .app figcaption strong {{ display: block; font-size: 9pt; }}
+  .app figcaption span {{ display: block; font-size: 7pt; color: #444; }}
+  .app-oznaka {{
+    margin-top: .8mm; font-weight: 600; text-transform: uppercase;
+    letter-spacing: .03em; font-size: 6.5pt !important;
+  }}
+  .app-must {{ color: #111 !important; }}
+  .upozorenje {{ border-left: 1.2pt solid #111; padding-left: 2.5mm; }}
+  /* Eksplicitne kolone, ne tekuće: sa `columns: 2` upozorenje uz NoiseCapture
+     iscuri na vrh desne kolone i pročita se kao deo uputstva za mapu. */
+  .uput-grid {{ display: grid; grid-template-columns: 1fr 1fr; gap: 0 8mm; font-size: 8.5pt; }}
+  .uput-grid h2 {{ font-size: 10pt; margin: 0 0 1.5mm; }}
+  .uput-grid h2 + p {{ margin-top: 0; }}
+  .uput-grid p {{ margin: 0 0 2mm; }}
+  .uput-grid ol {{ margin: 0 0 2mm; padding-left: 4.5mm; }}
+  .uput-grid li {{ margin-bottom: 1.2mm; }}
+
+  .lista-naslov {{ font-size: 10pt; margin: 6mm 0 2mm; }}
+  .kontrolna {{ display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.8mm 8mm; font-size: 8.5pt; }}
+  .kontrolna span {{ display: flex; align-items: center; gap: 2mm; }}
+  .kontrolna span::before {{
+    content: ""; flex: 0 0 auto; width: 4.2mm; height: 4.2mm;
+    border: .6pt solid #111; border-radius: .8mm;
+  }}
 </style>
 </head>
 <body>
@@ -389,6 +433,78 @@ def write_form(pts, path):
 
   <h2 class="belezke-naslov">Opšte beleške sa izlaska</h2>
   <div class="belezke">{"".join('<span></span>' for _ in range(9))}</div>
+</section>
+
+<section class="list">
+  <h1>Pre izlaska: šta instalirati</h1>
+  <p class="pod">Skeniraj kodove telefonom. Sve je besplatno i bez naloga.
+  Uradi ovo kod kuće, na Wi-Fi mreži — ne na trasi.</p>
+
+  <div class="app-red">
+    {"".join(f"""
+    <figure class="app">
+      {qr_svg(PLAY + pkg, 25)}
+      <figcaption><strong>{ime}</strong><span>{sta}</span>
+        <span class="app-oznaka{' app-must' if must else ''}">{oznaka}</span></figcaption>
+    </figure>""" for ime, pkg, sta, oznaka, must in APLIKACIJE)}
+    <figure class="app app-fajl">
+      {qr_svg(DOCS_URL + "tacke.gpx", 25)}
+      <figcaption><strong>tacke.gpx</strong><span>{len(pts)} tačaka za mapu</span>
+        <span class="app-oznaka app-must">preuzmi</span></figcaption>
+    </figure>
+  </div>
+
+  <div class="uput-grid">
+   <div>
+    <h2>Zvuk — NoiseCapture</h2>
+    <p>Otvoren kod, iza njega stoje Université Gustave Eiffel i CNRS, pravljen
+    baš za građansko mapiranje buke. Daje <strong>LA90 i LA50 percentile</strong>
+    i sam GPS-taguje merenja. Ima ga i na F-Droid-u.</p>
+    <div class="okvir">
+      <strong>Jedan telefon i jedna aplikacija za ceo prolaz.</strong>
+      Svaki mikrofon nosi svoj stalni pomeraj. U obradi se sam poništi — ali
+      samo ako je isti na svim tačkama.
+    </div>
+    <p><strong>Trik koji štedi posao:</strong> pusti NoiseCapture da snima
+    neprekidno kroz ceo obilazak. Zaustavljanja ispadaju kao čiste zaravni u
+    GPS tragu i iz njih se vade vrednosti. Vožnja između tačaka je zagađena
+    šumom vetra i baca se, ali ništa ne košta.</p>
+    <p class="upozorenje">Ne koristi generičke „Sound Meter" aplikacije.
+    Skoro nijedna ne traži neobrađen audio izvor, pa im automatska kontrola
+    pojačanja izravna tačno ono što merimo. Daju uverljive brojeve bez značenja.</p>
+   </div>
+   <div>
+    <h2>Mapa — kako ubaciti GPX</h2>
+    <ol>
+      <li>Skeniraj kod <strong>tacke.gpx</strong>. Fajl se preuzme u Downloads.</li>
+      <li>Otvori preuzeti fajl i izaberi <strong>OsmAnd</strong> ili
+        <strong>Organic Maps</strong> kao aplikaciju. U OsmAnd-u radi i
+        <em>Meni → Podešavanja → Uvoz/izvoz → Uvoz</em>.</li>
+      <li><strong>Proveri da se vidi svih {len(pts)} tačaka</strong>, od
+        {pts[0]["id"]} do {pts[-1]["id"]}. Organic Maps ume da preskoči prvu i
+        poslednju — ako fali, dodaj ih ručno po koordinatama sa prve strane.</li>
+      <li>Skini <strong>offline mapu Srbije</strong> dok si na Wi-Fi mreži.</li>
+    </ol>
+    <p>OsmAnd je preporučen zato što prikazuje <strong>opis</strong> svake
+    tačke, a u opisu stoji ceo protokol za tu tačku — model indeks, kilometraža,
+    deonica i način merenja. Uz njega papir služi samo za upis, ne i za
+    podsećanje šta se radi. Organic Maps je jednostavniji i lakši, ali pokazuje
+    samo pin.</p>
+   </div>
+  </div>
+
+  <h2 class="lista-naslov">Kontrolna lista pre polaska</h2>
+  <div class="kontrolna">
+    <span>telefon pun, punjač u torbi</span>
+    <span>NoiseCapture instaliran i probano snimanje</span>
+    <span>tacke.gpx učitan, vidi se svih {len(pts)} tačaka</span>
+    <span>offline mapa Srbije skinuta</span>
+    <span>pena na mikrofonu (protiv vetra)</span>
+    <span>ovaj obrazac odštampan, olovka</span>
+    <span>radni dan, bez kiše i jakog vetra</span>
+    <span>2–3 sata slobodno, 13 km trase</span>
+    <span>voda — merenje je leti, po suncu</span>
+  </div>
 </section>
 
 </body>
