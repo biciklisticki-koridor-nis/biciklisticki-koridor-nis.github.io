@@ -43,11 +43,14 @@ numpy, da izolovano okruženje ne mora ništa više da instalira.
 Izvori: EEA / SEPA (validirani E1a) · CAMS preko Open-Meteo (CC BY 4.0).
 """
 import csv
+import email.utils
 import json
 import math
 import os
 import statistics
 import sys
+import time
+import urllib.error
 import urllib.parse
 import urllib.request
 
@@ -102,6 +105,11 @@ PROX_R_M = 400.0        # exp(-400/60) = 0,001 — dalje je nemerljivo
 EMIT_STEP_M = 10.0      # na koliko se segmenti puta dele u tačkaste emitere
 D_MIN_M = 5.0           # ne dozvoli nulu kad tačka leži na putu
 
+# Posle ovoliko dana se proverava da li EEA ima noviju verziju fajla.
+# Validirani podaci stižu jednom godišnje, ali provera je uslovna pa
+# ništa ne košta kad promene nema.
+CACHE_MAX_DANA = 14
+
 MIN_DANA_GODINA = 300   # ispod ovoga godina nije reprezentativna
 MIN_SATI_DAN = 18       # dnevni prosek zahteva ovoliko validnih sati
 
@@ -123,19 +131,58 @@ SEZONA_MESECI = (5, 6, 7, 8, 9)
 
 # ---------- EEA metapodaci ----------
 
-def _cache_get(url, name, binary=True):
+def _cache_get(url, name):
+    """Fajl iz keša, sa rokom trajanja.
+
+    EEA menja iste URL-ove u mestu kad objavi novu porciju validiranih
+    podataka — nova godina ne dobija novo ime fajla. Keš bez roka bi zato
+    značio da `make vazduh` i za godinu dana vrti istu, zastarelu 2025.
+
+    Posle CACHE_MAX_DANA se šalje uslovni zahtev sa `If-Modified-Since`.
+    Discomap ga poštuje i na nepromenjen fajl vraća 304, pa se metapodaci od
+    26 MB ne skidaju ponovo. Azure blob, na kome stoje parquet fajlovi, vraća
+    200 bez obzira na zaglavlje, pa se oni ponovo preuzimaju — ali svih osam
+    zajedno je oko 4,6 MB jednom u dve nedelje, što ne vredi zaobilaziti.
+
+    Skida se u privremeni fajl pa preimenuje, da prekinuto preuzimanje ne
+    ostavi krnj keš koji izgleda ispravno.
+    """
     os.makedirs(CACHE_DIR, exist_ok=True)
     path = os.path.join(CACHE_DIR, name)
+    od_kada = None
     if os.path.exists(path) and os.path.getsize(path) > 0:
-        return path
-    print(f"  preuzimam {name} ...", flush=True)
-    req = urllib.request.Request(url, headers=UA)
-    with urllib.request.urlopen(req, timeout=300) as r, open(path, "wb") as f:
+        mtime = os.path.getmtime(path)
+        if time.time() - mtime < CACHE_MAX_DANA * 86400:
+            return path
+        od_kada = mtime
+
+    req = urllib.request.Request(url, headers=dict(UA))
+    if od_kada is not None:
+        req.add_header("If-Modified-Since",
+                       email.utils.formatdate(od_kada, usegmt=True))
+        print(f"  proveravam ima li novija verzija: {name} ...", flush=True)
+    else:
+        print(f"  preuzimam {name} ...", flush=True)
+
+    try:
+        r = urllib.request.urlopen(req, timeout=300)
+    except urllib.error.HTTPError as exc:
+        if exc.code == 304 and od_kada is not None:
+            os.utime(path, None)
+            print("    bez promene na serveru")
+            return path
+        raise
+
+    tmp = path + ".tmp"
+    with r, open(tmp, "wb") as f:
         while True:
             chunk = r.read(1 << 20)
             if not chunk:
                 break
             f.write(chunk)
+    os.replace(tmp, path)
+    if od_kada is not None:
+        print("    preuzeta novija verzija")
     return path
 
 
