@@ -4,9 +4,15 @@ Uputstvo za jedan terenski izlazak koji model buke iz analize 9.2 prevodi iz
 relativnog indeksa 0–100 u decibele, i proverava da li uopšte ispravno rangira
 deonice.
 
-**Za teren:** [`obrazac.pdf`](obrazac.pdf) — **odštampaj ovo i ponesi**.
-Jedan list sa svih 18 tačaka i praznim kolonama za upis, plus uputstvo na
-poleđini. U zaglavlju su dva QR koda: GPX za aplikaciju za mape i CSV za unos.
+**Za teren:** [`obrazac.pdf`](obrazac.pdf) — **odštampaj ovo i ponesi**. Tri
+strane:
+
+1. svih 18 tačaka sa koordinatama i praznim kolonama za upis; u zaglavlju QR
+   kodovi za GPX i CSV
+2. protokol merenja i mesto za slobodne beleške
+3. **šta instalirati pre izlaska** — QR kodovi ka Play Store-u za
+   NoiseCapture, OsmAnd i Organic Maps, uputstvo kako se GPX ubacuje u mapu,
+   i kontrolna lista pre polaska
 
 **Ostali fajlovi:** [`tacke.gpx`](tacke.gpx) (18 waypoint-a + redosled obilaska) ·
 [`tacke.csv`](tacke.csv) (tabela za popunjavanje) ·
@@ -120,7 +126,8 @@ beleži, a klupe su osnov za „mesta predaha". Pošto se ionako prelazi celih
 | Generičke „Sound Meter" aplikacije | besplatno | ✓ | ✓ | retko | retko | ne | **2** |
 
 **Preporuka: jedan Class 2 merač (~40 €) za grupu, plus NoiseCapture na
-telefonima kao paralelna provera.**
+telefonima kao paralelna provera.** QR kodovi za instalaciju su na trećoj
+strani obrasca.
 
 NoiseCapture je najbolji softverski izbor — otvoren kod, iza njega stoje
 Université Gustave Eiffel i CNRS, pravljen baš za građansko mapiranje buke.
@@ -144,6 +151,25 @@ stoje apsolutni decibeli.
 obilazak. Zaustavljanja ispadaju kao čiste zaravni u GPS tragu i iz njih se
 vade vrednosti — jedno snimanje, jedan prolaz, bez ručnog beleženja. Vožnja
 između tačaka je zagađena šumom vetra i baca se, ali ništa ne košta.
+
+## Aplikacija za mapu
+
+Naš GPX ima 18 waypoint-a i rutu, ali **nema track**. Waypoint-i rade svuda;
+`<rte>` je najslabije podržan element GPX-a. Nije problem — redosled obilaska
+stoji u imenima tačaka (T01…T18).
+
+- **[OsmAnd](https://play.google.com/store/apps/details?id=net.osmand)** —
+  preporučeno. Prikazuje **opis** svake tačke, a u opisu stoji ceo protokol za
+  nju: model indeks, kilometraža, deonica i način merenja. Uz njega papir služi
+  samo za upis. Besplatna verzija dozvoljava 7 preuzimanja mapa; Srbija je jedna.
+- **[Organic Maps](https://play.google.com/store/apps/details?id=app.organicmaps)**
+  — jednostavnije i lakše, ali pokazuje samo pin. Ima
+  [otvorenu prijavu](https://github.com/organicmaps/organicmaps/issues/8703) da
+  pri uvozu GPX-a ume da preskoči prvu i poslednju tačku — proveri da se vidi
+  svih 18 pre izlaska.
+
+Uvoz: otvori preuzeti `tacke.gpx` i izaberi aplikaciju. U OsmAnd-u radi i
+*Meni → Podešavanja → Uvoz/izvoz → Uvoz*. Offline mapu Srbije skini pre polaska.
 
 ## Šta očekivati
 
