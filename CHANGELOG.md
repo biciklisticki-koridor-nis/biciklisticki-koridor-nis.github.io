@@ -5,6 +5,56 @@ Format prati [Keep a Changelog](https://keepachangelog.com/sr/1.1.0/).
 
 ## [Neobjavljeno]
 
+### Izmenjeno
+- **Kvalitet vazduha u analizi 9.2 više nije procena nego merenje.** Izvor su
+  validirani časovni podaci zvaničnih mernih stanica (SEPA preko EEA, bez
+  ključa), umesto CAMS-a preko Open-Meteo. Poređen sa stanicom na istim danima,
+  CAMS daje PM2.5 1,58×, PM10 1,98× i NO₂ 4,05× niže, a za NO₂ dnevno nema
+  veštinu (r = 0,29). Brojevi na stranici bili su zato pogrešni:
+  - PM2.5 godišnje 24,7 umesto 16,9 µg/m³ (smernica SZO je 5), 52 % dana preko
+    dnevne smernice umesto 45 %.
+  - NO₂ 22,8 umesto 5,7 µg/m³; preko dnevne smernice 28 % dana, a ne 0,1 %.
+  - PM10 prelazi zakonsku dnevnu granicu 76 dana godišnje kod keja, uz
+    dopuštenih 35. Saobraćajna stanica prekoračuje **svake godine od 2013**,
+    između 53 i 106 dana.
+  - Polen ostaje na CAMS-u — stanice ga ne mere, a regionalna je pojava.
+- **`noise_air.py` → `buka.py`**, `data/noise_air.json` → `data/buka.json`
+  (schema 2). Vazduh je izašao iz tog modula čim je dobio sopstvenu prostornu
+  logiku, pa je staro ime počelo da laže.
+
+### Dodato
+- **Procena NO₂ po deonicama (9.2)**, za maj–septembar: Niška Banja i Brzi Brod
+  8,8–9,3, Medoševac 9,5–11,7, Delta–Lidl 11,0–11,5, Centar 14,5–15,5 µg/m³.
+  Donji bedem je dosledno najčistiji. Ne interpolira se između stanica — dve
+  urbane su 400 m jedna od druge, pa bi svaki gradijent preko 13 km bio
+  artefakt njihovog položaja. Umesto toga se izmerena razlika između
+  saobraćajne i pozadinske stanice raspoređuje modelom blizine puteva
+  (eksponencijalno opadanje, L = 60 m), a regionalni i urbani član su merenja.
+  - Sidro je **letnje**, ne godišnje: zimi pozadinska stanica ima viši NO₂ od
+    saobraćajne (41,7 prema 25,2 u januaru) jer stoji u naselju sa
+    individualnim grejanjem. Godišnja razlika je +2,8 µg/m³, letnja +9,6.
+  - Čestice se po deonicama ne prikazuju: letnja razlika između te dve stanice
+    je +3,6 za PM2.5 i −3,7 za PM10, pa nije saobraćajna.
+- **Mapa mernih stanica** sa isprekidanim potezom do najbliže tačke trase, i
+  grafikon prekoračenja zakonske granice po godini.
+- **`vazduh.py` + `make vazduh`** → `data/vazduh.json` (10 KB). Pošto pyarrow
+  nema wheel za Python 3.14, korak se vrti kroz
+  `uv run --python 3.13 --with pyarrow` ako `uv` postoji.
+- **Obrazac za teren (`obrazac.pdf`)** — A4 landscape, svih 18 mernih tačaka sa
+  koordinatama na jednom listu i praznim kolonama za upis, uputstvo na
+  poleđini. U zaglavlju dva QR koda, ka GPX-u i CSV-u na sajtu; provereni
+  modul po modul na rasterizaciji od 300 dpi. `make teren-pdf`.
+- **Tačke merenja na mapi buke** u analizi 9.2, iz `data/merne_tacke.json`.
+- **Kolone `podloga` i `klupe` u `tacke.csv`** — pripadaju analizi 9.3, ali se
+  beleže na istom izlasku, da se 13 km ne prelazi dvaput.
+
+### Popravljeno
+- **Linija smernice SZO na mesečnom grafikonu nikada se nije prikazivala na
+  pravom mestu**: vrednost je prosleđivana kao `--szo: 26%`, pa je
+  `calc(dužina × procenat)` nevalidan i linija je padala na dno okvira.
+- **Dugački URL-ovi i putanje u dnevniku** razvlačili su stranicu na telefonu
+  (`overflow-wrap` na inline `code`).
+
 ### Dodato
 - **Sadržaj na vrhu `analize.html`** — sekcije i njihove analize sa
   linkovima: sekcija skače na sebe na stranici, objavljene analize otvaraju

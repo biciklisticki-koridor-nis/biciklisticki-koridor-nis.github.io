@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>9.2 Buka i kvalitet vazduha — Nišavski biciklistički koridor</title>
-  <meta name="description" content="Analiza 9.2: koliko saobraćajne buke stiže do koridora, deonica po deonica, i kakav je vazduh nad Nišavom kroz godinu." />
+  <meta name="description" content="Analiza 9.2: koliko saobraćajne buke stiže do koridora, deonica po deonica, i kakav je vazduh nad Nišavom — sa zvaničnih mernih stanica." />
 
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <link rel="stylesheet" href="style.css" />
@@ -32,8 +32,8 @@
         <p class="nalaz-tekst">Donji bedem je <strong>najtiša od tri staze</strong> — toliko tiši od gornjeg. Isto to rastojanje od ulica daje mu i duplo više hlada.</p>
       </div>
       <div class="nalaz nalaz-warn">
-        <p class="nalaz-broj">45 %</p>
-        <p class="nalaz-tekst">dana u godini vazduh prelazi dnevnu smernicu SZO za PM2.5 — <strong>ali gotovo isključivo zimi</strong>, van sezone korišćenja keja.</p>
+        <p class="nalaz-broj">76 dana</p>
+        <p class="nalaz-tekst">godišnje vazduh kod keja prelazi <strong>zakonsku granicu</strong> za PM10. Zakon dopušta 35. Prekoračena je svake godine otkad se meri.</p>
       </div>
     </div>
   </div>
@@ -68,6 +68,7 @@
     <h3>Na mapi</h3>
     <p class="muted">Trasa je obojena istom skalom. Tiši delovi su zeleni, izloženi crveni.</p>
     <div id="buka-map" aria-label="Mapa izloženosti buci"></div>
+    <p class="muted mapa-nota" id="merne-tacke-nota"></p>
 
     <h3>Po deonicama</h3>
     <div class="table-scroll">
@@ -82,17 +83,45 @@
 <section id="vazduh" class="vazduh-section">
   <div class="container">
     <h2>Vazduh</h2>
-    <p class="lead">Vazduh se, za razliku od buke, <strong>ne može prikazati po kilometru</strong>. Najbolji besplatan izvor ima ćeliju od oko 11 km — jednu za ceo koridor. Ono što se može pokazati jeste kako se menja <strong>kroz godinu</strong>, a to ispada važnije nego što zvuči.</p>
+    <p class="lead">Vazduh nad kejom <strong>nije procenjen — izmeren je</strong>. Zvanična merna stanica stoji <strong id="rep-d">288 m</strong> od staze i meri svaki sat, godinama. To menja sve brojeve na ovoj stranici, i to nagore.</p>
 
+    <div class="callout callout-info" id="cams-callout"></div>
+
+    <h3>Odakle brojevi dolaze</h3>
+    <p class="muted">Tri stanice, tri različite uloge. Nijedna ne stoji na samom keju, pa je za svaku rečeno šta tačno iz nje čitamo.</p>
+    <div class="stanice-grid" id="stanice-grid"></div>
+    <div id="vazduh-map" aria-label="Mapa mernih stanica u odnosu na koridor"></div>
+
+    <h3>Koliko je zagađen vazduh</h3>
+    <p class="muted">Prosek na stanici najbližoj stazi, u odnosu na smernicu Svetske zdravstvene organizacije.</p>
     <div class="vazduh-kartice" id="vazduh-kartice"></div>
 
+    <div class="callout callout-warn" id="zakon-callout"></div>
+
+    <h3>Prekoračenja zakonske granice, godina po godina</h3>
+    <p class="muted">Dani u kojima je dnevni prosek PM10 prešao <strong>50 µg/m³</strong>. Isprekidana linija je ono što zakon dopušta — 35 dana godišnje.</p>
+    <div class="godine-graf" id="pm10-godine"></div>
+
     <h3>Kroz godinu</h3>
-    <p class="muted">Prosečna dnevna koncentracija PM2.5 po mesecu, uprosečeno kroz tri godine. Crvena linija je dnevna smernica SZO.</p>
+    <p class="muted">Prosečna dnevna koncentracija PM2.5 po mesecu. Crvena linija je dnevna smernica SZO.</p>
     <div class="mesec-graf" id="pm-mesecno"></div>
 
     <div class="callout callout-good">
-      <p><strong>Sezone se ne poklapaju — i to je dobra vest.</strong> Vazduh je najgori u decembru, januaru i februaru, kada se grad greje. Od maja do septembra, kada se kej zapravo koristi, koncentracije padaju ispod smernice. Koridor se koristi tačno onda kada je vazduh najčistiji.</p>
+      <p><strong>Sezone se ne poklapaju — i to je jedina dobra vest ovde.</strong> Vazduh je najgori od novembra do februara, kada se grad greje. Od maja do septembra, kada se kej zapravo koristi, spušta se ispod dnevne smernice. Koridor se koristi tačno onda kada je vazduh najčistiji — ali to ne popravlja godinu, samo objašnjava zašto se na keju ne primećuje.</p>
     </div>
+
+    <h3>Razlika između deonica</h3>
+    <p class="muted">Jedini zagađivač kod koga se blizina saobraćaja može razlučiti je azot-dioksid, i to u toploj polovini godine. Vrednosti su prosečna koncentracija NO₂ u µg/m³, za maj–septembar.</p>
+
+    <div class="raspodela" id="no2-raspodela"></div>
+
+    <div class="table-scroll">
+      <table class="senka-table" id="no2-table">
+        <caption class="sr-only">Procena NO₂ po deonici i stazi, maj–septembar</caption>
+      </table>
+    </div>
+
+    <p class="muted">Razlika između deonica je stvarna, ali mala u odnosu na nivo koji nosi ceo grad. <strong>Od niškog vazduha se ne može odbiciklirati</strong> — izbor staze menja nekoliko procenata, grejna sezona menja sve.</p>
 
     <h3>Polen</h3>
     <p class="muted">Za rekreativnu stazu uz reku polen je praktično pitanje — kada je šetnja neprijatna i kome.</p>
@@ -114,21 +143,21 @@
         <p>Drveće snažno zaklanja pogled na saobraćaj, ali zvuk zaustavlja slabo. Uračunati ga značilo bi obećati tišinu koje nema.</p>
       </div>
       <div class="metod-item">
-        <h4>Vazduh je gradski, ne kejski</h4>
-        <p>Vrednosti opisuju Niš kao celinu. Razlika između keja i ulice postoji, ali je besplatnim podacima nemoguće razlučiti.</p>
+        <h4>Vazduh je merenje, uz jednu procenu</h4>
+        <p>Nivoi dolaze sa zvaničnih stanica i nisu modelirani. Modelirana je samo razlika između deonica — i to jedino za azot-dioksid, jer se kod čestica saobraćaj ne može razdvojiti od grejanja.</p>
       </div>
       <div class="metod-item">
         <h4>Nasip nije uračunat</h4>
         <p>Donji bedem je zaklonjen nasipom, što bi ga činilo još tišim nego što piše. Dostupni visinski podaci su pregrubi da se to izmeri.</p>
       </div>
     </div>
-    <p class="muted metod-foot">Puni tehnički opis — izvori, formule, ograničenja i šta je odbačeno — nalazi se u <a href="dnevnik.html">tehničkom dnevniku</a>. Podaci o putevima: OpenStreetMap (ODbL). Vazduh: CAMS preko Open-Meteo (CC BY 4.0).</p>
+    <p class="muted metod-foot">Puni tehnički opis — izvori, formule, ograničenja i šta je odbačeno — nalazi se u <a href="dnevnik.html">tehničkom dnevniku</a>. Podaci o putevima: OpenStreetMap (ODbL). Vazduh: merne stanice SEPA preko Evropske agencije za životnu sredinu; polen: CAMS preko Open-Meteo (CC BY 4.0).</p>
   </div>
 </section>
 
 <footer>
   <div class="container">
-    <p>Podaci: terensko mapiranje 2026. · Putevi: OpenStreetMap · Vazduh: CAMS / Open-Meteo · Mapa: Leaflet.js</p>
+    <p>Podaci: terensko mapiranje 2026. · Putevi: OpenStreetMap · Vazduh: SEPA / EEA · Polen: CAMS / Open-Meteo · Mapa: Leaflet.js</p>
     <p class="muted">Nišavski biciklistički koridor — inicijativa zajednice, Niš</p>
     <p class="muted footer-meta">
       <a href="index.html">Početna</a>
