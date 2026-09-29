@@ -5,6 +5,51 @@ Format prati [Keep a Changelog](https://keepachangelog.com/sr/1.1.0/).
 
 ## [Neobjavljeno]
 
+### Dodato
+- **Analiza 9.3 — termalni komfor i kvalitet predela**, u stepenima a ne u
+  oceni od 0 do 100. Predlog je bio da se senka, voda, vegetacija, podloga,
+  sunce, otvorenost i izgrađenost saberu u jedinstven indeks; to bi izgledalo
+  kao sedam faktora a ponašalo se kao jedan, pa se umesto toga računa fizika i
+  izlazi **UTCI**, sa priznatom skalom toplotnog stresa. Činioci ostaju na
+  stranici, ali kao objašnjenje zašto je negde toplije, ne kao ulaz u ocenu.
+  - **93 %** biciklističke staze je u *jakom toplotnom stresu* vrelog
+    popodneva; potpuno ugodnog dela nema nijedan metar.
+  - Krošnja spušta zračenje na telo (Tmrt) za **21,9 °C** — 53,1 prema
+    31,2 — što je jedna cela kategorija stresa manje.
+  - Medoševac, Centar i Delta–Lidl imaju **0,0 sati senke** u prozoru 12–17 h.
+  - Vrh nije u podne nego u **15 h**: kad je Sunce visoko, na uspravno telo
+    pada manji deo snopa.
+  - Scenario je vruć vedar dan (77 najtoplijih od 310 dana oko solsticija,
+    2016–2025), a ne prosek leta — kišni dani bi razblažili ono što se meri.
+- **9.3.1 Mesta predaha** — potezi od bar 30 m koji ostaju u senci bar 5 od
+  6 sati. Biciklistička staza ih ima 10 (4,8 % dužine), gornji bedem 6,
+  donji bedem 26 (14,9 %). Najduži potez bez ijednog na biciklističkoj stazi
+  je **8,84 km**.
+  - **33 od 36 mapiranih klupa nema nijedan sat senke**, prosečan UTCI na
+    klupi je 36,3 °C. Senka se računa na koordinati same klupe, ne u najbližoj
+    tački staze.
+- **Kvalitet predela** na istoj stranici, od ranije izračunatog pogleda na
+  reku koji do sada nije imao gde da stoji. Spoj dva dela daje nalaz koji
+  nijedan ne daje sam: zapadne deonice vide reku sa ~100 % trase i imaju
+  0,0 sati senke, istočne je vide sa 28 % i imaju 0,9 sati. Pošto je
+  geometrijski reka vidljiva sa cele trase, sav gubitak pogleda otpada na
+  zelenilo — isto ono koje pravi hlad.
+- **`utci.py`** — UTCI polinom (211 članova) bez ijedne spoljne biblioteke,
+  jer numba nema wheel za Python 3.14. Programski izvučen iz
+  `pythermalcomfort` 4.6.0 (MIT), ne prekucan. Nosi samoproveru
+  (`python utci.py`) i proveren je protiv originala na 840 kombinacija —
+  najveće odstupanje 0,000 °C.
+- **`termalni.py` + `make termalni`** → `data/termalni.json` (191 KB).
+- **Termalni komfor u tabeli pokazatelja** na `analize.html`: 36,3 / 36,4 /
+  35,7 °C. Tabela sada nosi jedinicu po redu, jer nije sve u procentima.
+
+### Popravljeno
+- **Grafikon po satu** je crtao stubiće od tik ispod minimuma, pa je razlika
+  od 1,6 °C izgledala petostruko. Sada počinju od granice kategorije, i to
+  piše ispod grafikona.
+- **Oznaka poslednjeg kilometra** na profilu sekla se o desnu ivicu platna
+  (i na 9.2 i na 9.3).
+
 ### Izmenjeno
 - **Kvalitet vazduha u analizi 9.2 više nije procena nego merenje.** Izvor su
   validirani časovni podaci zvaničnih mernih stanica (SEPA preko EEA, bez

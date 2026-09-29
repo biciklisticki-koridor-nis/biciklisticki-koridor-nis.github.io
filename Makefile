@@ -10,7 +10,7 @@ KML     := koridor_data.kml
 # Ekstraktuje href iz NetworkLink-a u $(SOURCE) (radi i sa CDATA wrapperom).
 KML_URL  = $(shell grep -oP '<href>\s*(<!\[CDATA\[)?\K[^]<]+' $(SOURCE))
 
-.PHONY: help convert serve fetch analyze clean all venv anketa node-deps shade canopy noise vazduh views indikatori safety teren teren-pdf
+.PHONY: help convert serve fetch analyze clean all venv anketa node-deps shade canopy noise vazduh views termalni indikatori safety teren teren-pdf
 
 help:
 	@echo "Dostupni targeti:"
@@ -20,7 +20,8 @@ help:
 	@echo "  make noise     - buka iz geometrije puteva (OSM) -> data/buka.json"
 	@echo "  make vazduh    - vazduh sa mernih stanica (EEA/SEPA, traži uv) -> data/vazduh.json"
 	@echo "  make views     - pogled na reku (OSM voda + krošnje, traži canopy) -> data/river_views.json"
-	@echo "  make indikatori - tabela pokazatelja sekcije 9 (traži canopy, noise, views) -> data/indikatori.json"
+	@echo "  make termalni  - termalni komfor u °C (UTCI, traži canopy) -> data/termalni.json"
+	@echo "  make indikatori - tabela pokazatelja sekcije 9 (traži canopy, noise, views, termalni)"
 	@echo "  make anketa    - anonimizuje anketa.csv -> data/anketa.json (samo agregati)"
 	@echo "  make node-deps - instalira Node zavisnosti za shadeMap pre-compute (Puppeteer)"
 	@echo "  make shade     - pre-računa pokrivenost senkom (treba SHADEMAP_API_KEY env)"
@@ -30,7 +31,7 @@ help:
 	@echo "  make safety    - bezbednosni audit: tamne zone, stanja, konflikti -> data/safety.json"
 	@echo "  make teren     - merne tačke za kalibraciju buke -> docs/ + data/merne_tacke.json"
 	@echo "  make teren-pdf - obrazac za štampu sa QR kodovima -> docs/.../obrazac.pdf"
-	@echo "  make all       - ceo lanac: fetch, convert, anketa, canopy, noise, vazduh, views, indikatori, safety, teren"
+	@echo "  make all       - ceo lanac svih koraka odozgo, redom"
 	@echo "  make clean     - briše data/ (GeoJSON + slike) i preuzeti KML"
 
 venv:
@@ -80,6 +81,9 @@ vazduh:
 views:
 	$(PYTHON) river_views.py
 
+termalni:
+	$(PYTHON) termalni.py
+
 indikatori:
 	$(PYTHON) indikatori.py
 
@@ -93,7 +97,7 @@ teren-pdf: teren
 	@test -d node_modules || { echo "Prvo: make node-deps"; exit 1; }
 	node docs/9.2-kalibracija-buke/napravi_pdf.js
 
-all: fetch convert anketa canopy noise vazduh views indikatori safety teren
+all: fetch convert anketa canopy noise vazduh views termalni indikatori safety teren
 
 clean:
 	rm -rf data/

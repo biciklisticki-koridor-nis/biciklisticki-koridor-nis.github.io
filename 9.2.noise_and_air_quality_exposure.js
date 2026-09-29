@@ -131,6 +131,8 @@ function drawProfil() {
   ctx.textAlign = "center";
   ctx.fillStyle = "#6b776f";
   for (let k = 0; k <= Math.floor(totalKm); k += 2) {
+    // poslednja oznaka bi se presekla o desnu ivicu platna
+    if (xOf(k) > PF.padL + g.plotW - 16) continue;
     ctx.fillText(k + " km", xOf(k), yOf(0) + 7);
   }
 }

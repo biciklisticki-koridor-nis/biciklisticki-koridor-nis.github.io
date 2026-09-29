@@ -9,9 +9,10 @@ iz već izračunatih izlaza:
   buka.json     -> izloženost buci
   river_views.json   -> pogled na reku
 
-i piše data/indikatori.json (~2 KB). Termalni komfor je analiza 9.3 i za
-sada nema vrednost. Zagađenje vazduha po mestu (hotspot) je namerno izostavljeno:
-CAMS ćelija od 11 km ne razlučuje prostor duž koridora.
+i piše data/indikatori.json (~2 KB). Zagađenje vazduha po mestu (hotspot) je
+namerno izostavljeno: ni merne stanice ni satelitski model ne razlučuju prostor
+duž koridora, a ono što se može razlučiti — saobraćajni doprinos NO2 po
+deonici — stoji na stranici 9.2, ne u ovoj tabeli.
 """
 import json
 import os
@@ -96,8 +97,10 @@ def main():
     shade = load("shade_canopy.json")
     noise = load("buka.json")
     views = load("river_views.json")
+    term = load("termalni.json")
     by = {name: {s["tip"]: s for s in d["staze"]}
-          for name, d in (("shade", shade), ("noise", noise), ("views", views))}
+          for name, d in (("shade", shade), ("noise", noise), ("views", views),
+                          ("term", term))}
 
     def row(key, izvor, bolje, fn):
         return {"key": key, "izvor": izvor, "bolje": bolje,
@@ -114,7 +117,8 @@ def main():
             lambda t: by["views"][t]["totals"]["pct_view"]),
         row("buka", "9.2", "manje",
             lambda t: by["noise"][t]["totals"]["pct_izlozeno"]),
-        {"key": "termalni_komfor", "izvor": "9.3", "bolje": None, "vrednosti": None},
+        row("termalni_komfor", "9.3", "manje",
+            lambda t: by["term"][t]["totals"]["utci"]),
     ]
 
     out = {
@@ -128,6 +132,8 @@ def main():
             "buka_min_indeks": NOISE_MIN_IDX,
             "pogled_min_ugao": views["min_view_deg"],
             "pogled_max_m": views["max_view_m"],
+            "termalni_sati": [term["sati"][0], term["sati"][-1]],
+            "termalni_scenario": term["scenario"]["opis"],
         },
         "redovi": rows,
     }

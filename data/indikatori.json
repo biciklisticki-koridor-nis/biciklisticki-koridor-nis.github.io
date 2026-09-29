@@ -23,7 +23,12 @@
   ],
   "buka_min_indeks": 50,
   "pogled_min_ugao": 10,
-  "pogled_max_m": 250.0
+  "pogled_max_m": 250.0,
+  "termalni_sati": [
+   12,
+   17
+  ],
+  "termalni_scenario": "vruć vedar letnji dan"
  },
  "redovi": [
   {
@@ -79,8 +84,12 @@
   {
    "key": "termalni_komfor",
    "izvor": "9.3",
-   "bolje": null,
-   "vrednosti": null
+   "bolje": "manje",
+   "vrednosti": {
+    "bici": 36.3,
+    "pesacki_gornji": 36.4,
+    "pesacki_donji": 35.7
+   }
   }
  ]
 }

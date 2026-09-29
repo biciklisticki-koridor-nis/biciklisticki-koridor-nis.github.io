@@ -23,6 +23,78 @@
     <article class="post">
       <header class="post-head">
         <time datetime="2026-09-29">29. septembar 2026.</time>
+        <h2>Analiza 9.3: termalni komfor u stepenima, a ne u oceni od 0 do 100</h2>
+      </header>
+      <p class="post-summary">Predlog je bio da se senka, blizina vode, vegetacija, podloga, izloženost suncu, otvorenost i izgrađenost saberu u jedinstven „Thermal Comfort Index". To nije urađeno, jer bi takav indeks izgledao kao sedam faktora a ponašao se kao jedan — sve sem podloge i vode je ista promenljiva merena iz više uglova, a vrednost bi zavisila od težina koje bismo mi izabrali. Umesto toga se računa fizika i izlazi u stepenima: <strong>UTCI</strong>, sa priznatom skalom stresa. Rezultat: 93 % biciklističke staze je u jakom toplotnom stresu vrelog popodneva, krošnja spušta zračenje na telo za 21,9 °C, a 33 od 36 mapiranih klupa nema nijedan sat senke.</p>
+      <div class="post-body">
+        <h3>Zašto UTCI a ne sopstveni indeks</h3>
+        <p>Indeks od 0 do 100 se koristi u 9.2 zato što za buku nema merila — nijedno merenje duž keja ne postoji. Za toplotu merilo postoji. UTCI je ekvivalentna temperatura: kaže na koliko bi stepeni u mirnom, zaklonjenom i umereno vlažnom okruženju čovek osećao isto što oseća ovde. Granice kategorija („umeren toplotni stres" 26–32, „jak" 32–38, „vrlo jak" 38–46) su deo definicije, pa niko ne mora da veruje našem izboru pragova.</p>
+        <p>Bojanini činioci nisu odbačeni — premešteni su iz ulaza u <em>objašnjenje</em>. Stranica prvo kaže koliko je stepeni, pa onda zašto: koliko je nebo otvoreno, koliko sati ima senke, koliko zračenja pada na telo.</p>
+
+        <h3>UTCI bez numbe</h3>
+        <p>Referentna implementacija <code>pythermalcomfort</code> traži numba i scipy, a numba nema wheel za Python 3.14 koji projekat koristi. Sam polinom je, međutim, čista aritmetika — <strong>211 članova</strong> po četiri promenljive, bez ijedne biblioteke.</p>
+        <p>Polinom je preuzet iz <code>pythermalcomfort</code> 4.6.0 (MIT licenca), funkcija <code>_utci_optimized</code>. Nije prekucan nego <strong>programski izvučen iz izvornog koda</strong> — 211 koeficijenata je previše da se prepisuju rukom bez greške. Modul <code>utci.py</code> nosi i samoproveru koja se pokreće sa <code>python utci.py</code>, a koja poredi sa vrednostima iz testova samog paketa.</p>
+        <p>Uz to je urađena unakrsna provera: naša implementacija protiv originalne, na mreži od <strong>840 kombinacija</strong> (temperatura 20–36 °C, Tmrt−Ta od −5 do +45, vetar 0,5–8 m/s, vlažnost 20–80 %). Najveće odstupanje: <strong>0,000 °C</strong>. Van granica važenja modela (Tmrt−Ta preko 70 °C, vetar ispod 0,5 m/s) funkcija vraća <code>None</code>, a ne približnu vrednost.</p>
+
+        <h3>Srednja radijantna temperatura</h3>
+        <p>Tmrt je veličina koju senka zapravo menja. Temperatura vazduha se duž 13 km praktično ne menja; Tmrt se između sunca i senke razlikuje za preko 20 °C. Bilans po tački i satu:</p>
+        <ul class="tech-list">
+          <li><strong>Direktno zračenje</strong> — <code>f<sub>p</sub>(h) · DNI</code>, samo ako maska senke iz 9.1 kaže da snop stiže do tačke.</li>
+          <li><strong>Difuzno sa neba</strong> — <code>0,5 · SVF · D</code>. Faktor 0,5 jer telo nebo vidi iz jedne polusfere.</li>
+          <li><strong>Odbijeno od tla</strong> — <code>0,5 · albedo · (ono što na tlo stiže na tom mestu)</code>. Bitno je „na tom mestu": u senci je i tlo u senci, pa odbija višestruko manje.</li>
+          <li><strong>Dugotalasno</strong> — gornja polusfera je nebo (udeo SVF) i prepreke (1−SVF), donja je tlo. Emisivnost neba po Brutsaertu, sa korekcijom na oblačnost.</li>
+        </ul>
+        <p>Faktor projektovane površine <code>f<sub>p</sub></code> nije uzet iz tabele nego izveden: čovek je uspravan valjak 1,75 × 0,35 m, bočna strana se projektuje kao <code>D·H·cos h</code>, gornja osnova kao <code>(πD²/4)·sin h</code>, sve podeljeno ukupnom površinom. Daje 0,29 na horizontu i 0,05 u zenitu, što se slaže sa objavljenim vrednostima za uspravnog čoveka — ali se može proveriti iz geometrije, bez verovanja na reč.</p>
+        <p>Faktor vidljivosti neba se računa zracima u 36 pravaca preko mape visine krošnji, do 150 m: <code>SVF = 1 − ⟨sin²β⟩</code>, gde je β najveći ugao zaklona u tom pravcu.</p>
+
+        <h3>Greška koju je otkrio prvi rezultat</h3>
+        <p>Prvo pokretanje dalo je UTCI u rasponu 32,7–38,5 °C, sa razlikom sunce/senka od svega 5,8 °C. To je premalo — literatura daje 7 do 10. Uzrok su bile dve stvari u bilansu: difuzno zračenje je ulazilo bez faktora 0,5 (telo ga prima iz polusfere, ne iz cele sfere), a odbijeno od tla se računalo iz globalnog zračenja i u senci, kao da je i tamo tlo obasjano. Obe greške naduvavaju vrednosti u senci i time <em>gutaju kontrast</em>. Posle ispravke: Tmrt 52,1 na suncu prema 31,4 u senci, razlika <strong>20,7 °C</strong>.</p>
+
+        <h3>Scenario: vruć dan, ne prosečan</h3>
+        <p>Geometrija Sunca je za 21. jun, jer su maske senke iz 9.1 računate za taj datum. Meteorologija je prosek <strong>77 najtoplijih od 310 dana</strong> u prozoru od ±15 dana oko solsticija, kroz 2016–2025, za sate 12–17. Prosek preko svih letnjih dana bio bi pogrešan izbor: kišni i oblačni dani spuštaju i sunce i Tmrt, a senka se ne sadi zbog njih. Dobijeni uslovi: vazduh 32,0–33,3 °C, tlo 30,8–33,2 °C, vlažnost 33–38 %, vetar 1,9–2,5 m/s, direktno zračenje 525–791 W/m².</p>
+        <p>Vrh nije u podne nego u <strong>15 h</strong>. Razlog je faktor projekcije: kad je Sunce visoko, na uspravno telo pada manji deo snopa nego kad je koso. U podne je UTCI 35,5, u 15 h 37,1 °C.</p>
+
+        <h3>Koliko se ovim brojevima sme verovati</h3>
+        <p>Urađena je provera osetljivosti na sve pretpostavke koje nisu izmerene:</p>
+        <table class="tech-table">
+          <thead><tr><th>Pretpostavka</th><th>Opseg</th><th>ΔUTCI na suncu</th></tr></thead>
+          <tbody>
+            <tr><td>Albedo tla</td><td>0,08–0,30</td><td>−0,7 do +1,4 °C</td></tr>
+            <tr><td>Apsorpcija tela</td><td>0,6–0,8</td><td>−0,8 do +0,8 °C</td></tr>
+            <tr><td>Prečnik valjka</td><td>0,25–0,45 m</td><td>−0,2 do +0,1 °C</td></tr>
+            <tr><td>Tlo toplije (asfalt)</td><td>+20 °C</td><td>+2,0 °C</td></tr>
+          </tbody>
+        </table>
+        <p>Dakle: apsolutni nivo nosi oko <strong>±2 °C</strong>, a razlika sunce/senka ostaje između 17,7 i 26,2 °C pri svim izborima — nikad ne nestaje. Zato se na stranici razlika naglašava više od nivoa. Pošto su sve pretpostavke o tlu na strani prirodne podloge, vrednosti na asfaltu su <strong>potcenjene</strong>, ne precenjene.</p>
+
+        <h3>Zgrade: izostavljene, ali izmereno koliko to košta</h3>
+        <p>U OSM-u oko koridora ima 38.297 zgrada, ali samo 12 ima tag <code>height</code>, a 401 <code>building:levels</code> — <strong>99 % nema nijedan podatak o visini</strong>. Umesto da im se visina izmisli, izmereno je koliko bi uopšte značile: samo 3,7 % tačaka trase ima zgradu bliže od 20 m, a medijana rastojanja je 43 m u Centru do 97 m na Delti. Zgrada na 43 m sa 15 m visine zaklanja nebo do 19°, a Sunce je u prozoru 12–17 h uvek iznad 30°. Ne zaklanja snop niti bitno menja SVF. Kej je nasip uz reku, ne ulični kanjon.</p>
+
+        <h3>Mesta predaha (9.3.1)</h3>
+        <p>Prag u apsolutnim stepenima ne bi radio: na vruć dan je cela trasa iznad granice „bez toplotnog stresa", pa bi spisak bio prazan. Ono što se traži nije hladno mesto nego hladnije, i to dovoljno dugo. Definicija: neprekidan potez od bar 30 m u kome je tačka u senci bar 5 od 6 sati prozora.</p>
+        <p>Rezultat po stazama: biciklistička 10 predaha (680 m, 4,8 %), gornji bedem 6 (290 m, 1,9 %), donji bedem <strong>26 (1.870 m, 14,9 %)</strong>. Najduži potez bez ijednog predaha na biciklističkoj stazi je <strong>8,84 km</strong> — od početka trase do Brzog Broda.</p>
+        <p>Senka na klupama i letnjikovcima se ne čita iz najbliže tačke staze nego se računa <em>na samoj koordinati objekta</em>, istim zracima. Razlika je bitna jer klupa ume da stoji dvadesetak metara od staze, u sasvim drugim uslovima. Ispalo je 33 od 36 klupa bez ijednog sata senke, prosečan UTCI na klupi 36,3 °C.</p>
+        <p>Za letnjikovce je dodata napomena u samom izlazu: mapa visine krošnji vidi drveće, ne građevine, pa „nema senke od krošnji" kod letnjikovca ne znači da je na suncu — on ima sopstveni krov. Bez te napomene broj bi se čitao naopako.</p>
+
+        <h3>Kvalitet predela i jedna neprijatna veza</h3>
+        <p>Druga polovina sekcije po okviru je „landscape quality"; podaci o pogledu na reku postojali su od ranije ali nisu imali stranicu, nego su samo stajali kao broj u tabeli pokazatelja koja je upućivala na 9.3. Sada su na svom mestu.</p>
+        <p>Spoj dva dela daje nalaz koji nijedan od njih ne daje sam: zapadne deonice (Medoševac, Centar) vide reku sa skoro 100 % trase i imaju <strong>0,0 sati senke</strong>; istočne (Brzi Brod, Niška Banja) vide je sa 28 % i imaju 0,9 sati. Pošto je geometrijski reka vidljiva sa <em>cele</em> trase — potencijal je 100 % — sav gubitak pogleda otpada na zelenilo. Isto drveće. Odluka gde se seče i gde se sadi zato nije popravka jednog bez cene po drugo.</p>
+
+        <h3>Sitnice</h3>
+        <ul class="tech-list">
+          <li>Grafikon po satu prvo je crtao stubiće od tik ispod minimuma, pa je razlika od 1,6 °C izgledala petostruko. Sada počinju od granice kategorije (32 °C), i to piše ispod grafikona.</li>
+          <li>Oznaka poslednjeg kilometra na profilu sekla se o desnu ivicu platna. Ista greška postojala je i na 9.2; popravljena na oba mesta.</li>
+          <li><code>#termo-map</code> je u prvoj verziji bio bez pravila u CSS-u, pa je mapa imala nultu visinu — uhvaćeno tako što snimak elementa nije mogao da se napravi.</li>
+        </ul>
+
+        <h3>Šta nedostaje</h3>
+        <p>Tip podloge. Asfalt na suncu je i 20 °C topliji od prirodne podloge, a OpenStreetMap ga za staze uz Nišavu skoro ne beleži. Upisuje se na terenskom izlasku za 9.2, u koloni <code>podloga</code>, i ulazi ovde kad stigne. Isto važi i za klupe: terenski popis će pokazati koliko ih je stvarno i gde, pošto je mapiranih 36 verovatno nepotpuno.</p>
+      </div>
+    </article>
+
+    <article class="post">
+      <header class="post-head">
+        <time datetime="2026-09-29">29. septembar 2026.</time>
         <h2>Vazduh prestaje da bude procena: satelitski model zamenjen mernim stanicama</h2>
       </header>
       <p class="post-summary">Analiza 9.2 je za kvalitet vazduha koristila CAMS preko Open-Meteo, ćeliju od ~11 km. Poređen sa zvaničnom mernom stanicom na istim danima, CAMS daje PM2.5 1,58×, PM10 1,98× i NO₂ <strong>4,05×</strong> niže od izmerenog, a za NO₂ na dnevnom nivou praktično nema veštinu (r = 0,29). Brojevi na stranici bili su zato pogrešni, a najgore u pravcu koji umiruje. Zamenjeni su validiranim časovnim merenjima tri stanice, od kojih jedna stoji 288 m od staze. Uz to je dodata raspodela NO₂ po deonicama, ukotvljena u izmerenu razliku između stanica, i <code>noise_air.py</code> je razdvojen na <code>buka.py</code> i <code>vazduh.py</code>.</p>

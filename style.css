@@ -1439,7 +1439,8 @@ footer a:hover { color: #fff; border-bottom-color: rgba(255,255,255,.6); }
 }
 #buka-profil { display: block; width: 100%; }
 #buka-map,
-#vazduh-map {
+#vazduh-map,
+#termo-map {
   height: 420px;
   width: 100%;
   border-radius: var(--radius);
@@ -1561,7 +1562,8 @@ footer a:hover { color: #fff; border-bottom-color: rgba(255,255,255,.6); }
 @media (max-width: 640px) {
   .nalaz-broj { font-size: 1.8rem; }
   #buka-map,
-  #vazduh-map { height: 340px; }
+  #vazduh-map,
+  #termo-map { height: 340px; }
   .mg-plot { height: 175px; gap: .15rem; padding: .7rem .5rem .4rem; }
   .mg-val { display: none; }
   .mg-ime { font-size: .62rem; }
@@ -1812,3 +1814,76 @@ footer a:hover { color: #fff; border-bottom-color: rgba(255,255,255,.6); }
 }
 
 .mapa-nota { margin: .5rem 0 1.6rem; font-size: .82rem; }
+
+/* ── sunce protiv senke (9.3) ──────────────────────────────────── */
+.uporedba {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1.2rem 1.3rem 1rem;
+  box-shadow: var(--shadow);
+  margin: 1.2rem 0 2rem;
+}
+.up-red { display: grid; grid-template-columns: 9rem 1fr 5.4rem 11rem; align-items: center; gap: .9rem; margin-bottom: .8rem; }
+.up-ime { font-size: .92rem; font-weight: 700; color: var(--ink-900); }
+.up-traka { height: 22px; border-radius: 5px; background: var(--sand-100); overflow: hidden; }
+.up-traka span { display: block; height: 100%; border-radius: 5px; }
+.up-broj { font-size: 1.25rem; font-weight: 800; color: var(--ink-900); text-align: right; font-variant-numeric: tabular-nums; }
+.up-jed { font-size: .72rem; font-weight: 600; color: var(--ink-500); }
+.up-kat { font-size: .82rem; color: var(--ink-700); }
+.up-nota { margin: .9rem 0 0; font-size: .88rem; }
+
+/* ── sat po sat (9.3) ──────────────────────────────────────────── */
+.sat-graf { margin: 1.2rem 0 .6rem; }
+.sg-plot {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: .5rem;
+  align-items: end;
+  height: 180px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: .9rem 1rem .4rem;
+  box-shadow: var(--shadow);
+}
+.sg-col { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; }
+.sg-val { font-size: .74rem; color: var(--ink-700); font-variant-numeric: tabular-nums; margin-bottom: .2em; }
+.sg-bar { width: 100%; max-width: 54px; border-radius: 5px 5px 0 0; min-height: 3px; }
+.sg-ime { font-size: .76rem; color: var(--ink-500); margin-top: .35em; }
+
+/* ── činioci (9.3) ─────────────────────────────────────────────── */
+.cinioci {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 1rem;
+  margin: 1.3rem 0 0;
+}
+.cinilac {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1rem 1.1rem 1.1rem;
+  box-shadow: var(--shadow);
+}
+.ci-broj {
+  font-size: 1.7rem;
+  font-weight: 800;
+  line-height: 1.05;
+  color: var(--green-700);
+  font-variant-numeric: tabular-nums;
+}
+.ci-sub { font-size: .9rem; font-weight: 700; color: var(--ink-500); }
+.ci-naslov { margin: .25em 0 .5em; font-size: .88rem; font-weight: 600; color: var(--ink-700); }
+.ci-opis { margin: 0; font-size: .85rem; color: var(--ink-500); }
+
+@media (max-width: 640px) {
+  .up-red { grid-template-columns: 1fr 5rem; gap: .4rem .7rem; }
+  .up-ime { grid-column: 1 / -1; }
+  .up-kat { grid-column: 1 / -1; font-size: .78rem; margin-top: -.2rem; }
+  .sg-plot { height: 150px; gap: .25rem; padding: .8rem .5rem .4rem; }
+  .sg-val { font-size: .66rem; }
+  .sg-ime { font-size: .68rem; }
+  .ci-broj { font-size: 1.4rem; }
+}

@@ -52,9 +52,10 @@ const STAZA_MOB = { bici: "Bici", pesacki_gornji: "Gornji", pesacki_donji: "Donj
 const ANALIZA_URL = {
   "9.1": "9.1.shade_and_tree_canopy_coverage.html",
   "9.2": "9.2.noise_and_air_quality_exposure.html",
+  "9.3": "9.3.thermal_comfort_and_landscape_quality.html",
 };
 
-// naziv, izvorni naziv iz okvira, opis mere
+// naziv, izvorni naziv iz okvira, opis mere, jedinica (podrazumevano %)
 const POKAZATELJ = {
   kontinuitet_senke: p => ["Kontinuitet senke", "Shade continuity",
     `% dužine u neprekidnoj senci od bar ${p.kontinuitet_min_m}\u00a0m, 21. jun, ${p.sunce_sati[0]}-${p.sunce_sati[1]}\u00a0h`],
@@ -66,10 +67,12 @@ const POKAZATELJ = {
     "% dužine sa koje se vidi Nišava"],
   buka: p => ["Izloženost buci", "Noise exposure",
     `% dužine sa indeksom buke ${p.buka_min_indeks} i više`],
-  termalni_komfor: () => ["Termalni komfor", "Thermal comfort", "u pripremi"],
+  termalni_komfor: p => ["Termalni komfor", "Thermal comfort",
+    `UTCI na ${p.termalni_scenario}, ${p.termalni_sati[0]}-${p.termalni_sati[1]}\u00a0h`,
+    "\u00b0C"],
 };
 
-function fmt(v) { return v.toFixed(1) + " %"; }
+function fmt(v, jed) { return v.toFixed(1) + "\u00a0" + (jed || "%"); }
 
 function render(d) {
   const tips = d.staze.map(s => s.tip);
@@ -80,7 +83,7 @@ function render(d) {
     </tr></thead>`;
 
   const body = d.redovi.map(r => {
-    const [naziv, en, mera] = POKAZATELJ[r.key](d.parametri);
+    const [naziv, en, mera, jed] = POKAZATELJ[r.key](d.parametri);
     const url = ANALIZA_URL[r.izvor];
     const izvor = url ? `<a href="${url}">${r.izvor}</a>` : `<span class="muted">${r.izvor}</span>`;
     // opis mere se na telefonu prikazuje ispod naziva, umesto u svojoj koloni
@@ -93,7 +96,7 @@ function render(d) {
     const vals = tips.map(t => r.vrednosti[t]);
     const best = r.bolje === "manje" ? Math.min(...vals) : Math.max(...vals);
     return `<tr>${opis}<td class="pk-mera pk-col-mera">${mera}</td>
-      ${vals.map(v => `<td class="num${v === best ? " pk-best" : ""}">${fmt(v)}</td>`).join("")}
+      ${vals.map(v => `<td class="num${v === best ? " pk-best" : ""}">${fmt(v, jed)}</td>`).join("")}
       <td class="num pk-col-izvor">${izvor}</td></tr>`;
   }).join("");
 
@@ -101,9 +104,10 @@ function render(d) {
     head + `<tbody>${body}</tbody>`);
 
   document.getElementById("pokazatelji-nota").innerHTML =
-    "Podebljano je najbolja od tri staze. Za sunce i buku manje je bolje. " +
-    "Buka je relativni indeks, ne decibeli. Pogled sa gornjeg bedema je verovatno " +
-    "i veći od prikazanog, jer izračun ne zna da je bedem uzdignut. " +
+    "Podebljano je najbolja od tri staze. Za sunce, buku i termalni komfor manje " +
+    "je bolje. Buka je relativni indeks, ne decibeli — termalni komfor jeste u " +
+    "stepenima. Pogled sa gornjeg bedema je verovatno i veći od prikazanog, jer " +
+    "izračun ne zna da je bedem uzdignut. " +
     `Metod je u <a href="dnevnik.html">tehničkom dnevniku</a>.`;
 }
 
