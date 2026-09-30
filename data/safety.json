@@ -1,5 +1,5 @@
 {
-  "schema": 1,
+  "schema": 3,
   "osa_km": 14.04,
   "tamne_zone": {
     "prag_m": 200.0,
@@ -492,5 +492,883 @@
     ],
     "bin_m": 500,
     "missed": 0
+  },
+  "geometrija": {
+    "ukupno": 14,
+    "ukupno_suzenja": 8,
+    "ukupno_promena": 2,
+    "ukupno_usporavanja": 4,
+    "po_deonici": {
+      "Brzi Brod": {
+        "suzenje": 3,
+        "promena_nivoa": 0,
+        "usporavanje": 0
+      },
+      "Medoševac": {
+        "suzenje": 4,
+        "promena_nivoa": 1,
+        "usporavanje": 1
+      },
+      "Centar": {
+        "suzenje": 1,
+        "promena_nivoa": 1,
+        "usporavanje": 0
+      },
+      "Niška Banja": {
+        "suzenje": 0,
+        "promena_nivoa": 0,
+        "usporavanje": 3
+      }
+    },
+    "suzenja": [
+      {
+        "name": "suzenje staze od vodovoda",
+        "lon": 21.9423951,
+        "lat": 43.3197632,
+        "km": 6.97,
+        "deonica": "Brzi Brod",
+        "images": [
+          "images/d7d029f6a7a5910a.jpg"
+        ],
+        "geom_tip": "suzenje"
+      },
+      {
+        "name": "Suzhavanje keja",
+        "lon": 21.9396183,
+        "lat": 43.3207036,
+        "km": 6.72,
+        "deonica": "Brzi Brod",
+        "geom_tip": "suzenje"
+      },
+      {
+        "name": "Bariera (Zid na gornjem bedemu)",
+        "lon": 21.885932,
+        "lat": 43.3217924,
+        "km": 1.74,
+        "deonica": "Medoševac",
+        "geom_tip": "suzenje"
+      },
+      {
+        "name": "Privremeni parking, trotoar sa zemljom shirine 3m",
+        "lon": 21.8874771,
+        "lat": 43.3211173,
+        "km": 1.89,
+        "deonica": "Medoševac",
+        "images": [
+          "images/5d8c3daaeccf6d32.jpg"
+        ],
+        "geom_tip": "suzenje"
+      },
+      {
+        "name": "Asfaltirani trotoar, oznachili su kao parking zona 2m",
+        "lon": 21.8883235,
+        "lat": 43.3209905,
+        "km": 1.96,
+        "deonica": "Medoševac",
+        "geom_tip": "suzenje"
+      },
+      {
+        "name": "Trotoar 5 m, iskoristen za koso parkiranje",
+        "lon": 21.8890374,
+        "lat": 43.3209513,
+        "km": 2.02,
+        "deonica": "Medoševac",
+        "images": [
+          "images/d7cb76c007145e9f.jpg",
+          "images/2107b5be3187b724.jpg"
+        ],
+        "geom_tip": "suzenje"
+      },
+      {
+        "name": "Mozhe da se krece jedino po gornji bedem 3 -3,5m",
+        "lon": 21.9770993,
+        "lat": 43.312594,
+        "km": 10.05,
+        "deonica": "Brzi Brod",
+        "geom_tip": "suzenje"
+      },
+      {
+        "name": "Tesna rampa",
+        "lon": 21.8909196,
+        "lat": 43.3211297,
+        "km": 2.17,
+        "deonica": "Centar",
+        "geom_tip": "suzenje"
+      }
+    ],
+    "promena_nivoa": [
+      {
+        "name": "Strma rampa",
+        "lon": 21.9026061,
+        "lat": 43.3263043,
+        "km": 3.31,
+        "deonica": "Centar",
+        "geom_tip": "promena_nivoa"
+      },
+      {
+        "name": "Zemjena rampa ka donjeg bedemu",
+        "lon": 21.8817407,
+        "lat": 43.3249506,
+        "km": 1.23,
+        "deonica": "Medoševac",
+        "geom_tip": "promena_nivoa"
+      }
+    ],
+    "usporavanje": [
+      {
+        "name": "Prekid u kretanju neophodno da se peogje na most",
+        "lon": 21.984155,
+        "lat": 43.3072436,
+        "km": null,
+        "deonica": "Niška Banja",
+        "geom_tip": "usporavanje"
+      },
+      {
+        "name": "Prekid u kretanju zbog kutinska reka",
+        "lon": 21.9844688,
+        "lat": 43.3081022,
+        "km": 10.98,
+        "deonica": "Niška Banja",
+        "geom_tip": "usporavanje"
+      },
+      {
+        "name": "Prekid kretanja - nema peshachki prelaz",
+        "lon": 21.8906652,
+        "lat": 43.3210785,
+        "km": 2.15,
+        "deonica": "Medoševac",
+        "images": [
+          "images/b3206e2fbf76aea7.jpg"
+        ],
+        "geom_tip": "usporavanje"
+      },
+      {
+        "name": "prekid u kretanju zbog nepostojenje mosta preko kutinska reka",
+        "lon": 21.9847689,
+        "lat": 43.3080144,
+        "km": 11.01,
+        "deonica": "Niška Banja",
+        "images": [
+          "images/41a578f36f6fe6d1.jpg"
+        ],
+        "geom_tip": "usporavanje"
+      }
+    ]
+  },
+  "konflikti_korisnika": {
+    "ukupno_stepenica": 81,
+    "ukupno_rampi": 13,
+    "ukupno": 94,
+    "po_deonici": {
+      "Delta - Lidl": {
+        "stepenice": 14,
+        "rampe": 3
+      },
+      "Centar": {
+        "stepenice": 26,
+        "rampe": 6
+      },
+      "Medoševac": {
+        "stepenice": 2,
+        "rampe": 4
+      },
+      "Niška Banja": {
+        "stepenice": 2,
+        "rampe": 0
+      },
+      "Gabrovačka Reka": {
+        "stepenice": 37,
+        "rampe": 0
+      }
+    },
+    "stepenice": [
+      {
+        "name": "Stepenice urasle loshem stanju",
+        "lon": 21.9152579,
+        "lat": 43.3263477,
+        "km": 4.5,
+        "deonica": "Delta - Lidl"
+      },
+      {
+        "name": "stepenice",
+        "lon": 21.8912386,
+        "lat": 43.3212635,
+        "km": 2.2,
+        "deonica": "Centar",
+        "images": [
+          "images/1356c4f86138a4aa.jpg"
+        ]
+      },
+      {
+        "name": "stepenice",
+        "lon": 21.8957243,
+        "lat": 43.3225493,
+        "km": 2.6,
+        "deonica": "Centar"
+      },
+      {
+        "name": "stepenice",
+        "lon": 21.8904605,
+        "lat": 43.3210676,
+        "km": 2.13,
+        "deonica": "Medoševac",
+        "images": [
+          "images/387672a2de40705d.jpg"
+        ]
+      },
+      {
+        "name": "stepenice i rampa",
+        "lon": 21.9026148,
+        "lat": 43.3262799,
+        "km": 3.33,
+        "deonica": "Centar",
+        "images": [
+          "images/f16b5c12cdd84599.jpg"
+        ]
+      },
+      {
+        "name": "stepenice",
+        "lon": 21.9092134,
+        "lat": 43.3263201,
+        "km": 4.01,
+        "deonica": "Delta - Lidl"
+      },
+      {
+        "name": "Stepenice",
+        "lon": 21.9842106,
+        "lat": 43.3074798,
+        "km": null,
+        "deonica": "Niška Banja"
+      },
+      {
+        "name": "stepenice",
+        "lon": 21.9120737,
+        "lat": 43.3261359,
+        "km": 4.24,
+        "deonica": "Delta - Lidl"
+      },
+      {
+        "name": "stepenice",
+        "lon": 21.9137589,
+        "lat": 43.3265161,
+        "km": 4.38,
+        "deonica": "Delta - Lidl"
+      },
+      {
+        "name": "stepenice",
+        "lon": 21.9085214,
+        "lat": 43.3263992,
+        "km": 3.86,
+        "deonica": "Centar"
+      },
+      {
+        "name": "stepenice",
+        "lon": 21.8954712,
+        "lat": 43.3225967,
+        "km": 2.58,
+        "deonica": "Centar"
+      },
+      {
+        "name": "stepenice",
+        "lon": 21.9221183,
+        "lat": 43.324947,
+        "km": 5.1,
+        "deonica": "Delta - Lidl"
+      },
+      {
+        "name": "stepenice",
+        "lon": 21.9211082,
+        "lat": 43.3250493,
+        "km": 5.0,
+        "deonica": "Delta - Lidl"
+      },
+      {
+        "name": "stepenice",
+        "lon": 21.9163179,
+        "lat": 43.3260773,
+        "km": 4.59,
+        "deonica": "Delta - Lidl"
+      },
+      {
+        "name": "stepenice",
+        "lon": 21.8946858,
+        "lat": 43.3223679,
+        "km": 2.51,
+        "deonica": "Centar"
+      },
+      {
+        "name": "stepenice",
+        "lon": 21.9253542,
+        "lat": 43.3250323,
+        "km": 5.37,
+        "deonica": "Delta - Lidl"
+      },
+      {
+        "name": "stepenice",
+        "lon": 21.9026707,
+        "lat": 43.3263764,
+        "km": 3.31,
+        "deonica": "Centar"
+      },
+      {
+        "name": "stepenice",
+        "lon": 21.8929237,
+        "lat": 43.3219338,
+        "km": 2.36,
+        "deonica": "Centar"
+      },
+      {
+        "name": "stepenice",
+        "lon": 21.9031724,
+        "lat": 43.3264399,
+        "km": 3.43,
+        "deonica": "Centar"
+      },
+      {
+        "name": "Stepenice",
+        "lon": 21.895053,
+        "lat": 43.3224623,
+        "km": 2.55,
+        "deonica": "Centar"
+      },
+      {
+        "name": "stepenice",
+        "lon": 21.891077,
+        "lat": 43.3211845,
+        "km": 2.19,
+        "deonica": "Centar",
+        "images": [
+          "images/9672f15de2a5352b.jpg",
+          "images/31ed04ad623b65ee.jpg"
+        ]
+      },
+      {
+        "name": "stepenice",
+        "lon": 21.8985237,
+        "lat": 43.3243639,
+        "km": 2.91,
+        "deonica": "Centar"
+      },
+      {
+        "name": "stepenice",
+        "lon": 21.8949384,
+        "lat": 43.3225729,
+        "km": 2.54,
+        "deonica": "Centar"
+      },
+      {
+        "name": "Stepenice",
+        "lon": 21.8953015,
+        "lat": 43.3225653,
+        "km": 2.57,
+        "deonica": "Centar",
+        "images": [
+          "images/0b8ab64a2db3d86f.jpg"
+        ]
+      },
+      {
+        "name": "Velike stepenice",
+        "lon": 21.890933,
+        "lat": 43.3211031,
+        "km": 2.17,
+        "deonica": "Centar"
+      },
+      {
+        "name": "stepenice",
+        "lon": 21.8975226,
+        "lat": 43.3235078,
+        "km": 2.78,
+        "deonica": "Centar"
+      },
+      {
+        "name": "stepenice",
+        "lon": 21.9011283,
+        "lat": 43.3258665,
+        "km": 3.18,
+        "deonica": "Centar"
+      },
+      {
+        "name": "stepenice",
+        "lon": 21.9039067,
+        "lat": 43.3265046,
+        "km": 3.48,
+        "deonica": "Centar"
+      },
+      {
+        "name": "stepenice",
+        "lon": 21.9218235,
+        "lat": 43.3246785,
+        "km": 5.07,
+        "deonica": "Delta - Lidl"
+      },
+      {
+        "name": "stepenice ",
+        "lon": 21.9215378,
+        "lat": 43.3246765,
+        "km": 5.05,
+        "deonica": "Delta - Lidl"
+      },
+      {
+        "name": "Stepenice",
+        "lon": 21.8909167,
+        "lat": 43.3210577,
+        "km": 2.17,
+        "deonica": "Centar"
+      },
+      {
+        "name": "stepenice",
+        "lon": 21.9219953,
+        "lat": 43.3243109,
+        "km": null,
+        "deonica": "Gabrovačka Reka"
+      },
+      {
+        "name": "stepenice",
+        "lon": 21.9224531,
+        "lat": 43.3233363,
+        "km": null,
+        "deonica": "Gabrovačka Reka"
+      },
+      {
+        "name": "stepenice",
+        "lon": 21.9261492,
+        "lat": 43.3163565,
+        "km": null,
+        "deonica": "Gabrovačka Reka"
+      },
+      {
+        "name": "stepenice",
+        "lon": 21.9218947,
+        "lat": 43.3242767,
+        "km": null,
+        "deonica": "Gabrovačka Reka"
+      },
+      {
+        "name": "stepenice",
+        "lon": 21.9234719,
+        "lat": 43.3217938,
+        "km": null,
+        "deonica": "Gabrovačka Reka"
+      },
+      {
+        "name": "stepenice",
+        "lon": 21.8995275,
+        "lat": 43.3250824,
+        "km": 3.02,
+        "deonica": "Centar"
+      },
+      {
+        "name": "stepenice",
+        "lon": 21.8970364,
+        "lat": 43.323145,
+        "km": 2.72,
+        "deonica": "Centar"
+      },
+      {
+        "name": "stepenice",
+        "lon": 21.91815,
+        "lat": 43.3255334,
+        "km": 4.75,
+        "deonica": "Delta - Lidl"
+      },
+      {
+        "name": "stepenice",
+        "lon": 21.9236597,
+        "lat": 43.3218607,
+        "km": null,
+        "deonica": "Gabrovačka Reka"
+      },
+      {
+        "name": "stepenice",
+        "lon": 21.9256539,
+        "lat": 43.3161963,
+        "km": null,
+        "deonica": "Gabrovačka Reka"
+      },
+      {
+        "name": "stepenice",
+        "lon": 21.9258148,
+        "lat": 43.3140643,
+        "km": null,
+        "deonica": "Gabrovačka Reka"
+      },
+      {
+        "name": "stepenice",
+        "lon": 21.8997515,
+        "lat": 43.3252127,
+        "km": 3.04,
+        "deonica": "Centar"
+      },
+      {
+        "name": "stepenice",
+        "lon": 21.91594,
+        "lat": 43.3261599,
+        "km": 4.56,
+        "deonica": "Delta - Lidl"
+      },
+      {
+        "name": "stepenice",
+        "lon": 21.9256498,
+        "lat": 43.3140751,
+        "km": null,
+        "deonica": "Gabrovačka Reka"
+      },
+      {
+        "name": "stepenice",
+        "lon": 21.9226483,
+        "lat": 43.3234036,
+        "km": null,
+        "deonica": "Gabrovačka Reka"
+      },
+      {
+        "name": "stepenice",
+        "lon": 21.9158609,
+        "lat": 43.3261804,
+        "km": 4.55,
+        "deonica": "Delta - Lidl"
+      },
+      {
+        "name": "stepenice",
+        "lon": 21.9258456,
+        "lat": 43.3158105,
+        "km": null,
+        "deonica": "Gabrovačka Reka"
+      },
+      {
+        "name": "stepenice",
+        "lon": 21.9250827,
+        "lat": 43.3123519,
+        "km": null,
+        "deonica": "Gabrovačka Reka"
+      },
+      {
+        "name": "stepenice",
+        "lon": 21.9250475,
+        "lat": 43.3122492,
+        "km": null,
+        "deonica": "Gabrovačka Reka"
+      },
+      {
+        "name": "stepenice",
+        "lon": 21.9234504,
+        "lat": 43.3217393,
+        "km": null,
+        "deonica": "Gabrovačka Reka"
+      },
+      {
+        "name": "stepenice",
+        "lon": 21.9249054,
+        "lat": 43.3120291,
+        "km": null,
+        "deonica": "Gabrovačka Reka"
+      },
+      {
+        "name": "stepenice",
+        "lon": 21.9248167,
+        "lat": 43.3118326,
+        "km": null,
+        "deonica": "Gabrovačka Reka"
+      },
+      {
+        "name": "stepenice",
+        "lon": 21.9250078,
+        "lat": 43.311773,
+        "km": null,
+        "deonica": "Gabrovačka Reka"
+      },
+      {
+        "name": "stepenice",
+        "lon": 21.9247918,
+        "lat": 43.311774,
+        "km": null,
+        "deonica": "Gabrovačka Reka"
+      },
+      {
+        "name": "stepenice",
+        "lon": 21.9261474,
+        "lat": 43.3159665,
+        "km": null,
+        "deonica": "Gabrovačka Reka"
+      },
+      {
+        "name": "stepenice",
+        "lon": 21.9257685,
+        "lat": 43.3167347,
+        "km": null,
+        "deonica": "Gabrovačka Reka"
+      },
+      {
+        "name": "stepenice",
+        "lon": 21.9252376,
+        "lat": 43.3123119,
+        "km": null,
+        "deonica": "Gabrovačka Reka"
+      },
+      {
+        "name": "stepenice",
+        "lon": 21.9243964,
+        "lat": 43.3203875,
+        "km": null,
+        "deonica": "Gabrovačka Reka"
+      },
+      {
+        "name": "stepenice",
+        "lon": 21.9236469,
+        "lat": 43.3215193,
+        "km": null,
+        "deonica": "Gabrovačka Reka"
+      },
+      {
+        "name": "stepenice",
+        "lon": 21.925741,
+        "lat": 43.3177664,
+        "km": null,
+        "deonica": "Gabrovačka Reka"
+      },
+      {
+        "name": "stepenice",
+        "lon": 21.9249803,
+        "lat": 43.311715,
+        "km": null,
+        "deonica": "Gabrovačka Reka"
+      },
+      {
+        "name": "stepenice",
+        "lon": 21.9253079,
+        "lat": 43.3185871,
+        "km": null,
+        "deonica": "Gabrovačka Reka"
+      },
+      {
+        "name": "stepenice",
+        "lon": 21.9254722,
+        "lat": 43.3186228,
+        "km": null,
+        "deonica": "Gabrovačka Reka"
+      },
+      {
+        "name": "stepenice",
+        "lon": 21.8931631,
+        "lat": 43.3220133,
+        "km": 2.38,
+        "deonica": "Centar"
+      },
+      {
+        "name": "stepenice",
+        "lon": 21.9259328,
+        "lat": 43.31674,
+        "km": null,
+        "deonica": "Gabrovačka Reka"
+      },
+      {
+        "name": "stepenice",
+        "lon": 21.9253328,
+        "lat": 43.318966,
+        "km": null,
+        "deonica": "Gabrovačka Reka"
+      },
+      {
+        "name": "stepenice",
+        "lon": 21.9842798,
+        "lat": 43.3074664,
+        "km": null,
+        "deonica": "Niška Banja"
+      },
+      {
+        "name": "stepenice",
+        "lon": 21.895596,
+        "lat": 43.3226756,
+        "km": 2.59,
+        "deonica": "Centar"
+      },
+      {
+        "name": "Stepenice na zheleznichki most",
+        "lon": 21.8870215,
+        "lat": 43.3212842,
+        "km": 1.85,
+        "deonica": "Medoševac",
+        "images": [
+          "images/b69e05710e866cf3.jpg",
+          "images/816e9e035eb6ff88.jpg"
+        ]
+      },
+      {
+        "name": "stepenice",
+        "lon": 21.9258182,
+        "lat": 43.3167371,
+        "km": null,
+        "deonica": "Gabrovačka Reka"
+      },
+      {
+        "name": "stepenice",
+        "lon": 21.925576,
+        "lat": 43.3177449,
+        "km": null,
+        "deonica": "Gabrovačka Reka"
+      },
+      {
+        "name": "stepenice",
+        "lon": 21.9027553,
+        "lat": 43.3262249,
+        "km": 3.33,
+        "deonica": "Centar"
+      },
+      {
+        "name": "stepenice",
+        "lon": 21.9258799,
+        "lat": 43.3167395,
+        "km": null,
+        "deonica": "Gabrovačka Reka"
+      },
+      {
+        "name": "stepenice",
+        "lon": 21.9260025,
+        "lat": 43.3158119,
+        "km": null,
+        "deonica": "Gabrovačka Reka"
+      },
+      {
+        "name": "stepenice",
+        "lon": 21.9251779,
+        "lat": 43.3189294,
+        "km": null,
+        "deonica": "Gabrovačka Reka"
+      },
+      {
+        "name": "stepenice",
+        "lon": 21.9245687,
+        "lat": 43.3204451,
+        "km": null,
+        "deonica": "Gabrovačka Reka"
+      },
+      {
+        "name": "stepenice",
+        "lon": 21.9238287,
+        "lat": 43.3215817,
+        "km": null,
+        "deonica": "Gabrovačka Reka"
+      },
+      {
+        "name": "stepenice",
+        "lon": 21.925653,
+        "lat": 43.3165888,
+        "km": null,
+        "deonica": "Gabrovačka Reka"
+      },
+      {
+        "name": "peshachki most",
+        "lon": 21.9216694,
+        "lat": 43.3247317,
+        "km": 5.06,
+        "deonica": "Delta - Lidl"
+      },
+      {
+        "name": "peshachki prelaz (pod mosta)",
+        "lon": 21.9027926,
+        "lat": 43.3260421,
+        "km": 3.38,
+        "deonica": "Centar"
+      }
+    ],
+    "rampe": [
+      {
+        "name": "asfaltna rampa ",
+        "lon": 21.9092062,
+        "lat": 43.3260785,
+        "km": 3.92,
+        "deonica": "Delta - Lidl"
+      },
+      {
+        "name": "Rampa za donji bedem ",
+        "lon": 21.8727755,
+        "lat": 43.3239681,
+        "km": 0.49,
+        "deonica": "Medoševac"
+      },
+      {
+        "name": "Rampa",
+        "lon": 21.895308,
+        "lat": 43.3225251,
+        "km": 2.57,
+        "deonica": "Centar"
+      },
+      {
+        "name": "rampa",
+        "lon": 21.9158482,
+        "lat": 43.3261555,
+        "km": 4.55,
+        "deonica": "Delta - Lidl"
+      },
+      {
+        "name": "rampa",
+        "lon": 21.9027768,
+        "lat": 43.3257801,
+        "km": 3.37,
+        "deonica": "Centar"
+      },
+      {
+        "name": "Strma rampa",
+        "lon": 21.9026061,
+        "lat": 43.3263043,
+        "km": 3.31,
+        "deonica": "Centar"
+      },
+      {
+        "name": "Zemjena rampa ka donjeg bedemu",
+        "lon": 21.8817407,
+        "lat": 43.3249506,
+        "km": 1.23,
+        "deonica": "Medoševac"
+      },
+      {
+        "name": "Tesna rampa",
+        "lon": 21.8909196,
+        "lat": 43.3211297,
+        "km": 2.17,
+        "deonica": "Centar"
+      },
+      {
+        "name": "Rampa",
+        "lon": 21.8954835,
+        "lat": 43.3225505,
+        "km": 2.58,
+        "deonica": "Centar"
+      },
+      {
+        "name": "Rampa",
+        "lon": 21.8908921,
+        "lat": 43.3210479,
+        "km": 2.17,
+        "deonica": "Centar"
+      },
+      {
+        "name": "Rampa za put ka deponije",
+        "lon": 21.8731043,
+        "lat": 43.3239746,
+        "km": 0.51,
+        "deonica": "Medoševac",
+        "images": [
+          "images/901eacd5ce0a2566.jpg"
+        ]
+      },
+      {
+        "name": "rampa",
+        "lon": 21.9159286,
+        "lat": 43.326136,
+        "km": 4.56,
+        "deonica": "Delta - Lidl"
+      },
+      {
+        "name": "Rampa",
+        "lon": 21.8829571,
+        "lat": 43.3245206,
+        "km": 1.34,
+        "deonica": "Medoševac",
+        "images": [
+          "images/ec246f38150d617a.jpg",
+          "images/23675e69ec53920e.jpg"
+        ]
+      }
+    ]
   }
 }

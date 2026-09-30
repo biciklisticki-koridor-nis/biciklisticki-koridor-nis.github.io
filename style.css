@@ -1238,7 +1238,7 @@ footer a:hover { color: #fff; border-bottom-color: rgba(255,255,255,.6); }
   background: linear-gradient(90deg, #2f6b46, #d8a93a);
   box-shadow: inset 0 0 0 1px rgba(0,0,0,.1);
 }
-#shade-map, #safety-map {
+#shade-map, #safety-map, #geom-map, #kk-map {
   height: 420px;
   width: 100%;
   border-radius: var(--radius);
@@ -1299,7 +1299,7 @@ footer a:hover { color: #fff; border-bottom-color: rgba(255,255,255,.6); }
   .bar-row .label { grid-area: label; }
   .bar-row .value { grid-area: value; }
   .bar-row .track { grid-area: track; }
-  #shade-map, #safety-map { height: 340px; }
+  #shade-map, #safety-map, #geom-map, #kk-map { height: 340px; }
   .hour-slider-row { flex-basis: 100%; max-width: none; }
 }
 
