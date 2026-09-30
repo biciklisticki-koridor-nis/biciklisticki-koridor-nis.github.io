@@ -33,6 +33,7 @@ STANJA_FILE    = os.path.join(ROOT, "data", "stanja.geojson")
 OSVETLJENJE_FILE = os.path.join(ROOT, "data", "osvetljenje.geojson")
 PREKIDI_FILE   = os.path.join(ROOT, "data", "prekidi.geojson")
 STEPENICE_FILE = os.path.join(ROOT, "data", "stepenice.geojson")
+RAMPE_FILE     = os.path.join(ROOT, "data", "rampe.geojson")
 
 DARK_GAP_M = 200.0   # gap između svetiljki > ovoga → tamna zona
 
@@ -225,6 +226,21 @@ CROSSING_RE = re.compile(
     r"prelaz|nema\s*pesh|most\s+|bridge", re.IGNORECASE
 )
 
+# ── 8.4 Geometrija kretanja ───────────────────────────────────────────────────
+GEOM_SUZENJE_RE = re.compile(
+    r"suzenje|suzhavanje|bariera|tesna|uski|koso\s*park|parking\s*zona|shirine|3\s*-\s*3[,.]5",
+    re.IGNORECASE
+)
+GEOM_PROMENA_RE = re.compile(
+    r"strma|zemjena\s+rampa|kraj\s+asfalt|kraj\s+trotoa",
+    re.IGNORECASE
+)
+GEOM_USPOR_RE = re.compile(
+    r"neophodno|nema\s*peshachki",
+    re.IGNORECASE
+)
+GEOM_USPOR_TIPS = {"most_prelaz", "pritoka"}
+
 
 def compute_konflikti():
     parking = []
@@ -268,6 +284,87 @@ def compute_konflikti():
         "po_deonici": by_deonica,
         "parking": parking,
         "prelazi": prelazi,
+    }
+
+
+# ── 8.4 geometrija kretanja ───────────────────────────────────────────────────
+
+def compute_geometrija(axis):
+    grid, cell, _ = build_axis_index(axis)
+    suzenja = []
+    promena_nivoa = []
+    usporavanje = []
+
+    for feat in load_geojson(PREKIDI_FILE):
+        if feat["geometry"]["type"] != "Point":
+            continue
+        props = feat["properties"]
+        name = props.get("name", "")
+        tip  = props.get("tip", "ostalo")
+        deonica = props.get("deonica")
+        lon, lat = feat["geometry"]["coordinates"][:2]
+        km = project_onto_axis(lon, lat, grid, cell)
+
+        entry = {
+            "name": name, "lon": lon, "lat": lat,
+            "km": round(km, 3) if km is not None else None,
+            "deonica": deonica,
+        }
+        if props.get("images"):
+            entry["images"] = props["images"]
+
+        if GEOM_SUZENJE_RE.search(name):
+            entry["geom_tip"] = "suzenje"
+            suzenja.append(entry)
+        elif GEOM_PROMENA_RE.search(name):
+            entry["geom_tip"] = "promena_nivoa"
+            promena_nivoa.append(entry)
+        elif tip in GEOM_USPOR_TIPS or GEOM_USPOR_RE.search(name):
+            entry["geom_tip"] = "usporavanje"
+            usporavanje.append(entry)
+
+    # Problematične rampe iz rampe.geojson
+    for feat in load_geojson(RAMPE_FILE):
+        if feat["geometry"]["type"] != "Point":
+            continue
+        props = feat["properties"]
+        name = props.get("name", "")
+        deonica = props.get("deonica")
+        lon, lat = feat["geometry"]["coordinates"][:2]
+        km = project_onto_axis(lon, lat, grid, cell)
+
+        entry = {
+            "name": name, "lon": lon, "lat": lat,
+            "km": round(km, 3) if km is not None else None,
+            "deonica": deonica,
+        }
+        if props.get("images"):
+            entry["images"] = props["images"]
+
+        if re.search(r"tesna", name, re.IGNORECASE):
+            entry["geom_tip"] = "suzenje"
+            suzenja.append(entry)
+        elif re.search(r"strma|zemjena", name, re.IGNORECASE):
+            entry["geom_tip"] = "promena_nivoa"
+            promena_nivoa.append(entry)
+
+    all_tacke = suzenja + promena_nivoa + usporavanje
+
+    by_deonica = {}
+    for e in all_tacke:
+        d = e.get("deonica") or "—"
+        bd = by_deonica.setdefault(d, {"suzenje": 0, "promena_nivoa": 0, "usporavanje": 0})
+        bd[e["geom_tip"]] += 1
+
+    return {
+        "ukupno": len(all_tacke),
+        "ukupno_suzenja": len(suzenja),
+        "ukupno_promena": len(promena_nivoa),
+        "ukupno_usporavanja": len(usporavanje),
+        "po_deonici": by_deonica,
+        "suzenja": suzenja,
+        "promena_nivoa": promena_nivoa,
+        "usporavanje": usporavanje,
     }
 
 
@@ -389,6 +486,12 @@ def main():
     print(f"     {konflikti['ukupno_parking']} parking-konflikta, "
           f"{konflikti['ukupno_prelaza']} prelaza")
 
+    print("8.4  Geometrija kretanja...")
+    geometrija = compute_geometrija(axis)
+    print(f"     {geometrija['ukupno_suzenja']} suženja, "
+          f"{geometrija['ukupno_promena']} promena nivoa, "
+          f"{geometrija['ukupno_usporavanja']} neočekivanih usporavanja")
+
     axis_pts = resample_line(axis)
     osa_km = round(axis_pts[-1][2] / 1000.0, 3)
 
@@ -399,12 +502,13 @@ def main():
     print(f"     van domašaja: {stepenice['missed']}")
 
     out = {
-        "schema": 1,
+        "schema": 2,
         "osa_km": osa_km,
         "tamne_zone": tamne,
         "stanja": stanja,
         "konflikti": konflikti,
         "stepenice_po_deonici": stepenice,
+        "geometrija": geometrija,
     }
 
     with open(OUT_FILE, "w", encoding="utf-8") as f:

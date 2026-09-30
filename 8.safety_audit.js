@@ -375,6 +375,123 @@ function renderKonfliktiTable() {
   $("konflikti-table").innerHTML = head + `<tbody>${body}</tbody>`;
 }
 
+/* ── 8.4 geometrija kretanja ─────────────────────────────────── */
+
+const GEOM_COLOR = {
+  "suzenje":      "#e07b39",
+  "promena_nivoa":"#2980b9",
+  "usporavanje":  "#c0392b",
+};
+
+const GEOM_LABEL = {
+  "suzenje":       "Suženje",
+  "promena_nivoa": "Promena nivoa / pravca",
+  "usporavanje":   "Neočekivano usporavanje",
+};
+
+function renderGeomStats() {
+  const g = D.geometrija;
+  const tiles = [
+    { v: g.ukupno_suzenja,     label: "suženja",
+      sub: "uska mesta, barijere, parkiranje na stazi", warn: g.ukupno_suzenja > 0 },
+    { v: g.ukupno_promena,     label: "nagle promene nivoa",
+      sub: "strme i nestabilne rampe uz trasu", warn: g.ukupno_promena > 0 },
+    { v: g.ukupno_usporavanja, label: "neočekivanih zaustavljanja",
+      sub: "mrtve ulice, blokirani prelazi, nedostajući mostovi", warn: g.ukupno_usporavanja > 0 },
+  ];
+  $("geom-stats").innerHTML = tiles.map(x => `
+    <div class="shade-stat">
+      <div class="shade-stat-value${x.warn ? " warn" : ""}">${x.v}</div>
+      <div class="shade-stat-label">${x.label}</div>
+      <div class="shade-stat-sub">${x.sub}</div>
+    </div>`).join("");
+}
+
+function buildGeomMap() {
+  const vrste = ["suzenje", "promena_nivoa", "usporavanje"];
+
+  // legenda
+  $("geom-legenda").innerHTML = vrste.map(v =>
+    `<span class="hl-item"><span class="hl-swatch" style="background:${GEOM_COLOR[v]};border-radius:50%"></span> ${GEOM_LABEL[v]}</span>`
+  ).join("");
+
+  const map = L.map("geom-map", { scrollWheelZoom: false });
+  L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution: "© <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors",
+    maxZoom: 19,
+  }).addTo(map);
+
+  // trasa osa
+  fetch(DATA + "staze_mreza.geojson")
+    .then(r => r.json())
+    .then(gj => {
+      const axis = gj.features.find(f => f.properties.uloga === "osa");
+      if (!axis) return;
+      const latlngs = axis.geometry.coordinates.map(c => [c[1], c[0]]);
+      L.polyline(latlngs, { color: "#b8b0a0", weight: 3, opacity: 0.6 }).addTo(map);
+      map.fitBounds(L.latLngBounds(latlngs), { padding: [18, 18] });
+    });
+
+  const tacke = [
+    ...D.geometrija.suzenja,
+    ...D.geometrija.promena_nivoa,
+    ...D.geometrija.usporavanje,
+  ];
+
+  for (const p of tacke) {
+    const col = GEOM_COLOR[p.geom_tip] || "#888";
+    const label = GEOM_LABEL[p.geom_tip] || p.geom_tip;
+    L.circleMarker([p.lat, p.lon], {
+      radius: 8, color: darken(col), fillColor: col, fillOpacity: 0.9, weight: 2,
+    }).addTo(map)
+      .bindPopup(`<strong>${label}</strong><br>${p.name}<br><em>${p.deonica || ""}</em>`);
+  }
+}
+
+function darken(hex) {
+  const n = parseInt(hex.slice(1), 16);
+  const r = Math.max(0, (n >> 16) - 40);
+  const g = Math.max(0, ((n >> 8) & 0xff) - 40);
+  const b = Math.max(0, (n & 0xff) - 40);
+  return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, "0")}`;
+}
+
+function renderGeomTable() {
+  const bd = D.geometrija.po_deonici;
+  const vrste = ["suzenje", "promena_nivoa", "usporavanje"];
+
+  const dot = tip =>
+    `<span style="display:inline-block;width:10px;height:10px;border-radius:50%;
+      background:${GEOM_COLOR[tip]};margin-right:.35em;vertical-align:middle"></span>`;
+
+  const head = `<thead><tr>
+    <th>Deonica</th>
+    ${vrste.map(v => `<th>${dot(v)}${GEOM_LABEL[v]}</th>`).join("")}
+    <th>Ukupno</th>
+  </tr></thead>`;
+
+  const rows = DEONICE_ORDER.filter(dn => bd[dn]).map(dn => {
+    const d = bd[dn];
+    const total = vrste.reduce((s, v) => s + (d[v] || 0), 0);
+    return `<tr>
+      <td>${dn}</td>
+      ${vrste.map(v => `<td class="num">${d[v] || "—"}</td>`).join("")}
+      <td class="num"><strong>${total}</strong></td>
+    </tr>`;
+  });
+
+  const totals = vrste.map(v =>
+    Object.values(bd).reduce((s, d) => s + (d[v] || 0), 0)
+  );
+  const grandTotal = totals.reduce((s, v) => s + v, 0);
+  const foot = `<tr><td><strong>Ukupno</strong></td>
+    ${totals.map(v => `<td class="num"><strong>${v || "—"}</strong></td>`).join("")}
+    <td class="num"><strong>${grandTotal}</strong></td>
+  </tr>`;
+
+  $("geom-table").innerHTML = head + `<tbody>${rows.join("")}${foot}</tbody>`;
+}
+
 /* ── mapa ────────────────────────────────────────────────────── */
 
 function haversineKm(lon1, lat1, lon2, lat2) {
@@ -491,6 +608,7 @@ function buildMap() {
     }).addTo(map)
       .bindPopup(`<strong>Prelaz / ukrštanje</strong><br>${p.name}<br><em>${p.deonica || ""}</em>`);
   }
+
 }
 
 /* ── start ───────────────────────────────────────────────────── */
@@ -514,6 +632,9 @@ async function init() {
   renderDarkStats();
   renderKonfliktiStats();
   renderKonfliktiTable();
+  renderGeomStats();
+  renderGeomTable();
+  buildGeomMap();
   buildMap();
 }
 

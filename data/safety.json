@@ -1,5 +1,5 @@
 {
-  "schema": 1,
+  "schema": 2,
   "osa_km": 14.04,
   "tamne_zone": {
     "prag_m": 200.0,
@@ -492,5 +492,167 @@
     ],
     "bin_m": 500,
     "missed": 0
+  },
+  "geometrija": {
+    "ukupno": 14,
+    "ukupno_suzenja": 8,
+    "ukupno_promena": 2,
+    "ukupno_usporavanja": 4,
+    "po_deonici": {
+      "Brzi Brod": {
+        "suzenje": 3,
+        "promena_nivoa": 0,
+        "usporavanje": 0
+      },
+      "Medoševac": {
+        "suzenje": 4,
+        "promena_nivoa": 1,
+        "usporavanje": 1
+      },
+      "Centar": {
+        "suzenje": 1,
+        "promena_nivoa": 1,
+        "usporavanje": 0
+      },
+      "Niška Banja": {
+        "suzenje": 0,
+        "promena_nivoa": 0,
+        "usporavanje": 3
+      }
+    },
+    "suzenja": [
+      {
+        "name": "suzenje staze od vodovoda",
+        "lon": 21.9423951,
+        "lat": 43.3197632,
+        "km": 6.97,
+        "deonica": "Brzi Brod",
+        "images": [
+          "images/d7d029f6a7a5910a.jpg"
+        ],
+        "geom_tip": "suzenje"
+      },
+      {
+        "name": "Suzhavanje keja",
+        "lon": 21.9396183,
+        "lat": 43.3207036,
+        "km": 6.72,
+        "deonica": "Brzi Brod",
+        "geom_tip": "suzenje"
+      },
+      {
+        "name": "Bariera (Zid na gornjem bedemu)",
+        "lon": 21.885932,
+        "lat": 43.3217924,
+        "km": 1.74,
+        "deonica": "Medoševac",
+        "geom_tip": "suzenje"
+      },
+      {
+        "name": "Privremeni parking, trotoar sa zemljom shirine 3m",
+        "lon": 21.8874771,
+        "lat": 43.3211173,
+        "km": 1.89,
+        "deonica": "Medoševac",
+        "images": [
+          "images/5d8c3daaeccf6d32.jpg"
+        ],
+        "geom_tip": "suzenje"
+      },
+      {
+        "name": "Asfaltirani trotoar, oznachili su kao parking zona 2m",
+        "lon": 21.8883235,
+        "lat": 43.3209905,
+        "km": 1.96,
+        "deonica": "Medoševac",
+        "geom_tip": "suzenje"
+      },
+      {
+        "name": "Trotoar 5 m, iskoristen za koso parkiranje",
+        "lon": 21.8890374,
+        "lat": 43.3209513,
+        "km": 2.02,
+        "deonica": "Medoševac",
+        "images": [
+          "images/d7cb76c007145e9f.jpg",
+          "images/2107b5be3187b724.jpg"
+        ],
+        "geom_tip": "suzenje"
+      },
+      {
+        "name": "Mozhe da se krece jedino po gornji bedem 3 -3,5m",
+        "lon": 21.9770993,
+        "lat": 43.312594,
+        "km": 10.05,
+        "deonica": "Brzi Brod",
+        "geom_tip": "suzenje"
+      },
+      {
+        "name": "Tesna rampa",
+        "lon": 21.8909196,
+        "lat": 43.3211297,
+        "km": 2.17,
+        "deonica": "Centar",
+        "geom_tip": "suzenje"
+      }
+    ],
+    "promena_nivoa": [
+      {
+        "name": "Strma rampa",
+        "lon": 21.9026061,
+        "lat": 43.3263043,
+        "km": 3.31,
+        "deonica": "Centar",
+        "geom_tip": "promena_nivoa"
+      },
+      {
+        "name": "Zemjena rampa ka donjeg bedemu",
+        "lon": 21.8817407,
+        "lat": 43.3249506,
+        "km": 1.23,
+        "deonica": "Medoševac",
+        "geom_tip": "promena_nivoa"
+      }
+    ],
+    "usporavanje": [
+      {
+        "name": "Prekid u kretanju neophodno da se peogje na most",
+        "lon": 21.984155,
+        "lat": 43.3072436,
+        "km": null,
+        "deonica": "Niška Banja",
+        "geom_tip": "usporavanje"
+      },
+      {
+        "name": "Prekid u kretanju zbog kutinska reka",
+        "lon": 21.9844688,
+        "lat": 43.3081022,
+        "km": 10.98,
+        "deonica": "Niška Banja",
+        "geom_tip": "usporavanje"
+      },
+      {
+        "name": "Prekid kretanja - nema peshachki prelaz",
+        "lon": 21.8906652,
+        "lat": 43.3210785,
+        "km": 2.15,
+        "deonica": "Medoševac",
+        "images": [
+          "images/b3206e2fbf76aea7.jpg"
+        ],
+        "geom_tip": "usporavanje"
+      },
+      {
+        "name": "prekid u kretanju zbog nepostojenje mosta preko kutinska reka",
+        "lon": 21.9847689,
+        "lat": 43.3080144,
+        "km": 11.01,
+        "deonica": "Niška Banja",
+        "images": [
+          "images/41a578f36f6fe6d1.jpg"
+        ],
+        "geom_tip": "usporavanje"
+      }
+    ]
   }
 }
