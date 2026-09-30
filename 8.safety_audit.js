@@ -492,6 +492,91 @@ function renderGeomTable() {
   $("geom-table").innerHTML = head + `<tbody>${rows.join("")}${foot}</tbody>`;
 }
 
+/* ── 8.5 konflikt korisnika ──────────────────────────────────── */
+
+function renderKKStats() {
+  const k = D.konflikti_korisnika;
+  const tiles = [
+    { v: k.ukupno_stepenica, label: "stepenica",
+      sub: "tačke konvergencije — samo pešaci i trkači", warn: true },
+    { v: k.ukupno_rampi, label: "rampi",
+      sub: "tačke konvergencije — svi korisnici zajedno", warn: true },
+    { v: k.ukupno, label: "tačaka konvergencije ukupno",
+      sub: "indirektan proxy za konflikt korisnika", warn: false },
+  ];
+  $("kk-stats").innerHTML = tiles.map(x => `
+    <div class="shade-stat">
+      <div class="shade-stat-value${x.warn ? " warn" : ""}">${x.v}</div>
+      <div class="shade-stat-label">${x.label}</div>
+      <div class="shade-stat-sub">${x.sub}</div>
+    </div>`).join("");
+}
+
+function renderKKTable() {
+  const bd = D.konflikti_korisnika.po_deonici;
+
+  const head = `<thead><tr>
+    <th>Deonica</th>
+    <th><span style="color:#7b5ea7">●</span> Stepenice</th>
+    <th><span style="color:#2e86ab">●</span> Rampe</th>
+    <th>Ukupno</th>
+  </tr></thead>`;
+
+  const rows = DEONICE_ORDER.filter(dn => bd[dn]).map(dn => {
+    const d = bd[dn];
+    const s = d.stepenice || 0;
+    const r = d.rampe || 0;
+    return `<tr>
+      <td>${dn}</td>
+      <td class="num">${s || "—"}</td>
+      <td class="num">${r || "—"}</td>
+      <td class="num"><strong>${s + r}</strong></td>
+    </tr>`;
+  });
+
+  const totS = D.konflikti_korisnika.ukupno_stepenica;
+  const totR = D.konflikti_korisnika.ukupno_rampi;
+  const foot = `<tr><td><strong>Ukupno</strong></td>
+    <td class="num"><strong>${totS}</strong></td>
+    <td class="num"><strong>${totR}</strong></td>
+    <td class="num"><strong>${totS + totR}</strong></td>
+  </tr>`;
+
+  $("kk-table").innerHTML = head + `<tbody>${rows.join("")}${foot}</tbody>`;
+}
+
+function buildKKMap() {
+  const map = L.map("kk-map", { scrollWheelZoom: false });
+  L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution: "© <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors",
+    maxZoom: 19,
+  }).addTo(map);
+
+  fetch(DATA + "staze_mreza.geojson")
+    .then(r => r.json())
+    .then(gj => {
+      const axis = gj.features.find(f => f.properties.uloga === "osa");
+      if (!axis) return;
+      const latlngs = axis.geometry.coordinates.map(c => [c[1], c[0]]);
+      L.polyline(latlngs, { color: "#b8b0a0", weight: 3, opacity: 0.6 }).addTo(map);
+      map.fitBounds(L.latLngBounds(latlngs), { padding: [18, 18] });
+    });
+
+  for (const p of D.konflikti_korisnika.stepenice) {
+    L.circleMarker([p.lat, p.lon], {
+      radius: 5, color: "#5a3d8a", fillColor: "#7b5ea7", fillOpacity: 0.85, weight: 1.5,
+    }).addTo(map)
+      .bindPopup(`<strong>Stepenice</strong><br>${p.name}<br><em>${p.deonica || ""}</em>`);
+  }
+
+  for (const p of D.konflikti_korisnika.rampe) {
+    L.circleMarker([p.lat, p.lon], {
+      radius: 7, color: "#1a5f7a", fillColor: "#2e86ab", fillOpacity: 0.9, weight: 2,
+    }).addTo(map)
+      .bindPopup(`<strong>Rampa</strong><br>${p.name}<br><em>${p.deonica || ""}</em>`);
+  }
+}
+
 /* ── mapa ────────────────────────────────────────────────────── */
 
 function haversineKm(lon1, lat1, lon2, lat2) {
@@ -635,6 +720,9 @@ async function init() {
   renderGeomStats();
   renderGeomTable();
   buildGeomMap();
+  renderKKStats();
+  renderKKTable();
+  buildKKMap();
   buildMap();
 }
 

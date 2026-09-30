@@ -368,6 +368,52 @@ def compute_geometrija(axis):
     }
 
 
+# ── 8.5 konflikt korisnika ───────────────────────────────────────────────────
+
+def compute_konflikti_korisnika(axis):
+    """Tačke konvergencije: stepenice + rampe kao indirektan proxy za konflikt
+    pešaka, biciklista i trkača na istom uskom prolazu."""
+    grid, cell, _ = build_axis_index(axis)
+
+    def collect(path):
+        result = []
+        for feat in load_geojson(path):
+            if feat["geometry"]["type"] != "Point":
+                continue
+            props = feat["properties"]
+            lon, lat = feat["geometry"]["coordinates"][:2]
+            km = project_onto_axis(lon, lat, grid, cell)
+            entry = {
+                "name": props.get("name", ""),
+                "lon": lon, "lat": lat,
+                "km": round(km, 3) if km is not None else None,
+                "deonica": props.get("deonica"),
+            }
+            if props.get("images"):
+                entry["images"] = props["images"]
+            result.append(entry)
+        return result
+
+    stepenice = collect(STEPENICE_FILE)
+    rampe     = collect(RAMPE_FILE)
+
+    by_deonica = {}
+    for tip, tacke in (("stepenice", stepenice), ("rampe", rampe)):
+        for e in tacke:
+            d = e.get("deonica") or "—"
+            bd = by_deonica.setdefault(d, {"stepenice": 0, "rampe": 0})
+            bd[tip] += 1
+
+    return {
+        "ukupno_stepenica": len(stepenice),
+        "ukupno_rampi": len(rampe),
+        "ukupno": len(stepenice) + len(rampe),
+        "po_deonici": by_deonica,
+        "stepenice": stepenice,
+        "rampe": rampe,
+    }
+
+
 # ── stepenice po deonici + gustina ───────────────────────────────────────────
 
 BIN_M = 500       # širina bins za histogram gustine
@@ -492,6 +538,12 @@ def main():
           f"{geometrija['ukupno_promena']} promena nivoa, "
           f"{geometrija['ukupno_usporavanja']} neočekivanih usporavanja")
 
+    print("8.5  Konflikt korisnika (proxy)...")
+    konflikti_korisnika = compute_konflikti_korisnika(axis)
+    print(f"     {konflikti_korisnika['ukupno_stepenica']} stepenica, "
+          f"{konflikti_korisnika['ukupno_rampi']} rampi = "
+          f"{konflikti_korisnika['ukupno']} tačaka konvergencije")
+
     axis_pts = resample_line(axis)
     osa_km = round(axis_pts[-1][2] / 1000.0, 3)
 
@@ -502,13 +554,14 @@ def main():
     print(f"     van domašaja: {stepenice['missed']}")
 
     out = {
-        "schema": 2,
+        "schema": 3,
         "osa_km": osa_km,
         "tamne_zone": tamne,
         "stanja": stanja,
         "konflikti": konflikti,
         "stepenice_po_deonici": stepenice,
         "geometrija": geometrija,
+        "konflikti_korisnika": konflikti_korisnika,
     }
 
     with open(OUT_FILE, "w", encoding="utf-8") as f:

@@ -150,6 +150,35 @@
   </div>
 </section>
 
+<!-- ── 8.5 Konflikt korisnika ─────────────────────────────────── -->
+<section id="s8-5" class="zelenilo-section">
+  <div class="container">
+    <h2>8.5 Konflikt korisnika</h2>
+    <p class="lead">Gde se staze pešaka, biciklista i trkača sužavaju na jednu tačku — svaka stepenica i rampa je mesto gde svi korisnici moraju da prođu istim uskim prolazom. Ovo je indirektan proxy za konflikt, ne direktno mapirana opservacija.</p>
+
+    <div class="shade-stats" id="kk-stats"></div>
+
+    <h3 style="margin-top: 1.5rem;">Po deonici</h3>
+    <div class="table-scroll">
+      <table class="senka-table" id="kk-table">
+        <caption class="sr-only">Tačke konvergencije korisnika po deonici</caption>
+      </table>
+    </div>
+
+    <h3 style="margin-top: 2rem;">Na mapi</h3>
+    <div class="heatmap-legend" style="margin-bottom:.5rem;">
+      <span class="hl-item"><span class="hl-swatch" style="background:#7b5ea7;border-radius:50%"></span> stepenice</span>
+      <span class="hl-item"><span class="hl-swatch" style="background:#2e86ab;border-radius:50%"></span> rampe</span>
+    </div>
+    <div id="kk-map" aria-label="Mapa tačaka konvergencije korisnika" style="margin-top:.5rem;"></div>
+    <p class="muted" style="margin-top:.5rem; font-size:.85rem;">Osnova: OpenStreetMap · terenski podaci 2026.</p>
+
+    <div class="callout callout-info" style="margin-top: 1.5rem;">
+      <p><strong>Ovo je proxy analiza.</strong> Za potpun uvid potrebno je terensko mapiranje: gde bici i pešačka staza dele istu površinu bez fizičke separacije, širina staze po segmentima i direktne opservacije susreta korisnika.</p>
+    </div>
+  </div>
+</section>
+
 <!-- ── metod ──────────────────────────────────────────────────── -->
 <section class="metod-section">
   <div class="container">
@@ -168,8 +197,8 @@
         <p>Ove kategorije iz standarda bezbednosnog audita nisu bile deo terenskog protokola. Nedostaju iz analize i treba ih dodati u sledećoj iteraciji mapiranja.</p>
       </div>
       <div class="metod-item">
-        <h4>Konflikt korisnika nije moguće izvesti iz postojećih podataka</h4>
-        <p>Analiza sukoba pešaka, biciklista i trkača zahteva podatke kojih nema: gde bici i pešačka staza dele istu površinu bez fizičke separacije, širinu staze po segmentima i terenske opservacije susreta. Geometrija staza postoji, ali su sve tri staze paralelne — blizina na mapi ne znači i deljenu površinu. Potrebna je nova iteracija terenskog mapiranja sa eksplicitnim protokolom za mešovitu upotrebu.</p>
+        <h4>Konflikt korisnika — proxy, ne direktna opservacija</h4>
+        <p>Stepenice i rampe koriste se kao indirektan proxy: svaka je tačka gde se svi tipovi korisnika sužavaju na isti prolaz. Za potpun uvid treba nova iteracija mapiranja — gde bici i pešačka staza dele istu površinu, širina staze po segmentima i direktne opservacije susreta na terenu.</p>
       </div>
       <div class="metod-item">
         <h4>Stepenice ≠ sve prepreke</h4>
