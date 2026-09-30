@@ -22,6 +22,31 @@
 
     <article class="post">
       <header class="post-head">
+        <time datetime="2026-09-30">30. septembar 2026.</time>
+        <h2>Bezbednosni audit: geometrija kretanja i konflikt korisnika (8.4–8.5)</h2>
+      </header>
+      <p class="post-summary">Dve nove kategorije proširuju analizu 8. Geometrija kretanja (8.4) klasifikuje tačke iz <code>prekidi.geojson</code> i <code>rampe.geojson</code> po tipu fizičke smetnje — suženja, nagle promene nivoa i mesta prinudnog zaustavljanja. Konflikt korisnika (8.5) je proxy analiza: direktnih opservacija susreta pešaka, biciklista i trkača nema, ali svaka stepenica i rampa je tačka konvergencije gde svi moraju proći istim uskim prolazom. Obe sekcije prikazane su tabelom i Leaflet mapom.</p>
+      <div class="post-body">
+        <h3>8.4 Geometrija kretanja: klasifikacija regexom</h3>
+        <p>Izvor su dve datoteke: <code>prekidi.geojson</code> (52 tačke) i <code>rampe.geojson</code> (13 rampi). Svaka tačka prolazi kroz tri regex-a redom, bez preklapanja:</p>
+        <ul class="tech-list">
+          <li><strong>suzenje</strong> — <code>suzenje|suzhavanje|bariera|tesna|uski|koso\s*park|parking\s*zona|shirine|3\s*-\s*3[,.]5</code> — obuhvata fizička suženja, barijere i parkiranje koje smanjuje prolaznu širinu.</li>
+          <li><strong>promena_nivoa</strong> — <code>strma|zemjena\s+rampa|kraj\s+asfalt|kraj\s+trotoa</code> — nagla promena visine ili podloge koja zahteva usporavanje ili silaženje s bicikla.</li>
+          <li><strong>usporavanje</strong> — <code>neophodno|nema\s*peshachki</code>, plus tačke čiji je <code>tip</code> polje <code>most_prelaz</code> ili <code>pritoka</code> — mesta gde korisnik mora da stane ili silazi bez upozorenja.</li>
+        </ul>
+        <p>Rezultat: 8 suženja, 2 promene nivoa, 4 mesta prinudnog zaustavljanja. Konvencija je ista kao u 8.3 — svaka tačka je ručno zabeležena na terenu, regex samo sortira, ne kreira. Greška je greška klasifikacije, ne podataka.</p>
+        <p>Vizualizacija: Leaflet mapa sa kružnim markerima bojenim po tipu (narandžasta = suženje, plava = promena nivoa, crvena = usporavanje). Legenda se gradi dinamički iz <code>GEOM_COLOR</code> i <code>GEOM_LABEL</code> mapa u JS-u, pa su boje i natpisi na jednom mestu.</p>
+        <h3>8.5 Konflikt korisnika: proxy umesto direktnih opservacija</h3>
+        <p>Direktnih podataka o susretima korisnika nema u <code>koridor_data.kml</code> — terenski protokol nije predviđao opservaciju konflikta. Umesto da se sekcija izostavi, odabran je indirektan proxy: svaka stepenica i svaka rampa je tačka konvergencije gde pešaci, biciklisti i trkači moraju proći istim uskim prolazom bez fizičke separacije. To ne dokazuje da do konflikta dolazi — ali identifikuje gde je šansa za konflikt strukturno najveća.</p>
+        <p>Ukupno 94 tačke: 81 stepenica + 13 rampi. Gabrovačka Reka dominira sa 37 stepenica, što je i nalaz 8.1, samo gledano iz ugla gustine korisnika umesto gustine biciklista.</p>
+        <p>Sekcija nosi eksplicitno upozorenje da je ovo proxy, ne direktna analiza, i navodi šta bi trebalo mapirati u sledećoj iteraciji: gde bici i pešačka staza dele isti asfalt bez fizičke granice, širina staze po segmentima i direktne opservacije susreta.</p>
+        <h3>Šta i dalje nedostaje</h3>
+        <p>Kategorija <em>specifični rizici uz reku</em> (ograda na ivici, strme kosine, oštećenja bedema) nema ni jednu mapiranu tačku u postojećim podacima. Pretraga KML-a nije pronašla ni ograda/kosina/erozija ni oštećenja markere — pojava reči „bedem" u podacima su samo nazivi staza. Ova kategorija zahteva novu iteraciju terenskog mapiranja sa eksplicitnim protokolom za ivicu reke.</p>
+      </div>
+    </article>
+
+    <article class="post">
+      <header class="post-head">
         <time datetime="2026-09-14">14. septembar 2026.</time>
         <h2>Bezbednosni audit: tri kategorije, bez novih podataka</h2>
       </header>

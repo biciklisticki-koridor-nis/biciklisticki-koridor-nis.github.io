@@ -467,26 +467,21 @@ function renderGeomTable() {
   const head = `<thead><tr>
     <th>Deonica</th>
     ${vrste.map(v => `<th>${dot(v)}${GEOM_LABEL[v]}</th>`).join("")}
-    <th>Ukupno</th>
   </tr></thead>`;
 
   const rows = DEONICE_ORDER.filter(dn => bd[dn]).map(dn => {
     const d = bd[dn];
-    const total = vrste.reduce((s, v) => s + (d[v] || 0), 0);
     return `<tr>
       <td>${dn}</td>
       ${vrste.map(v => `<td class="num">${d[v] || "—"}</td>`).join("")}
-      <td class="num"><strong>${total}</strong></td>
     </tr>`;
   });
 
   const totals = vrste.map(v =>
     Object.values(bd).reduce((s, d) => s + (d[v] || 0), 0)
   );
-  const grandTotal = totals.reduce((s, v) => s + v, 0);
   const foot = `<tr><td><strong>Ukupno</strong></td>
     ${totals.map(v => `<td class="num"><strong>${v || "—"}</strong></td>`).join("")}
-    <td class="num"><strong>${grandTotal}</strong></td>
   </tr>`;
 
   $("geom-table").innerHTML = head + `<tbody>${rows.join("")}${foot}</tbody>`;
@@ -519,7 +514,6 @@ function renderKKTable() {
     <th>Deonica</th>
     <th><span style="color:#7b5ea7">●</span> Stepenice</th>
     <th><span style="color:#2e86ab">●</span> Rampe</th>
-    <th>Ukupno</th>
   </tr></thead>`;
 
   const rows = DEONICE_ORDER.filter(dn => bd[dn]).map(dn => {
@@ -530,7 +524,6 @@ function renderKKTable() {
       <td>${dn}</td>
       <td class="num">${s || "—"}</td>
       <td class="num">${r || "—"}</td>
-      <td class="num"><strong>${s + r}</strong></td>
     </tr>`;
   });
 
@@ -539,7 +532,6 @@ function renderKKTable() {
   const foot = `<tr><td><strong>Ukupno</strong></td>
     <td class="num"><strong>${totS}</strong></td>
     <td class="num"><strong>${totR}</strong></td>
-    <td class="num"><strong>${totS + totR}</strong></td>
   </tr>`;
 
   $("kk-table").innerHTML = head + `<tbody>${rows.join("")}${foot}</tbody>`;
