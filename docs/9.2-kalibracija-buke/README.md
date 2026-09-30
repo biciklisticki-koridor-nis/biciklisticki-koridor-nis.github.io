@@ -4,13 +4,28 @@ Uputstvo za jedan terenski izlazak koji model buke iz analize 9.2 prevodi iz
 relativnog indeksa 0–100 u decibele, i proverava da li uopšte ispravno rangira
 deonice.
 
-**Fajlovi:** [`tacke.gpx`](tacke.gpx) (18 waypoint-a + redosled obilaska) ·
-[`tacke.csv`](tacke.csv) (tabela za popunjavanje na terenu) ·
-[`izbor_tacaka.py`](izbor_tacaka.py) (regeneriše oba iz `data/noise_air.json`)
+**Za teren:** [`obrazac.pdf`](obrazac.pdf) — **odštampaj ovo i ponesi**. Tri
+strane:
+
+1. svih 18 tačaka sa koordinatama i praznim kolonama za upis; u zaglavlju QR
+   kodovi za GPX i CSV
+2. protokol merenja i mesto za slobodne beleške
+3. **šta instalirati pre izlaska** — QR kodovi ka Play Store-u za
+   NoiseCapture, OsmAnd i Organic Maps, uputstvo kako se GPX ubacuje u mapu,
+   i kontrolna lista pre polaska
+
+**Ostali fajlovi:** [`tacke.gpx`](tacke.gpx) (18 waypoint-a + redosled obilaska) ·
+[`tacke.csv`](tacke.csv) (tabela za popunjavanje) ·
+[`obrazac.html`](obrazac.html) (izvor za PDF; može i da se štampa direktno iz
+pregledača) · [`izbor_tacaka.py`](izbor_tacaka.py) (regeneriše sve iz
+`data/buka.json`) · [`napravi_pdf.js`](napravi_pdf.js) (HTML → PDF)
 
 ```
-.venv/bin/python docs/9.2-kalibracija-buke/izbor_tacaka.py
+make teren        # tacke.gpx, tacke.csv, obrazac.html, data/merne_tacke.json
+make teren-pdf    # + obrazac.pdf
 ```
+
+Tačke se vide i na mapi u [analizi 9.2](../../9.2.noise_and_air_quality_exposure.html).
 
 ---
 
@@ -84,6 +99,21 @@ Sa 3–5 minuta po tački, ukupno **2,5–3 sata**.
 - odmaknuti se od lokalnih izvora: šetača, pasa, dece na igralištu
 - **bez kiše, bez vetra jačeg od ~5 m/s**; pena na mikrofonu obavezna
 - zapisati vreme svakog merenja u `tacke.csv`
+- **jedan telefon i jedna aplikacija za ceo prolaz.** Svaki mikrofon nosi svoj
+  stalni pomeraj; u regresiji on upada u odsečak i sam se poništi — ali samo
+  ako je isti na svim tačkama. Menjanje uređaja usred obilaska pokvarilo bi
+  ceo izlazak.
+
+### Dve kolone koje ne služe buci
+
+`podloga` i `klupe` u CSV-u pripadaju analizi 9.3 (termalni komfor), ne 9.2.
+Tip podloge nam nedostaje jer ga OpenStreetMap za staze uz Nišavu skoro ne
+beleži, a klupe su osnov za „mesta predaha". Pošto se ionako prelazi celih
+13 km, beleže se usput — drugi obilazak samo zbog toga bio bi traćenje istog puta.
+
+- **podloga:** asfalt, beton, behaton, tucanik, zemlja, trava
+- **klupe:** koliko ih ima u dvadesetak metara oko tačke i ima li hlada nad
+  njima (npr. `2, u hladu`)
 
 ## Oprema
 
@@ -96,7 +126,8 @@ Sa 3–5 minuta po tački, ukupno **2,5–3 sata**.
 | Generičke „Sound Meter" aplikacije | besplatno | ✓ | ✓ | retko | retko | ne | **2** |
 
 **Preporuka: jedan Class 2 merač (~40 €) za grupu, plus NoiseCapture na
-telefonima kao paralelna provera.**
+telefonima kao paralelna provera.** QR kodovi za instalaciju su na trećoj
+strani obrasca.
 
 NoiseCapture je najbolji softverski izbor — otvoren kod, iza njega stoje
 Université Gustave Eiffel i CNRS, pravljen baš za građansko mapiranje buke.
@@ -121,6 +152,25 @@ obilazak. Zaustavljanja ispadaju kao čiste zaravni u GPS tragu i iz njih se
 vade vrednosti — jedno snimanje, jedan prolaz, bez ručnog beleženja. Vožnja
 između tačaka je zagađena šumom vetra i baca se, ali ništa ne košta.
 
+## Aplikacija za mapu
+
+Naš GPX ima 18 waypoint-a i rutu, ali **nema track**. Waypoint-i rade svuda;
+`<rte>` je najslabije podržan element GPX-a. Nije problem — redosled obilaska
+stoji u imenima tačaka (T01…T18).
+
+- **[OsmAnd](https://play.google.com/store/apps/details?id=net.osmand)** —
+  preporučeno. Prikazuje **opis** svake tačke, a u opisu stoji ceo protokol za
+  nju: model indeks, kilometraža, deonica i način merenja. Uz njega papir služi
+  samo za upis. Besplatna verzija dozvoljava 7 preuzimanja mapa; Srbija je jedna.
+- **[Organic Maps](https://play.google.com/store/apps/details?id=app.organicmaps)**
+  — jednostavnije i lakše, ali pokazuje samo pin. Ima
+  [otvorenu prijavu](https://github.com/organicmaps/organicmaps/issues/8703) da
+  pri uvozu GPX-a ume da preskoči prvu i poslednju tačku — proveri da se vidi
+  svih 18 pre izlaska.
+
+Uvoz: otvori preuzeti `tacke.gpx` i izaberi aplikaciju. U OsmAnd-u radi i
+*Meni → Podešavanja → Uvoz/izvoz → Uvoz*. Offline mapu Srbije skini pre polaska.
+
 ## Šta očekivati
 
 **Pod od reke.** Na najtišim tačkama (T14, T17) Nišava će verovatno postaviti
@@ -144,6 +194,6 @@ put na svega par metara). Proveriti pristupačnost i bezbednost pre merenja.
    fali struktura — najverovatnije baš zaklon — i zna se šta se sledeće
    popravlja.
 4. Razlika unutar parova → empirijska konstanta zaklona nasipa, koja se vraća
-   u `noise_air.py`.
+   u `buka.py`.
 5. Objaviti i sam dijagram rasipanja izmereno-naspram-modelirano, u duhu
    ostatka sajta: pokazati gde se slaže i gde ne.

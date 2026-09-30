@@ -1,19 +1,15 @@
 #!/usr/bin/env python3
-"""Izloženost buci i kvalitetu vazduha duž koridora (analiza 9.2).
+"""Izloženost buci duž koridora (analiza 9.2).
 
-Dva odvojena pitanja sa dva odvojena izvora, jer se razlikuju po tome šta
-uopšte mogu da kažu:
+Buka je prostorna, pa se modelira po tački. Svaki segment puta iz
+OpenStreetMap-a (preko Overpass API-ja) je niz nekoherentnih tačkastih izvora
+jačine po klasi puta, energija opada sa 1/d², a zbir preko svih segmenata u
+krugu od 300 m daje relativnu izloženost tačke. Integral tačkastih izvora duž
+linije reprodukuje ponašanje linijskog izvora (−10·log10 d).
 
-  BUKA je prostorna. Modelira se iz geometrije puteva (OpenStreetMap preko
-  Overpass API-ja): svaki segment puta je niz nekoherentnih tačkastih izvora
-  jačine po klasi puta, energija opada sa 1/d², a zbir preko svih segmenata
-  u krugu od 300 m daje relativnu izloženost tačke. Integral tačkastih
-  izvora duž linije reprodukuje ponašanje linijskog izvora (−10·log10 d).
-
-  VAZDUH nije prostoran. CAMS (preko Open-Meteo) ima 0.1° ≈ 11 km, što je
-  jedna ćelija za ceo koridor. Zato se vazduh ne prikazuje po kilometru nego
-  kao vremenski kontekst — višegodišnji prosek, prekoračenja SZO pragova i
-  sezonski hod, plus polen kao faktor upotrebljivosti rekreativne staze.
+Kvalitet vazduha je bio u ovom modulu dok je dolazio iz CAMS-a i bio jedan broj
+za ceo koridor. Sada dolazi sa mernih stanica i ima svoju prostornu logiku, pa
+živi u vazduh.py.
 
 Indeks buke NIJE u decibelima. Nema nijednog merenja duž keja; kalibracija
 bi bila lažna preciznost. Indeks je 0–100 relativno na sam koridor, gde je
@@ -23,7 +19,7 @@ Vegetacija namerno NE ulazi u model. Drvored zaklanja pogled na saobraćaj
 snažno, ali zvuk slabo (red veličine 1–3 dB na 10 m gustog pojasa); ubaciti
 je u indeks značilo bi preuveličati efekat koji se čuje.
 
-Izvori: OpenStreetMap (ODbL) · CAMS preko Open-Meteo (CC BY 4.0).
+Izvor: OpenStreetMap (ODbL).
 """
 import hashlib
 import json
@@ -37,10 +33,10 @@ import urllib.request
 from koridor import (DEONICE_FILE, MREZA_FILE, ROOT, STAZE, axis_km,
                      planar_xy, prepare, samples_hash)
 
-OUT_FILE = os.path.join(ROOT, "data", "noise_air.json")
+OUT_FILE = os.path.join(ROOT, "data", "buka.json")
 CACHE_DIR = os.path.join(ROOT, "data", ".cache", "noise")
 
-NOISE_SCHEMA = 1
+NOISE_SCHEMA = 2
 
 # ---------- buka ----------
 
@@ -216,99 +212,6 @@ def band(idx):
     return next(name for lim, name in BANDS if idx < lim)
 
 
-# ---------- vazduh ----------
-
-AQ_URL = "https://air-quality-api.open-meteo.com/v1/air-quality"
-AQ_YEARS = ("2023", "2024", "2025")
-AQ_VARS = ["pm2_5", "pm10", "nitrogen_dioxide", "ozone",
-           "grass_pollen", "birch_pollen", "ragweed_pollen"]
-# SZO smernice 2021 — dnevni pragovi (µg/m³)
-WHO_DAILY = {"pm2_5": 15.0, "pm10": 45.0, "nitrogen_dioxide": 25.0}
-WHO_ANNUAL = {"pm2_5": 5.0, "pm10": 15.0, "nitrogen_dioxide": 10.0}
-MESECI = ["jan", "feb", "mar", "apr", "maj", "jun",
-          "jul", "avg", "sep", "okt", "nov", "dec"]
-
-
-def fetch_air(lat, lon):
-    """Satni CAMS za centar koridora, više godina. Keširano po godini."""
-    os.makedirs(CACHE_DIR, exist_ok=True)
-    hourly = {v: [] for v in AQ_VARS}
-    times = []
-    for yr in AQ_YEARS:
-        cache = os.path.join(CACHE_DIR, f"air_{yr}.json")
-        if os.path.exists(cache):
-            with open(cache) as f:
-                d = json.load(f)
-        else:
-            url = (f"{AQ_URL}?latitude={lat:.4f}&longitude={lon:.4f}"
-                   f"&hourly={','.join(AQ_VARS)}&domains=cams_europe"
-                   f"&start_date={yr}-01-01&end_date={yr}-12-31"
-                   f"&timezone=Europe%2FBelgrade")
-            print(f"  Preuzimam vazduh za {yr}...", flush=True)
-            try:
-                with urllib.request.urlopen(url, timeout=120) as r:
-                    d = json.load(r)
-            except Exception as exc:                   # noqa: BLE001
-                print(f"    ! {yr} preskočena: {exc}")
-                continue
-            with open(cache, "w") as f:
-                json.dump(d, f)
-        times += d["hourly"]["time"]
-        for v in AQ_VARS:
-            hourly[v] += d["hourly"].get(v, [None] * len(d["hourly"]["time"]))
-    return times, hourly
-
-
-def air_stats(times, hourly):
-    """Godišnji proseci, prekoračenja SZO dnevnih pragova, sezonski hod."""
-    out = {"godine": list(AQ_YEARS), "zagadjivaci": {}, "polen": {}}
-
-    for v in ("pm2_5", "pm10", "nitrogen_dioxide"):
-        vals = hourly.get(v) or []
-        # dnevni proseci
-        daily = {}
-        for t, x in zip(times, vals):
-            if x is None:
-                continue
-            daily.setdefault(t[:10], []).append(x)
-        day_avg = {d: sum(a) / len(a) for d, a in daily.items() if len(a) >= 18}
-        if not day_avg:
-            continue
-        allv = [x for x in vals if x is not None]
-        over = sum(1 for x in day_avg.values() if x > WHO_DAILY[v])
-        months = {}
-        for d, x in day_avg.items():
-            months.setdefault(int(d[5:7]), []).append(x)
-        out["zagadjivaci"][v] = {
-            "prosek": round(sum(allv) / len(allv), 1),
-            "szo_godisnji": WHO_ANNUAL[v],
-            "szo_dnevni": WHO_DAILY[v],
-            "dana_preko": over,
-            "dana_ukupno": len(day_avg),
-            "pct_dana_preko": round(100.0 * over / len(day_avg), 1),
-            "po_mesecu": [round(sum(months[m]) / len(months[m]), 1)
-                          if m in months else None for m in range(1, 13)],
-        }
-
-    for v in ("grass_pollen", "birch_pollen", "ragweed_pollen"):
-        vals = hourly.get(v) or []
-        pairs = [(t, x) for t, x in zip(times, vals) if x is not None]
-        if not pairs:
-            continue
-        months = {}
-        for t, x in pairs:
-            months.setdefault(int(t[5:7]), []).append(x)
-        peak_m = max(months, key=lambda m: sum(months[m]) / len(months[m]))
-        out["polen"][v] = {
-            "max": round(max(x for _, x in pairs)),
-            "vrhunac_mesec": MESECI[peak_m - 1],
-            "po_mesecu": [round(sum(months[m]) / len(months[m]), 1)
-                          if m in months else None for m in range(1, 13)],
-        }
-    out["meseci"] = MESECI
-    return out
-
-
 # ---------- agregati ----------
 
 def aggregate(samples, idx_list, near_list, deon_order):
@@ -364,7 +267,7 @@ def main():
                 old = json.load(f)
             if (old.get("schema") == NOISE_SCHEMA
                     and old.get("samples_hash") == cur_hash):
-                print(f"noise_air cache hit ({len(flat)} tačaka)")
+                print(f"buka cache hit ({len(flat)} tačaka)")
                 return 0
         except (OSError, json.JSONDecodeError):
             pass
@@ -400,28 +303,16 @@ def main():
             "totals": totals,
         })
 
-    lat0 = sum(c[1] for c in axis) / len(axis)
-    lon0 = sum(c[0] for c in axis) / len(axis)
-    times, hourly = fetch_air(lat0, lon0)
-    air = air_stats(times, hourly) if times else None
-    if air:
-        pm = air["zagadjivaci"].get("pm2_5", {})
-        print(f"  vazduh: PM2.5 prosek {pm.get('prosek')} µg/m³, "
-              f"{pm.get('dana_preko')} dana preko SZO praga "
-              f"({pm.get('dana_ukupno')} merenih)")
-
     out = {
         "schema": NOISE_SCHEMA,
         "samples_hash": cur_hash,
-        "source_buka": "OpenStreetMap (ODbL) — modelirano, bez merenja",
-        "source_vazduh": "CAMS preko Open-Meteo (CC BY 4.0), ~11 km mreža",
+        "source": "OpenStreetMap (ODbL) — modelirano, bez merenja",
         "step_m": 10.0,
         "osa_km": round(axis_km(axis), 2),
         "radius_m": SEARCH_R_M,
         "bands": [{"do": lim, "naziv": name} for lim, name in BANDS],
         "deonice": deon_order,
         "staze": staze_out,
-        "vazduh": air,
     }
     with open(OUT_FILE, "w", encoding="utf-8") as f:
         json.dump(out, f, ensure_ascii=False, separators=(",", ":"))
