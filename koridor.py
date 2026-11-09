@@ -71,7 +71,7 @@ def resample_line(coords, step_m=STEP_M):
         while seg > 0 and next_m <= acc + seg:
             f = (next_m - acc) / seg
             out.append((lo1 + (lo2 - lo1) * f, la1 + (la2 - la1) * f, next_m))
-            next_m += STEP_M
+            next_m += step_m
         acc += seg
     return out
 
