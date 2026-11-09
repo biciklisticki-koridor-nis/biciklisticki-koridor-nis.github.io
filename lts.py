@@ -219,6 +219,29 @@ def lanes_of(tags):
     return (1 if is_oneway(tags) else 2), "pretpostavka"
 
 
+_CYR = dict(zip("абвгдђежзијклљмнњопрстћуфхцчџш",
+                ["a","b","v","g","d","đ","e","ž","z","i","j","k","l","lj","m","n","nj",
+                 "o","p","r","s","t","ć","u","f","h","c","č","dž","š"]))
+
+
+def latin(s):
+    """Srpska ćirilica → latinica (OSM `name` je na ćirilici, sajt je na latinici)."""
+    if not s:
+        return s
+    out = []
+    for i, ch in enumerate(s):
+        lo = ch.lower()
+        if lo not in _CYR:
+            out.append(ch)
+            continue
+        t = _CYR[lo]
+        if ch != lo:  # veliko slovo: Lj u reči, LJ kad je i sledeće slovo veliko
+            nxt = s[i + 1] if i + 1 < len(s) else ""
+            t = t.upper() if len(t) > 1 and nxt.isupper() else t.capitalize()
+        out.append(t)
+    return "".join(out)
+
+
 def street_key(way):
     nm = way["tags"].get("name")
     return ("n:" + nm.strip().lower()) if nm else f"w:{way['id']}"
@@ -399,7 +422,7 @@ def build_net(osm, speed_bump=0, low_residential=True, footways=True):
                     or layer not in ("0", ""))
         winfo.append({
             "lts": lts, "rule": rule, "key": street_key(w),
-            "hw": t.get("highway"), "name": t.get("name"),
+            "hw": t.get("highway"), "name": latin(t.get("name")),
             "v": v, "v_src": v_src, "n": n_total, "n_src": n_src,
             "divided": dv, "elevated": elevated, "id": w["id"],
         })

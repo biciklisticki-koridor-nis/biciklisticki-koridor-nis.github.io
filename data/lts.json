@@ -1,6 +1,6 @@
 {
  "schema": 1,
- "hash": "aa5d3811f0006bfb",
+ "hash": "949fa7f7708fe4a6",
  "izvori": {
   "osm": "2026-11-08",
   "worldpop": "R2025A, 2025, 100 m constrained"
@@ -163,7 +163,7 @@
     "km_od": 1.66,
     "km_do": 1.85,
     "lts": 2,
-    "ulica": "Симе Матавуља",
+    "ulica": "Sime Matavulja",
     "hw": "residential",
     "deonica": "Medoševac",
     "pravilo": "T4: 50 km/h, 2 trake",
@@ -173,7 +173,7 @@
     "km_od": 1.86,
     "km_do": 2.01,
     "lts": 2,
-    "ulica": "Кеј Кола српских сестара",
+    "ulica": "Kej Kola srpskih sestara",
     "hw": "residential",
     "deonica": "Medoševac",
     "pravilo": "T4: 50 km/h, 1 traka",
@@ -219,7 +219,7 @@
    },
    {
     "km": 2.16,
-    "ulica": "Кнегиње Љубице",
+    "ulica": "Kneginje Ljubice",
     "hw": "secondary",
     "kmh": 50,
     "kmh_izvor": "RS:urban",
@@ -289,7 +289,7 @@
    },
    {
     "km": 5.395,
-    "ulica": "Пролетерска",
+    "ulica": "Proleterska",
     "hw": "tertiary",
     "kmh": 50,
     "kmh_izvor": "pretpostavka",
@@ -301,7 +301,7 @@
    },
    {
     "km": 6.461,
-    "ulica": "Булевар Медијана",
+    "ulica": "Bulevar Medijana",
     "hw": "secondary",
     "kmh": 60,
     "kmh_izvor": "znak",
@@ -5982,7 +5982,7 @@
    "prekid": false,
    "lon": 21.884067,
    "lat": 43.321711,
-   "ulica": "Даничићева",
+   "ulica": "Daničićeva",
    "hw": "residential",
    "lts": 2,
    "kmh": 50,
@@ -5999,7 +5999,7 @@
    "prekid": true,
    "lon": 21.890425,
    "lat": 43.321041,
-   "ulica": "Кеј Кола српских сестара",
+   "ulica": "Kej Kola srpskih sestara",
    "hw": "residential",
    "lts": 2,
    "kmh": 50,
@@ -6016,7 +6016,7 @@
    "prekid": false,
    "lon": 21.890815,
    "lat": 43.32063,
-   "ulica": "Кнегиње Љубице",
+   "ulica": "Kneginje Ljubice",
    "hw": "secondary",
    "lts": 4,
    "kmh": 50,
@@ -6033,7 +6033,7 @@
    "prekid": false,
    "lon": 21.890991,
    "lat": 43.320802,
-   "ulica": "Кнегиње Љубице",
+   "ulica": "Kneginje Ljubice",
    "hw": "secondary",
    "lts": 4,
    "kmh": 50,
@@ -6076,7 +6076,7 @@
    "prekid": false,
    "lon": 21.902849,
    "lat": 43.325624,
-   "ulica": "Краља Стефана Првовенчаног",
+   "ulica": "Kralja Stefana Prvovenčanog",
    "hw": "secondary",
    "lts": 4,
    "kmh": 50,
@@ -6093,7 +6093,7 @@
    "prekid": false,
    "lon": 21.904324,
    "lat": 43.324874,
-   "ulica": "Цвијићева",
+   "ulica": "Cvijićeva",
    "hw": "residential",
    "lts": 2,
    "kmh": 50,
@@ -6179,7 +6179,7 @@
    "prekid": false,
    "lon": 21.924865,
    "lat": 43.31226,
-   "ulica": "Булевар др Зорана Ђинђића",
+   "ulica": "Bulevar dr Zorana Đinđića",
    "hw": "secondary",
    "lts": 3,
    "kmh": 40,
@@ -6196,7 +6196,7 @@
    "prekid": false,
    "lon": 21.925823,
    "lat": 43.324368,
-   "ulica": "Бранка Миљковића",
+   "ulica": "Branka Miljkovića",
    "hw": "tertiary",
    "lts": 3,
    "kmh": 40,
@@ -6213,7 +6213,7 @@
    "prekid": false,
    "lon": 21.925827,
    "lat": 43.324772,
-   "ulica": "Бранка Миљковића",
+   "ulica": "Branka Miljkovića",
    "hw": "tertiary",
    "lts": 4,
    "kmh": 50,
@@ -6230,7 +6230,7 @@
    "prekid": false,
    "lon": 21.929469,
    "lat": 43.323995,
-   "ulica": "Византијски булевар",
+   "ulica": "Vizantijski bulevar",
    "hw": "unclassified",
    "lts": 3,
    "kmh": 50,
@@ -6247,7 +6247,7 @@
    "prekid": false,
    "lon": 21.925894,
    "lat": 43.316406,
-   "ulica": "27. марта",
+   "ulica": "27. marta",
    "hw": "service",
    "lts": 2,
    "kmh": 50,
@@ -6277,7 +6277,7 @@
    "prekid": true,
    "lon": 21.93703,
    "lat": 43.322,
-   "ulica": "Булевар Медијана",
+   "ulica": "Bulevar Medijana",
    "hw": "secondary",
    "lts": 3,
    "kmh": 40,
@@ -6294,7 +6294,7 @@
    "prekid": true,
    "lon": 21.937331,
    "lat": 43.321772,
-   "ulica": "Булевар Медијана",
+   "ulica": "Bulevar Medijana",
    "hw": "secondary",
    "lts": 4,
    "kmh": 50,
@@ -6311,7 +6311,7 @@
    "prekid": false,
    "lon": 21.936454,
    "lat": 43.318656,
-   "ulica": "Булевар Медијана",
+   "ulica": "Bulevar Medijana",
    "hw": "secondary",
    "lts": 4,
    "kmh": 60,
@@ -6328,7 +6328,7 @@
    "prekid": false,
    "lon": 21.94828,
    "lat": 43.32061,
-   "ulica": "Ратка Павловића",
+   "ulica": "Ratka Pavlovića",
    "hw": "residential",
    "lts": 2,
    "kmh": 50,
@@ -6345,7 +6345,7 @@
    "prekid": false,
    "lon": 21.96652,
    "lat": 43.312781,
-   "ulica": "Павла Софрића",
+   "ulica": "Pavla Sofrića",
    "hw": "residential",
    "lts": 2,
    "kmh": 50,
@@ -6362,7 +6362,7 @@
    "prekid": false,
    "lon": 21.978946,
    "lat": 43.312121,
-   "ulica": "АВНОЈ-а",
+   "ulica": "AVNOJ-a",
    "hw": "residential",
    "lts": 2,
    "kmh": 50,
@@ -6379,7 +6379,7 @@
    "prekid": false,
    "lon": 21.981452,
    "lat": 43.311319,
-   "ulica": "АВНОЈ-а",
+   "ulica": "AVNOJ-a",
    "hw": "residential",
    "lts": 2,
    "kmh": 50,
@@ -6396,7 +6396,7 @@
    "prekid": false,
    "lon": 21.983146,
    "lat": 43.307459,
-   "ulica": "Друга Нишавска",
+   "ulica": "Druga Nišavska",
    "hw": "residential",
    "lts": 2,
    "kmh": 50,
@@ -6413,7 +6413,7 @@
    "prekid": false,
    "lon": 22.000874,
    "lat": 43.304281,
-   "ulica": "Цара Константина",
+   "ulica": "Cara Konstantina",
    "hw": "residential",
    "lts": 2,
    "kmh": 50,
@@ -6430,7 +6430,7 @@
    "prekid": false,
    "lon": 22.009595,
    "lat": 43.301227,
-   "ulica": "Цариградска",
+   "ulica": "Carigradska",
    "hw": "secondary",
    "lts": 3,
    "kmh": 50,
@@ -6529,7 +6529,7 @@
  "barijere": [
   {
    "tip": "prelaz",
-   "ulica": "Булевар Медијана",
+   "ulica": "Bulevar Medijana",
    "preko": [],
    "lts": 3,
    "kmh": 50,
@@ -6545,7 +6545,7 @@
   },
   {
    "tip": "prelaz",
-   "ulica": "Булевар Медијана",
+   "ulica": "Bulevar Medijana",
    "preko": [],
    "lts": 3,
    "kmh": 50,
@@ -6561,7 +6561,7 @@
   },
   {
    "tip": "potez",
-   "ulica": "Булевар др Зорана Ђинђића",
+   "ulica": "Bulevar dr Zorana Đinđića",
    "hw": "secondary",
    "duzina_m": 189,
    "lts": 4,
@@ -6579,7 +6579,7 @@
   },
   {
    "tip": "potez",
-   "ulica": "Војводе Гојка",
+   "ulica": "Vojvode Gojka",
    "hw": "tertiary",
    "duzina_m": 159,
    "lts": 3,
@@ -6597,7 +6597,7 @@
   },
   {
    "tip": "potez",
-   "ulica": "Генерала Милојка Лешјанина",
+   "ulica": "Generala Milojka Lešjanina",
    "hw": "tertiary",
    "duzina_m": 198,
    "lts": 3,
@@ -6615,7 +6615,7 @@
   },
   {
    "tip": "potez",
-   "ulica": "Шумадијска",
+   "ulica": "Šumadijska",
    "hw": "tertiary",
    "duzina_m": 31,
    "lts": 3,
@@ -6633,7 +6633,7 @@
   },
   {
    "tip": "potez",
-   "ulica": "Књажевачка",
+   "ulica": "Knjaževačka",
    "hw": "secondary",
    "duzina_m": 30,
    "lts": 4,
@@ -6651,7 +6651,7 @@
   },
   {
    "tip": "potez",
-   "ulica": "Књажевачка",
+   "ulica": "Knjaževačka",
    "hw": "secondary",
    "duzina_m": 28,
    "lts": 4,
@@ -6669,7 +6669,7 @@
   },
   {
    "tip": "potez",
-   "ulica": "Кнегиње Љубице",
+   "ulica": "Kneginje Ljubice",
    "hw": "secondary",
    "duzina_m": 82,
    "lts": 4,
@@ -6687,7 +6687,7 @@
   },
   {
    "tip": "potez",
-   "ulica": "Генерала Милојка Лешјанина",
+   "ulica": "Generala Milojka Lešjanina",
    "hw": "tertiary",
    "duzina_m": 46,
    "lts": 3,
@@ -6710,7 +6710,7 @@
    "lon": 21.91304,
    "lat": 43.31539,
    "ulice": [
-    "Михајла Пупина"
+    "Mihajla Pupina"
    ]
   },
   {
@@ -6718,8 +6718,8 @@
    "lon": 21.88845,
    "lat": 43.3187,
    "ulice": [
-    "Др Петра Вучинића",
-    "Радована Лале Ђурића"
+    "Dr Petra Vučinića",
+    "Radovana Lale Đurića"
    ]
   },
   {
@@ -6739,7 +6739,7 @@
    "lon": 21.87912,
    "lat": 43.3142,
    "ulice": [
-    "Прокупачка"
+    "Prokupačka"
    ]
   },
   {
