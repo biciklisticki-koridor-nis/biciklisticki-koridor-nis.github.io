@@ -26,6 +26,24 @@
   </div>
 </section>
 
+<!-- ── mapa ─────────────────────────────────────────────────────── -->
+<section id="mapa" class="vazduh-section">
+  <div class="container">
+    <h2>Ko stiže do keja</h2>
+    <p class="lead" id="povezanost-lead"></p>
+    <p>LTS 1 je vožnja bezbedna i za decu, LTS 2 prijatna za većinu odraslih, LTS 3 samo za sigurne bicikliste, LTS 4 veliki stres. Kako se ocena dodeljuje stoji u <a href="#s2-1">2.1</a>, šta mapa znači po deonicama u <a href="#s2-2">2.2</a>, a šta menjati u <a href="#s2-3">2.3</a>.</p>
+    <div class="shade-map-controls">
+      <div class="chip-filters" id="map-mode" role="tablist" aria-label="Prikaz na mapi">
+        <button type="button" class="chip active" data-mode="stanovnici">Stanovnici</button>
+        <button type="button" class="chip" data-mode="ulice">Stres ulica</button>
+      </div>
+    </div>
+    <div class="heatmap-legend" id="map-legenda" style="margin-top:.6rem;"></div>
+    <div id="lts-map" aria-label="Mapa nivoa saobraćajnog stresa i povezanosti stanovnika sa kejom"></div>
+    <p class="muted" style="margin-top:.5rem; font-size:.85rem;">Ćelija je 100 × 100 m. Brojevi na mapi su prioritetne mere iz 2.3. Osnova: OpenStreetMap · stanovništvo: WorldPop 2025.</p>
+  </div>
+</section>
+
 <!-- ── 2.1 Okvir klasifikacije ─────────────────────────────────── -->
 <section id="s2-1" class="zelenilo-section">
   <div class="container">
@@ -115,17 +133,8 @@
       </table>
     </div>
 
-    <h3 style="margin-top:2.4rem;">Ko stiže do keja</h3>
-    <p class="lead" id="povezanost-lead"></p>
-    <div class="shade-map-controls">
-      <div class="chip-filters" id="map-mode" role="tablist" aria-label="Prikaz na mapi">
-        <button type="button" class="chip active" data-mode="stanovnici">Stanovnici</button>
-        <button type="button" class="chip" data-mode="ulice">Stres ulica</button>
-      </div>
-    </div>
-    <div class="heatmap-legend" id="map-legenda" style="margin-top:.6rem;"></div>
-    <div id="lts-map" aria-label="Mapa nivoa saobraćajnog stresa i povezanosti stanovnika sa kejom"></div>
-    <p class="muted" style="margin-top:.5rem; font-size:.85rem;">Ćelija je 100 × 100 m. Brojevi na mapi su prioritetne mere iz 2.3. Osnova: OpenStreetMap · stanovništvo: WorldPop 2025.</p>
+    <h3 style="margin-top:2.4rem;">Ko stiže do keja, po deonici i udaljenosti</h3>
+    <p class="lead">Brojevi iza <a href="#mapa">mape na vrhu strane</a>: isti rezultat, podeljen po deonici koridora i po udaljenosti od keja.</p>
 
     <div class="lts-dve" style="margin-top:1.6rem;">
       <div>
