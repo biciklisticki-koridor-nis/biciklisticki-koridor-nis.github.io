@@ -6,6 +6,29 @@ Format prati [Keep a Changelog](https://keepachangelog.com/sr/1.1.0/).
 ## [Neobjavljeno]
 
 ### Dodato
+- **Analiza 2 — nivo saobraćajnog stresa (LTS)**, po Mekuria, Furth i Nixon
+  (2012). Ocena 1–4 se čita iz tabela, uz pravilo najslabije karike, bez
+  težina koje bismo mi birali. Koriste se originalne tabele, ne v2.2: ta traži
+  dnevni protok vozila, a za Niš ga nema ni u jednom javnom izvoru.
+  - Bukvalno primenjen, LTS bi ceo kej ocenio sa 1: 73,3 % ose je
+    dalje od 50 m od bilo koje ulice. Zato se ocenjuje i ono što je oko keja:
+    ulice na koje izlaze ulazi, prelazi i **povezanost** — koliko stanovnika u
+    krugu od 2 km može do keja i nazad bez ulice iznad zadatog nivoa, uz
+    obilazak do 25 % (prag iz istog izvora).
+  - Osa: 12,85 km LTS 1, 1,20 km LTS 2 (ulicom), nijedan metar iznad.
+    3 prelaza u nivou, svi do LTS 2; 6 mostova iznad staze.
+  - **12 od 31** mapiranih ulaza izlazi na ulicu ocene 3 ili 4.
+  - **39,7 %** od 182.331 stanovnika do 2 km je povezano na LTS 2, **7,8 %**
+    na LTS 1 (dete samo). Medoševac 14,0 %, Brzi Brod 83,0 %.
+  - Jednosmerne ulice se poštuju u oba smera; kad bi se zanemarile, rezultat
+    bi bio 49,0 %. Najveća pretpostavka je da stambena ulica ima mali
+    protok — bez nje rezultat pada na 12,0 %. Svih sedam osetljivosti je na
+    stranici.
+  - Deset mera izabranih pohlepno (svaka uz već izabrane) priključuje
+    6.437 stanovnika, 39,7 → 43,2 %. Nijedna nije obiđena na terenu.
+  - Mreža iz Geofabrik ekstrakta Srbije (`lts_osm.py`, keš u `data/.cache/lts/`),
+    jer javni Overpass za ovoliki upit vraća 502/504. Stanovništvo iz WorldPop
+    R2025A (100 m). Novi target `make lts`; `osmium` dodat u `make venv`.
 - **Treća strana terenskog obrasca — „Pre izlaska: šta instalirati".** QR
   kodovi ka Play Store-u za NoiseCapture (merenje zvuka), OsmAnd i Organic
   Maps (mapa), plus zaseban QR ka `tacke.gpx`. Uz to uputstvo kako se GPX
@@ -51,6 +74,9 @@ Format prati [Keep a Changelog](https://keepachangelog.com/sr/1.1.0/).
   35,7 °C. Tabela sada nosi jedinicu po redu, jer nije sve u procentima.
 
 ### Popravljeno
+- `koridor.resample_line(coords, step_m)` je ignorisao `step_m` i uvek
+  koristio 10 m. Niko ga do sada nije pozivao sa drugim korakom, pa se nijedan
+  postojeći izlaz ne menja.
 - **Grafikon po satu** je crtao stubiće od tik ispod minimuma, pa je razlika
   od 1,6 °C izgledala petostruko. Sada počinju od granice kategorije, i to
   piše ispod grafikona.

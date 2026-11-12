@@ -22,6 +22,40 @@
 
     <article class="post">
       <header class="post-head">
+        <time datetime="2026-11-09">9. novembar 2026.</time>
+        <h2>Analiza 2: nivo saobraćajnog stresa, i zašto se ne ocenjuje samo kej</h2>
+      </header>
+      <p class="post-summary">Zadatak je bio da se svaki segment koridora oceni na skali LTS 1–4 i da cilj bude ceo koridor na LTS 1–2. Prva provera je pokazala da bi takva ocena bila prazna: 73,3 % biciklističke ose je dalje od 50 m od bilo koje ulice, a po tabeli 1 samostalna staza je LTS 1 po definiciji. Zato je analiza proširena na ono što ista metodologija predviđa za mrežu — ulaze, prelaze i povezanost. Rezultat: osa je 12,85 km LTS 1 i 1,20 km LTS 2, a od 182.331 stanovnika do 2 km od keja <strong>39,7 %</strong> može do njega i nazad bez ulice iznad LTS 2. Dete samo — 7,8 %. Rezultat je na <a href="2.level_of_traffic_stress.html">Analiza 2 → Nivo saobraćajnog stresa</a>.</p>
+      <div class="post-body">
+        <h3>Koje tabele: original, ne v2.2</h3>
+        <p>Furth-ove tabele postoje u tri verzije: original iz 2012 (MTI Report 11-19), v2 iz 2017. i v2.2 iz maja 2022. Najnovija za vožnju u saobraćaju traži dnevni protok vozila (ADT) po ulici. Za Niš ga nema ni u jednom javnom izvoru, a izmišljati ga po klasi ulice bilo bi gore od otvorenog korišćenja originala, koji kao zamenu za protok uzima broj traka. Tabele su preračunate u km/h; granice pojaseva su sredine između vrednosti iz tabela (25/30/35/40 mph), pa 50 km/h pada u red „30 mph", a 60 km/h u „35 mph". Tabele za obeležene biciklističke trake ne učestvuju, jer ih u OSM-u za Niš nema nijedne.</p>
+        <h3>Mreža iz PBF-a, ne sa Overpass-a</h3>
+        <p>Buka i vazduh koriste Overpass, ali za ovu analizu treba cela mreža zahvata (osa ± 3 km, sve klase puteva, sa referencama čvorova za topologiju). Javni Overpass je na takav upit vraćao 502 i 504 na tri servera, uz poruku da nije za automatizovanu upotrebu. Umesto toga se preuzima Geofabrik ekstrakt Srbije (242 MB, dnevni, proveren md5) i seče lokalno sa <code>pyosmium</code>; to je <code>lts_osm.py</code>. Seče se jednom, za minut-dva, pa je keš u <code>data/.cache/lts/</code> vezan za bbox i datum mape. U istom prolazu se uzimaju Nišava, kanali i pruge — ne kao ulice nego kao barijere, da se stanovnik ne „prikači" za ulicu preko reke.</p>
+        <h3>Graf, prelazi i čvor koji se deli</h3>
+        <p>Svako teme puta je čvor, ne samo raskrsnice, da se stanovnik može prikačiti i usred dugog bloka: 68.399 čvorova i ~62.000 ivica. Ivica nosi ocenu iz tabele 4. Prelaz se ocenjuje tabelom 6 tamo gde ulica <em>prolazi</em> kroz čvor (ima bar dve ivice u njemu); na ulicu koja se tu završava se skreće, ne prelazi je se. Kad je ocena prelaza iznad zadatog nivoa a semafora nema, čvor se deli na sektore koje ta ulica odvaja, pa rutiranje ne može da pređe na drugu stranu kroz njega. Bulevar mapiran kao dva jednosmerna kolovoza prepoznaje se po imenu i suprotnom smeru na manje od 40 m; broje se trake oba kolovoza, a razdelno ostrvo se priznaje za tabelu 6b. Bez toga bi se bulevar 3+3 ocenio kao ulica od tri trake.</p>
+        <p>Provereno na ulicama za koje se zna kakve su: Bulevar Nemanjića je 91 % LTS 4, sa 20 nesignalisanih prelaza ocene 3–4; Bulevar 12. februar 100 % LTS 4; Obrenovićeva LTS 1 kao pešačka zona.</p>
+        <h3>Jednosmerne ulice su ušle u osnovu</h3>
+        <p>Prva verzija je rutirala bez smera i davala 49,0 %. Kada je dodata osetljivost na jednosmerne ulice, rezultat je pao za skoro deset poena. Vožnja kontra smeru nije nizak stres nego prekršaj, pa je to prebačeno u osnovu: ćelija je povezana tek ako i put do keja i povratak prolaze, svaki sa svojim najkraćim putem kao merom obilaska. Neusmerena verzija je ostala kao osetljivost (49,0 %). Usput se promenio i vrh liste barijera — 73 m Vardarske koji su „priključivali" 7.600 ljudi ispali su, jer je njihov mirni nastavak jednosmeran.</p>
+        <h3>Stanovništvo i kačenje</h3>
+        <p>WorldPop R2025A (2025, 100 m, constrained) za šire područje Niša daje 255.522 stanovnika; popis 2022. kaže 249.501 za Grad Niš, a za celu Srbiju 6,71 miliona. Ćelija se kači za do 10 najbližih čvorova mreže u krugu od 150 m, ali samo ako duž te prave ne preseca reku, prugu, autoput ili ulicu iznad zadatog nivoa — inače bi kuća preko bulevara bila „povezana" preko čvora do kog ne može. Udaljenost do keja je mrežna, ne vazdušna.</p>
+        <h3>Barijere: pohlepno, jer se dobici ne sabiraju</h3>
+        <p>Kandidati su prelazi bez semafora koji seku mrežu niskog stresa i potezi ulica iznad LTS 2 do 600 m na ivici dostignutog dela mreže. Prvo rangiranje po pojedinačnom dobitku dalo je dve susedne stavke koje su rešavale istu prepreku, pa se lista nije mogla sabrati. Sada se bira pohlepno: svaka sledeća je ona koja uz već izabrane dodaje najviše. Ocena kandidata je inkrementalna Dijkstra koja kreće od postojećih rastojanja i širi samo poboljšanja — cela lista se računa za nekoliko sekundi. Deset mera priključuje 6.437 stanovnika (39,7 → 43,2 %). To je malo, i to je nalaz: od nepovezanih, većina ima put niskog stresa, ali je zaobilazan za više od 25 %.</p>
+        <h3>Greške nađene usput</h3>
+        <ul class="tech-list">
+          <li><strong>Prag obilaska ∞ je brojao nedostižne kao povezane.</strong> <code>d_k ≤ ∞·d</code> je tačno i kad je <code>d_k = ∞</code>. Osetljivost je pokazivala 100 %; sa uslovom konačnosti je 75,8 %.</li>
+          <li><strong>Sektor za kačenje stanovnika</strong> je tražen po granicama u redosledu posle rotacije liste, a ne po rastućem azimutu, pa je pravac posle 360° padao u pogrešan sektor.</li>
+          <li><strong>Mera za bulevar</strong> je glasila „semafor ili ostrvo", iako je bulevar sa dva kolovoza već ocenjen kao prelaz sa ostrvom. Za takve prelaze mera je samo semafor.</li>
+          <li><code>koridor.resample_line</code> je ignorisao argument koraka. Niko ga nije prosleđivao, pa se nijedan postojeći izlaz ne menja.</li>
+        </ul>
+        <h3>Koliko se ovim brojevima sme verovati</h3>
+        <p>Brzina je upisana na 19,7 % ulica, broj traka na 25,2 %; ostalo su pretpostavke (50 km/h, dve trake ili jedna za jednosmernu). Najosetljivija je pretpostavka da stambena ulica ima mali protok: bez nje rezultat pada na 12,0 %. Sa stvarnom brzinom 10 km/h većom od ograničenja na glavnim ulicama — 31,1 %. Bez vožnje pešačkim stazama — 34,8 %. Rezultat je zato pre optimističan nego pesimističan.</p>
+        <h3>Šta nedostaje</h3>
+        <p>Brojanje saobraćaja u nekoliko stambenih ulica bi presudilo najveću pretpostavku. Nijedna barijera iz liste nije obiđena; većina zavisi od broja traka upisanog u OSM na kratkom potezu. Za sam kej, koji je deljen sa pešacima, LTS nema šta da kaže — za to bi trebala FHWA ocena deljene staze, koja traži širinu staze i brojanje korisnika po satu na terenu.</p>
+      </div>
+    </article>
+
+    <article class="post">
+      <header class="post-head">
         <time datetime="2026-09-30">30. septembar 2026.</time>
         <h2>Bezbednosni audit: geometrija kretanja i konflikt korisnika (8.4–8.5)</h2>
       </header>

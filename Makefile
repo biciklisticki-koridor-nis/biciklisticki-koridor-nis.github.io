@@ -10,7 +10,7 @@ KML     := koridor_data.kml
 # Ekstraktuje href iz NetworkLink-a u $(SOURCE) (radi i sa CDATA wrapperom).
 KML_URL  = $(shell grep -oP '<href>\s*(<!\[CDATA\[)?\K[^]<]+' $(SOURCE))
 
-.PHONY: help convert serve fetch analyze clean all venv anketa node-deps shade canopy noise vazduh views termalni indikatori safety teren teren-pdf
+.PHONY: help convert serve fetch analyze clean all venv anketa node-deps shade canopy noise vazduh views termalni indikatori safety lts teren teren-pdf
 
 help:
 	@echo "Dostupni targeti:"
@@ -29,6 +29,7 @@ help:
 	@echo "  make fetch     - preuzima sveže podatke sa Google MyMaps (-> $(KML))"
 	@echo "  make analyze   - prikazuje pregled KML strukture (analyze.py)"
 	@echo "  make safety    - bezbednosni audit: tamne zone, stanja, konflikti -> data/safety.json"
+	@echo "  make lts       - nivo saobraćajnog stresa i povezanost (OSM PBF + WorldPop) -> data/lts.json"
 	@echo "  make teren     - merne tačke za kalibraciju buke -> docs/ + data/merne_tacke.json"
 	@echo "  make teren-pdf - obrazac za štampu sa QR kodovima -> docs/.../obrazac.pdf"
 	@echo "  make all       - ceo lanac svih koraka odozgo, redom"
@@ -37,7 +38,7 @@ help:
 venv:
 	python3 -m venv $(VENV)
 	$(VENV)/bin/pip install --upgrade pip
-	$(VENV)/bin/pip install Pillow numpy rasterio qrcode
+	$(VENV)/bin/pip install Pillow numpy rasterio qrcode osmium
 	@echo "Venv spreman: 'make convert' automatski koristi $(VENV)/bin/python"
 
 convert:
@@ -90,6 +91,9 @@ indikatori:
 safety:
 	$(PYTHON) safety.py
 
+lts:
+	$(PYTHON) lts.py
+
 teren:
 	$(PYTHON) docs/9.2-kalibracija-buke/izbor_tacaka.py
 
@@ -97,7 +101,7 @@ teren-pdf: teren
 	@test -d node_modules || { echo "Prvo: make node-deps"; exit 1; }
 	node docs/9.2-kalibracija-buke/napravi_pdf.js
 
-all: fetch convert anketa canopy noise vazduh views termalni indikatori safety teren
+all: fetch convert anketa canopy noise vazduh views termalni indikatori safety lts teren
 
 clean:
 	rm -rf data/

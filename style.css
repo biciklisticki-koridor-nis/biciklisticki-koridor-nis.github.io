@@ -1887,3 +1887,88 @@ footer a:hover { color: #fff; border-bottom-color: rgba(255,255,255,.6); }
   .sg-ime { font-size: .68rem; }
   .ci-broj { font-size: 1.4rem; }
 }
+
+/* ---------- analiza 2: nivo saobraćajnog stresa ---------- */
+.lts-badge {
+  display: inline-block;
+  min-width: 1.6em;
+  padding: .05em .45em;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: .82rem;
+  text-align: center;
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.lts-table td.num { white-space: nowrap; }
+.lts-badge[data-lts="1"] { background: #2f6b46; }
+.lts-badge[data-lts="2"] { background: #7fa05c; }
+.lts-badge[data-lts="3"] { background: #e0a03a; color: var(--ink-900); }
+.lts-badge[data-lts="4"] { background: #c0392b; }
+.senka-table .tl, .senka-table td.tl { text-align: left; }
+.senka-table tbody.lts-noshade tr:last-child td { background: #fff; }
+.lts-grid td, .lts-grid th { text-align: center !important; white-space: nowrap; }
+.lts-grid td.tl, .lts-grid th.tl { text-align: left !important; }
+.lts-tabele, .lts-dve {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.4rem;
+  margin-top: 1rem;
+}
+.lts-tabele h4, .lts-dve h4 { margin: 0 0 .6rem; font-size: .95rem; color: var(--ink-700); }
+/* bez ovoga tabela sa nowrap gura kolonu mreže šire od ekrana */
+.lts-tabele > div, .lts-dve > div { min-width: 0; }
+.lts-nota { font-size: .82rem; margin-top: .55rem; }
+.lts-strip-wrap { position: relative; margin: .6rem 0 .4rem; padding-top: 14px; }
+.lts-strip {
+  display: flex;
+  height: 26px;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.08);
+}
+.lts-strip .strip-seg { min-width: 1px; height: 100%; }
+.lts-strip-marks { position: absolute; left: 0; right: 0; top: 0; height: 14px; }
+.lts-strip-axis { position: relative; height: 1.2rem; margin-top: .3rem; font-size: .76rem; color: var(--ink-500); font-variant-numeric: tabular-nums; }
+.lts-strip-axis span { position: absolute; transform: translateX(-50%); }
+.lts-tri {
+  display: inline-block;
+  width: 0; height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 10px solid var(--ink-900);
+  vertical-align: middle;
+}
+.lts-strip-marks .lts-tri { position: absolute; top: 2px; transform: translateX(-50%); cursor: default; }
+.lts-tri-van { border-top-color: var(--ink-300); }
+.lts-tri-nivo { border-top-color: var(--warn); }
+#lts-map {
+  height: 520px;
+  width: 100%;
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+  z-index: 0;
+}
+.lts-num span {
+  display: flex; align-items: center; justify-content: center;
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  background: var(--ink-900);
+  color: #fff;
+  font-weight: 800;
+  font-size: .78rem;
+  box-shadow: 0 0 0 2px #fff, 0 2px 6px rgba(0,0,0,.3);
+}
+.lts-ok { color: var(--green-700); font-weight: 700; }
+.lts-ne { color: var(--warn); font-weight: 700; }
+.lts-minus { color: var(--warn); }
+.lts-plus { color: var(--green-700); }
+#nedostizno-bars .bar-row { grid-template-columns: minmax(180px, 2fr) 3fr auto; }
+
+@media (max-width: 640px) {
+  #lts-map { height: 380px; }
+  .lts-tabele, .lts-dve { grid-template-columns: 1fr; }
+  #nedostizno-bars .bar-row { grid-template-columns: 1fr auto; }
+}
