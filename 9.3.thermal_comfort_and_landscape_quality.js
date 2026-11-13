@@ -51,7 +51,7 @@ function renderNalazi() {
 
   const karte = [
     { broj: `${br(jak, 0)} %`, warn: true,
-      tekst: `trase je u <strong>jakom toplotnom stresu</strong> vrelog popodneva. Preostalih ${br(100 - jak, 0)} % je u umerenom — potpuno ugodnog dela nema nijedan metar.` },
+      tekst: `trase je u <strong>jakom toplotnom stresu</strong> vrelog popodneva. Preostalih ${br(100 - jak, 0)} % je u umerenom; ugodnog dela nema.` },
     { broj: `${br(u.tmrt_razlika, 0)} °C`,
       tekst: `za toliko krošnja spušta zračenje koje pada na čoveka. Na skali osećaja to je <strong>${br(u.utci_razlika)} °C</strong> i jedna cela kategorija stresa manje.` },
   ];
@@ -76,8 +76,7 @@ function renderScenario() {
     ${sc.dana_u_uzorku} najtoplijih od ${sc.dana_ukupno} dana oko letnjeg
     solsticija, ${sc.godine[0]}–${sc.godine[1]}: vazduh
     ${br(tmin)}–${br(tmax)} °C, vetar oko ${br(s[0].vetar_ms)} m/s,
-    vlažnost oko ${s[0].vlaga} %. Kišni i oblačni dani bi razblažili ono što se
-    meri — senka se ne sadi zbog njih.</p>`;
+    vlažnost oko ${s[0].vlaga} %. Kišni i oblačni dani bi razblažili rezultat, a senka se ne sadi zbog njih.</p>`;
 }
 
 /* ---------- sunce protiv senke ---------- */
@@ -95,9 +94,8 @@ function renderUporedba() {
     red(u.sunce, "Na otvorenom", colorOf(u.sunce.utci))
     + red(u.senka, "Pod krošnjom", colorOf(u.senka.utci))
     + `<p class="muted up-nota">Zračenje koje pada na telo (Tmrt) razlikuje se
-       <strong>${br(u.tmrt_razlika)} °C</strong> — ${br(u.sunce.tmrt)} prema
-       ${br(u.senka.tmrt)} °C. Osećaj se ne menja za toliko jer ga vazduh i vetar
-       delimično izravnaju, ali je razlika dovoljna da se pređe granica kategorije.</p>`;
+       <strong>${br(u.tmrt_razlika)} °C</strong>: ${br(u.sunce.tmrt)} prema
+       ${br(u.senka.tmrt)} °C. Osećaj se menja manje jer ga vazduh i vetar delimično izravnaju, ali dovoljno da se pređe granica kategorije.</p>`;
 }
 
 /* ---------- profil ---------- */
@@ -352,11 +350,11 @@ function renderCinioci() {
   const t = S.totals;
   const stavke = [
     { naslov: "Otvoreno nebo", v: `${Math.round(t.svf * 100)} %`,
-      opis: "koliko nebeskog svoda tačka prosečno vidi. Što je otvorenije, to više Sunca stiže — i to manje zaklona ima." },
+      opis: "koliko nebeskog svoda tačka prosečno vidi. Što je otvorenije, stiže više Sunca." },
     { naslov: "Senka u vrelim satima", v: `${br(t.sati_u_senci)} od ${D.sati.length} h`,
       opis: "prosečan broj sati u kojima krošnja stoji između Sunca i staze." },
     { naslov: "Zračenje na telo", v: `${br(t.tmrt)} °C`,
-      opis: "srednja radijantna temperatura. Ovo je veličina koju senka zapravo menja — vazduh se duž 13 km praktično ne menja." },
+      opis: "srednja radijantna temperatura. Nju senka menja, dok se temperatura vazduha duž 13 km praktično ne menja." },
     { naslov: "Najtoplija deonica", v: najgoraDeonica(),
       opis: "deonica sa najvišim prosečnim UTCI na izabranoj stazi." },
   ];
@@ -427,8 +425,7 @@ function renderPredasi() {
       je mapirano ${kl.ukupno} klupa. Od njih ${kl.bez_senke} nema
       <strong>nijedan sat senke</strong> između ${D.sati[0]} i ${D.sati[D.sati.length - 1]} časova,
       a ${kl.u_trajnoj_senci === 0 ? "nijedna nije" : `samo ${kl.u_trajnoj_senci} je`}
-      u senci ceo taj deo dana. Prosečan UTCI na klupi je ${br(kl.utci)} °C —
-      ${kl.kategorija}. Sesti na njih u letnje popodne nije odmor.</p>`;
+      u senci ceo taj deo dana. Prosečan UTCI na klupi je ${br(kl.utci)} °C, ${kl.kategorija}.</p>`;
   } else {
     $("klupe-callout").hidden = true;
   }
@@ -498,14 +495,11 @@ function renderPredeo() {
   if (zapad.length && istok.length && sZapad.length && sIstok.length) {
     $("predeo-callout").innerHTML = `
       <p><strong>Ista krošnja, dve strane.</strong> Na zapadnoj polovini
-      (Medoševac, Centar) reka se vidi sa ${br(sr(zapad), 0)} % trase — ali
-      senke tamo ima ${br(sr(sZapad))} sata od ${D.sati.length}. Na istočnoj
+      (Medoševac, Centar) reka se vidi sa ${br(sr(zapad), 0)} % trase, a senke ima ${br(sr(sZapad))} sata od ${D.sati.length}. Na istočnoj
       (Brzi Brod, Niška Banja) pogled pada na ${br(sr(istok), 0)} %, a senke
-      ima ${br(sr(sIstok))} sata. Drveće koje zaklanja reku isto je ono koje
-      pravi hlad, i to se vidi u brojevima: <strong>sav gubitak pogleda otpada
+      ima ${br(sr(sIstok))} sata. Reku zaklanja isto drveće koje pravi hlad: <strong>sav gubitak pogleda otpada
       na zelenilo</strong>, jer je geometrijski reka vidljiva sa cele trase.
-      Odluka gde se seče i gde se sadi zato nije popravka jednog bez cene po
-      drugo, nego izbor između pogleda i hlada.</p>`;
+      Seča i sadnja su zato izbor između pogleda i hlada.</p>`;
   }
 }
 

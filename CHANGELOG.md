@@ -73,6 +73,16 @@ Format prati [Keep a Changelog](https://keepachangelog.com/sr/1.1.0/).
 - **Termalni komfor u tabeli pokazatelja** na `analize.html`: 36,3 / 36,4 /
   35,7 °C. Tabela sada nosi jedinicu po redu, jer nije sve u procentima.
 
+### Izmenjeno
+- Tekstovi na glavnoj strani, spisku analiza i analizama 2, 8, 9.1, 9.2 i 9.3
+  su skraćeni (125 pasusa, oko 16 % kraće). Brojevi, linkovi i sadržaj su
+  isti; izbačena su ponavljanja i umetnute rečenice. Usput je ispravljeno
+  ćirilično slovo u reči „bezbedan" na stranici 8.
+- Odgovori i komentari iz ankete na glavnoj strani su na latinici, kao i ostatak
+  sajta. `anketa.py` ih preslovljava pre brojanja, pa se isti odgovor napisan
+  na dva pisma računa jednom; brojevi se nisu promenili. Preslovljavanje je u
+  novom modulu `latinica.py`, koji koristi i `lts.py`.
+
 ### Popravljeno
 - `koridor.resample_line(coords, step_m)` je ignorisao `step_m` i uvek
   koristio 10 m. Niko ga do sada nije pozivao sa drugim korakom, pa se nijedan

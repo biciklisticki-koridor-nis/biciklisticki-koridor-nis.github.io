@@ -267,9 +267,7 @@ function dodajMerneTacke(m) {
   });
   $("merne-tacke-nota").innerHTML =
     `Crne tačke su <strong>${T.tacke.length} planiranih mesta merenja</strong>.
-     Birane su tako da pokriju ceo raspon modela, od najtišeg do najbučnijeg dela
-     trase — jer raspon, a ne broj merenja, određuje koliko će prevod u decibele
-     biti pouzdan. Tamnije tačke su parovi gornji/donji bedem na istoj kilometraži.
+     Pokrivaju ceo raspon modela, od najtišeg do najbučnijeg dela trase, jer od raspona zavisi koliko će prevod u decibele biti pouzdan. Tamnije tačke su parovi gornji/donji bedem na istoj kilometraži.
      <a href="${T.gpx}">GPX za telefon</a> ·
      <a href="docs/9.2-kalibracija-buke/obrazac.pdf">obrazac za štampu (PDF)</a>`;
 }
@@ -327,7 +325,7 @@ function stanicaPo(kod) { return A.stanice.find(s => s.kod === kod); }
 function ulogaOf(kod) {
   if (kod === A.reprezentativna) {
     return { znak: "predstavlja kej", glavna: true,
-             opis: "Najbliža stazi i pozadinskog tipa — meri vazduh kakav dišu ljudi na keju, bez uticaja jedne konkretne ulice. Svi nivoi na ovoj stranici dolaze odavde." };
+             opis: "Najbliža stazi i pozadinskog tipa: meri vazduh koji dišu ljudi na keju, bez uticaja jedne ulice. Svi nivoi na ovoj stranici su odavde." };
   }
   if (kod === A.saobracajna) {
     return { znak: "daje saobraćajni deo",
@@ -433,10 +431,7 @@ function renderCams() {
   const spisak = red.map(p =>
     `${ZAG_KRATKO[p]} <strong>${br(A.cams[p].odnos, 1)}×</strong>`).join(", ");
   $("cams-callout").innerHTML = `
-    <p><strong>Brojevi su se popravili nagore.</strong> Ova stranica je do sada prikazivala
-    satelitski model, jer je bio jedini izvor koji nam je bio poznat. Na istim danima on
-    daje niže vrednosti od onoga što stanica izmeri: ${spisak} niže. Sve što sledi je
-    merenje, a ne procena.</p>`;
+    <p><strong>Izmerene vrednosti su više.</strong> Stranica je ranije prikazivala satelitski model, jedini izvor koji smo tada znali. Na istim danima on daje niže vrednosti od stanice: ${spisak} niže. Sve što sledi je merenje.</p>`;
 }
 
 function renderZagadjivaci() {
@@ -484,11 +479,10 @@ function renderZakon() {
   const najgora = s.godine[vals.indexOf(Math.max(...vals))];
   const svePreko = vals.every(n => n > dop);
   $("zakon-callout").innerHTML = `
-    <p><strong>Granica nije prekoračena — ona se prekoračuje redovno.</strong>
-    ${svePreko ? "U svakoj od" : "U"} ${s.godine.length} godina za koje postoje merenja
-    PM10 je prešao dnevnu granicu između <strong>${Math.min(...vals)}</strong> i
+    <p><strong>Granica se prekoračuje redovno.</strong>
+    ${svePreko ? "U svakoj od" : "U"} ${s.godine.length} godina sa merenjima PM10 je prešao dnevnu granicu između <strong>${Math.min(...vals)}</strong> i
     <strong>${Math.max(...vals)}</strong> dana, a zakon dopušta ${dop}. Najgora je bila
-    ${najgora[0]}. godina, sa ${najgora[1]} dana — što je
+    ${najgora[0]}. godina, sa ${najgora[1]} dana,
     ${br(najgora[1] / dop)}× više od dopuštenog.</p>`;
 }
 

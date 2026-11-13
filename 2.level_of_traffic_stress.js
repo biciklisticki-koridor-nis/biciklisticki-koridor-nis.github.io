@@ -48,15 +48,15 @@ function renderNalazi() {
   const iznad2 = Object.entries(km).filter(([k]) => +k > 2).reduce((a, [, v]) => a + v, 0);
   const tiles = [
     { v: br(r.lts2_pct) + " %", warn: true,
-      tekst: `stanovnika u krugu od ${D.povezanost.zahvat_m / 1000} km stiže do keja i nazad bez ijedne ulice iznad <strong>LTS 2</strong> — od ${ceo(r.stanovnika)} koliko ih tu živi.` },
+      tekst: `stanovnika do ${D.povezanost.zahvat_m / 1000} km stiže do keja i nazad bez ulice iznad <strong>LTS 2</strong>, od ${ceo(r.stanovnika)} koliko ih tu živi.` },
     { v: br(r.lts1_pct) + " %", warn: true,
       tekst: "može da stigne <strong>dete samo</strong> (LTS 1). Mreža za decu su gotovo samo parkovske i pešačke staze." },
     { v: `${n34} od ${ul.length}`, warn: n34 > 0,
-      tekst: "mapiranih ulaza u koridor izlazi na ulicu ocene <strong>3 ili 4</strong> — to je ulica kojom se do keja mora doći." },
+      tekst: "mapiranih ulaza izlazi na ulicu ocene <strong>3 ili 4</strong>, kojom se do keja mora doći." },
     { v: br(km["1"] || 0) + " km", warn: false,
       tekst: iznad2 > 0
         ? `ose je LTS 1. Iznad LTS 2 je ${br(iznad2)} km.`
-        : "ose je LTS 1, a nijedan metar nije iznad LTS 2. Sam kej nije problem — put do njega jeste." },
+        : "ose je LTS 1, a nijedan metar nije iznad LTS 2. Problem je put do keja, ne sam kej." },
   ];
   $("nalazi").innerHTML = tiles.map(x => `
     <div class="nalaz${x.warn ? " nalaz-warn" : ""}">
@@ -94,7 +94,7 @@ function renderTabele() {
   $("t6").querySelector("tbody").classList.add("lts-noshade");
 
   const u = D.osa.udaljenost_od_ulice_pct;
-  $("zamka").innerHTML = `Po tabeli 1, staza odvojena od saobraćaja ima LTS 1 po definiciji. A <strong>${br(u.preko_50 || 0)} %</strong> biciklističke ose je dalje od 50 m od bilo koje ulice, a samo ${br(u.do_10 || 0)} % bliže od 10 m. Bukvalno primenjen, LTS bi ceo kej obojio jednom bojom i ne bi rekao ništa. Stres na ovom koridoru nije na stazi nego na ulazu — u ulicama kojima se do keja stiže i u prelazima preko njih.`;
+  $("zamka").innerHTML = `Po tabeli 1, staza odvojena od saobraćaja je LTS 1. <strong>${br(u.preko_50 || 0)} %</strong> biciklističke ose je dalje od 50 m od bilo koje ulice, a samo ${br(u.do_10 || 0)} % bliže od 10 m, pa bi ceo kej dobio istu ocenu. Stres je na ulazu: u ulicama kojima se do keja stiže i na prelazima preko njih.`;
 
   const p = D.podaci;
   const tiles = [
@@ -220,7 +220,7 @@ function renderUlazi() {
 
 function renderPovezanost() {
   const r = r2();
-  $("povezanost-lead").innerHTML = `Od ${ceo(r.stanovnika)} stanovnika koji žive do ${D.povezanost.zahvat_m / 1000} km od keja — mrežom ulica i staza, ne vazdušnom linijom — <strong>${br(r.lts2_pct)} %</strong> može do keja i nazad ulicama i stazama ocene najviše LTS 2, uz obilazak do 25 %. Za decu (LTS 1) to je ${br(r.lts1_pct)} %, za sigurne bicikliste (LTS 3) ${br(r.lts3_pct)} %.`;
+  $("povezanost-lead").innerHTML = `Od ${ceo(r.stanovnika)} stanovnika do ${D.povezanost.zahvat_m / 1000} km od keja (mereno mrežom ulica i staza) <strong>${br(r.lts2_pct)} %</strong> može do keja i nazad putem ocene najviše LTS 2, uz obilazak do 25 %. Za decu (LTS 1) to je ${br(r.lts1_pct)} %, za sigurne bicikliste (LTS 3) ${br(r.lts3_pct)} %.`;
 
   const pctCell = (v, best) => `<td class="num${best ? " pk-best" : ""}">${br(v)} %</td>`;
   const deo = D.povezanost.po_deonici;
@@ -268,7 +268,7 @@ function renderPovezanost() {
   const share = x => br(x.v / (tot - r.lts2) * 100, 0);
   let uvod;
   if (najveci === delovi[1]) {
-    uvod = `<strong>Najveći deo nepovezanih može do keja mirnim ulicama — ali zaobilazno.</strong> ${share(najveci)} % njih ima put niskog stresa, ali je duži od najkraćeg za više od 25 %. Mirna mreža postoji; ono što fali su prečice preko bulevara.`;
+    uvod = `<strong>Najveći deo nepovezanih ima miran put do keja, ali predug.</strong> ${share(najveci)} % njih ima put niskog stresa koji je više od 25 % duži od najkraćeg. Fale prečice preko bulevara.`;
   } else if (najveci === delovi[2]) {
     uvod = `<strong>Najveći deo nepovezanih je zaključan smerom.</strong> ${share(najveci)} % njih ima mirnu ulicu do keja, ali ona vodi samo u jednom smeru ili je obilazak ogroman.`;
   } else {
@@ -422,16 +422,16 @@ function renderCiljevi() {
 
   const top = c.top_prikljucuje;
   $("barijere-callout").querySelector("p").innerHTML =
-    `<strong>Deset mera zajedno priključuje ${ceo(top)} stanovnika</strong> — povezanost raste sa ${br(c.povezano_lts2_pct)} na ${br(c.povezano_lts2_posle_top)} %. To je malo, i to je nalaz: nepovezanost nije u nekoliko uskih grla nego u celoj mreži jednosmernih i višetračnih ulica. Nijedna tačka nije obiđena na terenu, a većina zavisi od broja traka upisanog u OSM na kratkom potezu.`;
+    `<strong>Deset mera zajedno priključuje ${ceo(top)} stanovnika</strong>: povezanost raste sa ${br(c.povezano_lts2_pct)} na ${br(c.povezano_lts2_posle_top)} %. To je malo, jer je nepovezana cela mreža jednosmernih i višetračnih ulica, a ne nekoliko uskih grla. Nijedna tačka nije obiđena na terenu, a većina zavisi od broja traka upisanog u OSM na kratkom potezu.`;
 
   // pešaci na keju — iz ankete
   if (ANKETA) {
     const q = ANKETA.questions.find(x => x.key === "purpose") ||
-      ANKETA.questions.find(x => (x.answers || []).some(a => a.label.startsWith("Вожња бицикла")));
+      ANKETA.questions.find(x => (x.answers || []).some(a => a.label.startsWith("Vožnja bicikla")));
     const get = pref => ((q && q.answers) || []).find(a => a.label.startsWith(pref));
-    const set = get("Шетња"), bic = get("Вожња бицикла");
+    const set = get("Šetnja"), bic = get("Vožnja bicikla");
     if (set && bic) {
-      $("deljena-tekst").innerHTML = `LTS meri stres od automobila, ne od pešaka — a kej je pre svega šetalište. U anketi je <strong>${set.count} od ${ANKETA.total}</strong> ispitanika reklo da kej koristi za šetnju, a ${bic.count} za vožnju bicikla. <a href="https://nacto.org/publication/urban-bikeway-design-guide/designing-ages-abilities-new/" target="_blank" rel="noopener">NACTO-ov vodič za infrastrukturu za sve uzraste</a> ima red baš za ovakav prostor, za prirodne koridore i obale reka: kad je pešaka mnogo, preporuka je biciklistička staza sa odvojenim šetalištem; deljena staza tek kad ih je malo.`;
+      $("deljena-tekst").innerHTML = `LTS meri stres od automobila, a kej je pre svega šetalište. U anketi je <strong>${set.count} od ${ANKETA.total}</strong> ispitanika reklo da kej koristi za šetnju, a ${bic.count} za vožnju bicikla. <a href="https://nacto.org/publication/urban-bikeway-design-guide/designing-ages-abilities-new/" target="_blank" rel="noopener">NACTO-ov vodič za infrastrukturu za sve uzraste</a> za prirodne koridore i obale reka preporučuje biciklističku stazu sa odvojenim šetalištem kad je pešaka mnogo, a deljenu stazu samo kad ih je malo.`;
     }
   }
 }

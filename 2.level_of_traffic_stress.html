@@ -15,7 +15,7 @@
   <div class="container">
     <p class="eyebrow"><a href="index.html">Nišavski biciklistički koridor</a> · <a href="analize.html">Analize</a> · 2. Nivo saobraćajnog stresa</p>
     <h1>2. Nivo saobraćajnog stresa</h1>
-    <p class="subtitle">Koliko je stresno doći do keja biciklom — po priznatoj skali od 1 do 4, ne po našoj proceni.</p>
+    <p class="subtitle">Koliko je stresno doći do keja biciklom, po priznatoj skali od 1 do 4.</p>
   </div>
 </header>
 
@@ -31,7 +31,7 @@
   <div class="container">
     <h2>Ko stiže do keja</h2>
     <p class="lead" id="povezanost-lead"></p>
-    <p>LTS 1 je vožnja bezbedna i za decu, LTS 2 prijatna za većinu odraslih, LTS 3 samo za sigurne bicikliste, LTS 4 veliki stres. Kako se ocena dodeljuje stoji u <a href="#s2-1">2.1</a>, šta mapa znači po deonicama u <a href="#s2-2">2.2</a>, a šta menjati u <a href="#s2-3">2.3</a>.</p>
+    <p>LTS 1 je bezbedno i za decu, LTS 2 prijatno za većinu odraslih, LTS 3 samo za sigurne bicikliste, LTS 4 veliki stres. Metod je u <a href="#s2-1">2.1</a>, stanje po deonicama u <a href="#s2-2">2.2</a>, mere u <a href="#s2-3">2.3</a>.</p>
     <div class="shade-map-controls">
       <div class="chip-filters" id="map-mode" role="tablist" aria-label="Prikaz na mapi">
         <button type="button" class="chip active" data-mode="stanovnici">Stanovnici</button>
@@ -48,7 +48,7 @@
 <section id="s2-1" class="zelenilo-section">
   <div class="container">
     <h2>2.1 Okvir klasifikacije</h2>
-    <p class="lead">Nivo saobraćajnog stresa (<em>Level of Traffic Stress</em>, LTS) je danas najšire korišćen način da se oceni da li je neka ulica pogodna za bicikl. Definisali su ga Mekuria, Furth i Nixon 2012. godine, a četiri nivoa su kalibrisana prema holandskim projektnim kriterijumima. Nivo nije ocena koju mi dajemo: ulica ga dobija iz tabele, prema brzini i broju traka.</p>
+    <p class="lead">Nivo saobraćajnog stresa (<em>Level of Traffic Stress</em>, LTS) je najšire korišćen način da se oceni da li je ulica pogodna za bicikl. Definisali su ga Mekuria, Furth i Nixon 2012, prema holandskim projektnim kriterijumima. Ulica dobija nivo iz tabele, prema brzini i broju traka.</p>
 
     <div class="table-scroll">
       <table class="senka-table lts-table" id="lts-nivoi">
@@ -64,14 +64,14 @@
     </div>
 
     <h3 style="margin-top:2rem;">Koje tabele i zašto</h3>
-    <p>Svaka ulica dobija <strong>najgoru</strong> ocenu po bilo kojoj dimenziji — ako je brzina za LTS 2, a broj traka za LTS 4, ulica je LTS 4. Ništa se ne sabira i nema težina koje bismo mi birali.</p>
-    <p>Koriste se <strong>originalne tabele iz 2012</strong>, a ne najnovija verzija 2.2 (Furth, maj 2022). Verzija 2.2 traži dnevni protok vozila za svaku ulicu, a za Niš takav podatak ne postoji ni u jednom javnom izvoru. Original koristi broj traka kao zamenu za protok, i to je jedino što se ovde može pošteno primeniti. Brzine su preračunate iz milja na sat u km/h; granice pojaseva su sredine između vrednosti iz tabela.</p>
+    <p>Svaka ulica dobija <strong>najgoru</strong> ocenu po bilo kojoj dimenziji: ako je brzina za LTS 2, a broj traka za LTS 4, ulica je LTS 4. Ništa se ne sabira i nema težina.</p>
+    <p>Koriste se <strong>originalne tabele iz 2012</strong>. Verzija 2.2 (Furth, 2022) traži dnevni protok vozila po ulici, a za Niš ga nema u javnim izvorima; original umesto protoka koristi broj traka. Brzine su preračunate iz milja na sat u km/h, a granice pojaseva su sredine između vrednosti iz tabela.</p>
 
     <div class="lts-tabele">
       <div>
         <h4>Vožnja u saobraćaju (tabela 4)</h4>
         <div class="table-scroll"><table class="senka-table lts-table lts-grid" id="t4"></table></div>
-        <p class="muted lts-nota">Gde stoje dve vrednosti, niža važi za ulicu bez središnje linije i sa malim protokom. Taj proxy je klasa ulice: stambena ulica, prilaz, poljski put i zona usporenog saobraćaja.</p>
+        <p class="muted lts-nota">Gde stoje dve vrednosti, niža važi za ulicu bez središnje linije i sa malim protokom. Mali protok se pretpostavlja po klasi ulice: stambena ulica, prilaz, poljski put i zona usporenog saobraćaja.</p>
       </div>
       <div>
         <h4>Prelaz bez semafora (tabela 6)</h4>
@@ -88,7 +88,7 @@
     <ul class="lead-list">
       <li><strong>osa</strong> — gde staza zaista ide ulicom i gde je preseca u nivou;</li>
       <li><strong>ulazi</strong> — na kakvu ulicu izlazi svaki od mapiranih prilaza keju;</li>
-      <li><strong>povezanost</strong> — koliki deo stanovnika u krugu od 2 km može da stigne do keja i nazad a da nijednom ne pređe zadati nivo, uz obilazak najviše 25 % duži od najkraćeg puta. Prag od 25 % je iz istog izvora.</li>
+      <li><strong>povezanost</strong> — koliki deo stanovnika do 2 km može do keja i nazad bez prelaska zadatog nivoa, putem najviše 25 % dužim od najkraćeg. Prag od 25 % je iz istog izvora.</li>
       <li><strong>barijere</strong> — koje bi pojedinačne mere priključile najviše ljudi.</li>
     </ul>
 
@@ -103,7 +103,7 @@
     <h2>2.2 Postojeće stanje</h2>
 
     <h3>Osa koridora</h3>
-    <p class="lead">Na kom delu biciklističke staze vozite uz automobile, i gde ih preseca.</p>
+    <p class="lead">Gde se na biciklističkoj stazi vozi uz automobile i gde je oni presecaju.</p>
     <div class="shade-stats" id="osa-stats"></div>
     <div class="heatmap-legend" id="lts-legenda-osa" style="margin-top:1rem;"></div>
     <div class="lts-strip-wrap">
@@ -125,7 +125,7 @@
     </div>
 
     <h3 style="margin-top:2.4rem;">Ulazi u koridor</h3>
-    <p class="lead">Za svaki mapirani prilaz keju: kakva je ulica na koju izlazi. To je ulica kojom se do koridora mora doći.</p>
+    <p class="lead">Na kakvu ulicu izlazi svaki mapirani prilaz keju. Tom ulicom se do koridora mora doći.</p>
     <div class="bars" id="ulazi-bars"></div>
     <div class="table-scroll" style="margin-top:1.4rem;">
       <table class="senka-table lts-table" id="ulazi-table">
@@ -134,7 +134,7 @@
     </div>
 
     <h3 style="margin-top:2.4rem;">Ko stiže do keja, po deonici i udaljenosti</h3>
-    <p class="lead">Brojevi iza <a href="#mapa">mape na vrhu strane</a>: isti rezultat, podeljen po deonici koridora i po udaljenosti od keja.</p>
+    <p class="lead">Rezultat sa <a href="#mapa">mape na vrhu strane</a>, podeljen po deonici i po udaljenosti od keja.</p>
 
     <div class="lts-dve" style="margin-top:1.6rem;">
       <div>
@@ -159,7 +159,7 @@
 <section id="s2-3" class="zelenilo-section">
   <div class="container">
     <h2>2.3 Ciljni nivoi stresa</h2>
-    <p class="lead">Cilj je da ceo Nišavski koridor bude LTS 1–2. Za kej se taj cilj raspada na četiri merljiva dela, jer sam kej uglavnom već jeste LTS 1 — ono što nije, jeste put do njega.</p>
+    <p class="lead">Cilj je da ceo koridor bude LTS 1–2. Sam kej je uglavnom već LTS 1, pa se cilj deli na četiri merljiva dela koji obuhvataju i put do njega.</p>
 
     <div class="table-scroll">
       <table class="senka-table lts-table" id="ciljevi-table">
@@ -168,7 +168,7 @@
     </div>
 
     <h3 style="margin-top:2.2rem;">Gde početi</h3>
-    <p class="lead">Deset mera koje bi priključile najviše stanovnika. Svaka sledeća je izabrana tek pošto su prethodne već urađene, pa se brojevi u koloni <em>priključuje</em> sabiraju.</p>
+    <p class="lead">Deset mera koje bi priključile najviše stanovnika. Svaka je izabrana pod pretpostavkom da su prethodne urađene, pa se brojevi u koloni <em>priključuje</em> sabiraju.</p>
     <div class="table-scroll">
       <table class="senka-table lts-table" id="barijere-table">
         <caption class="sr-only">Prioritetne mere za povezanost niskog stresa</caption>
@@ -178,10 +178,10 @@
 
     <h3 style="margin-top:2.2rem;">Sam kej: staza deljena sa pešacima</h3>
     <p id="deljena-tekst"></p>
-    <p>Kej već ima tri paralelne staze na razmaku od oko devet metara — biciklističku i pešačke na gornjem i donjem bedemu. To je argument za jasnu podelu postojećih staza, ne za novu gradnju. Koliko je to hitno pokazala bi <a href="https://www.fhwa.dot.gov/publications/research/safety/pedbike/05138/" target="_blank" rel="noopener">FHWA ocena deljene staze</a> (od A do F), koja traži širinu staze i brojanje korisnika po satu na terenu. Taj podatak još nemamo.</p>
+    <p>Kej već ima tri paralelne staze na oko devet metara razmaka, pa je dovoljna jasna podela postojećih staza, bez nove gradnje. Koliko je to hitno pokazala bi <a href="https://www.fhwa.dot.gov/publications/research/safety/pedbike/05138/" target="_blank" rel="noopener">FHWA ocena deljene staze</a> (od A do F), za koju trebaju širina staze i brojanje korisnika po satu. Te podatke još nemamo.</p>
 
     <h3 style="margin-top:2.2rem;">Propisi</h3>
-    <p>Srbija nema obavezujući pravilnik o projektovanju biciklističke infrastrukture; Državna revizorska institucija je to navela kao nedostatak. Ciljne širine se zato mogu citirati samo iz regionalnih i međunarodnih priručnika — na primer, 2,0 m za dvosmernu biciklističku stazu po hrvatskom pravilniku iz 2016, ili 3,0 m za dvosmernu deljenu stazu po AASHTO-u. To su reference, ne zakon.</p>
+    <p>Srbija nema obavezujući pravilnik o projektovanju biciklističke infrastrukture, što je Državna revizorska institucija navela kao nedostatak. Ciljne širine se zato navode iz stranih priručnika, na primer 2,0 m za dvosmernu biciklističku stazu (hrvatski pravilnik iz 2016) ili 3,0 m za dvosmernu deljenu stazu (AASHTO). To su reference, ne zakon.</p>
   </div>
 </section>
 
@@ -189,7 +189,7 @@
 <section class="metod-section">
   <div class="container">
     <h2>Kako čitati ove podatke</h2>
-    <p class="lead">Svaki broj na ovoj strani zavisi od nekoliko pretpostavki. Tabela pokazuje koliko se glavni rezultat pomera kad se svaka od njih promeni — svaki put samo jedna.</p>
+    <p class="lead">Svaki broj ovde zavisi od nekoliko pretpostavki. Tabela pokazuje koliko se glavni rezultat pomeri kad se promeni jedna po jedna.</p>
     <div class="table-scroll">
       <table class="senka-table lts-table" id="osetljivost-table">
         <caption class="sr-only">Osetljivost glavnog rezultata na pretpostavke</caption>
@@ -199,15 +199,15 @@
     <div class="metod-grid" style="margin-top:2rem;">
       <div class="metod-item">
         <h4>Najveća pretpostavka: stambene ulice</h4>
-        <p>Tabela 4 daje stambenoj ulici na 50 km/h ocenu LTS 2 samo ako nema središnju liniju i ima manje od 3.000 vozila dnevno. To ne znamo ni za jednu ulicu u Nišu, pa klasa ulice služi kao zamena. <span id="m-stambene"></span> Brojanje saobraćaja u nekoliko stambenih ulica bila bi najvrednija dopuna ove analize.</p>
+        <p>Tabela 4 daje stambenoj ulici na 50 km/h LTS 2 samo ako nema središnju liniju i ima manje od 3.000 vozila dnevno. To ne znamo ni za jednu ulicu u Nišu, pa se koristi klasa ulice. <span id="m-stambene"></span> Brojanje saobraćaja u nekoliko stambenih ulica najviše bi popravilo ovu analizu.</p>
       </div>
       <div class="metod-item">
         <h4>Brzine su uglavnom pretpostavljene</h4>
-        <p>Ograničenje brzine je u OpenStreetMap-u upisano na manjem delu ulica; ostale dobijaju 50 km/h, zakonsko ograničenje u naselju. Furth traži stvarnu brzinu vožnje, a na bulevarima je ona po pravilu veća od ograničenja. Zato je rezultat pre optimističan nego pesimističan.</p>
+        <p>Ograničenje brzine je u OpenStreetMap-u upisano za manji deo ulica; ostale dobijaju 50 km/h, zakonsko ograničenje u naselju. Furth traži stvarnu brzinu, koja je na bulevarima obično veća, pa je rezultat verovatno optimističan.</p>
       </div>
       <div class="metod-item">
         <h4>Jednosmerne ulice se poštuju</h4>
-        <p>Put mora da postoji u oba smera — do keja i nazad. Vožnja kontra smeru nije nizak stres nego prekršaj, osim gde je znakom dozvoljena. <span id="m-jednosmerne"></span> To je jedan od glavnih nalaza: u gustom delu grada mirna ulica često vodi samo u jednom smeru.</p>
+        <p>Put mora da postoji u oba smera, do keja i nazad. Vožnja u kontra smeru je prekršaj, osim gde je znakom dozvoljena. <span id="m-jednosmerne"></span> U gustom delu grada mirna ulica često vodi samo u jednom smeru.</p>
       </div>
       <div class="metod-item">
         <h4>Prelazi samo na raskrsnicama</h4>
@@ -215,15 +215,15 @@
       </div>
       <div class="metod-item">
         <h4>Stanovnici su procena</h4>
-        <p>WorldPop 2025 raspoređuje stanovništvo po ćelijama od 100 m prema zgradama sa satelitskih snimaka i usklađuje ga sa popisom. Za ceo Niš daje oko 255.000 ljudi; popis 2022. kaže 249.501. Ćelija se kači za do deset najbližih tačaka mreže u krugu od 150 m, ali nikad preko reke, pruge, autoputa ili ulice iznad zadatog nivoa.</p>
+        <p>WorldPop 2025 raspoređuje stanovništvo po ćelijama od 100 m prema zgradama sa satelitskih snimaka i usklađuje ga sa popisom: za Niš daje oko 255.000 ljudi, a popis 2022. 249.501. Ćelija se vezuje za do deset najbližih tačaka mreže u krugu od 150 m, ali ne preko reke, pruge, autoputa ili ulice iznad zadatog nivoa.</p>
       </div>
       <div class="metod-item">
         <h4>Koridor je naša mapa, ne OSM</h4>
-        <p>Na delu ose OSM nema stazu, pa se ulaz u koridor ne izvodi iz OSM-a nego iz naše ose i mapiranih prilaza. Most nad kejom nije ulaz — sa njega se ne silazi. Stepenice nisu deo mreže za bicikl.</p>
+        <p>Na delu ose OSM nema stazu, pa se ulazi u koridor uzimaju iz naše ose i mapiranih prilaza. Most nad kejom nije ulaz jer se sa njega ne silazi. Stepenice nisu deo mreže za bicikl.</p>
       </div>
       <div class="metod-item">
         <h4>Ništa nije provereno na terenu</h4>
-        <p>Barijere iz 2.3 su kandidati, ne zaključci. Mnoge zavise od toga da li je broj traka u OSM-u tačan na kratkom potezu. Pre nego što se neka predloži gradu, treba je obići.</p>
+        <p>Barijere iz 2.3 su kandidati. Mnoge zavise od tačnosti broja traka u OSM-u na kratkom potezu, pa svaku treba obići pre nego što se predloži gradu.</p>
       </div>
     </div>
     <p class="muted metod-foot" id="metod-foot"></p>
