@@ -769,14 +769,14 @@ const ANKETA_PALETTE = ["#2f6b46", "#4a9367", "#d8a93a", "#c08a4f", "#4f87a5", "
 function anketaColor(label, idx) {
   const l = (label || "").toLowerCase();
   // pozitivno (zeleno)
-  if (l.includes("сигурно") || l === "да" || l.includes("свакодневно")) return "#2f6b46";
-  if (l.includes("неколико пута")) return "#4a9367";
+  if (l.includes("sigurno") || l === "da" || l.includes("svakodnevno")) return "#2f6b46";
+  if (l.includes("nekoliko puta")) return "#4a9367";
   // umereno (žuto)
-  if (l.includes("повремено") || l.includes("можда") || l.includes("викенд")) return "#d8a93a";
+  if (l.includes("povremeno") || l.includes("možda") || l.includes("vikend")) return "#d8a93a";
   // pasivno (siva)
-  if (l.includes("информи") || l.includes("нисам сигуран")) return "#9aa5a2";
+  if (l.includes("informi") || l.includes("nisam siguran")) return "#9aa5a2";
   // negativno (crveno)
-  if (l === "не" || l.includes("никад")) return "#c0392b";
+  if (l === "ne" || l.includes("nikad")) return "#c0392b";
   return ANKETA_PALETTE[idx % ANKETA_PALETTE.length];
 }
 

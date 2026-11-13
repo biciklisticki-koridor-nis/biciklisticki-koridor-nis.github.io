@@ -43,6 +43,7 @@ import numpy as np
 
 from koridor import (DEONICE_FILE, MREZA_FILE, ROOT, load_mreza, planar_xy,
                      prepare)
+from latinica import latin
 from lts_osm import extract
 
 OUT_FILE = os.path.join(ROOT, "data", "lts.json")
@@ -217,29 +218,6 @@ def lanes_of(tags):
         if tok.isdigit() and int(tok) > 0:
             return int(tok), "tag"
     return (1 if is_oneway(tags) else 2), "pretpostavka"
-
-
-_CYR = dict(zip("абвгдђежзијклљмнњопрстћуфхцчџш",
-                ["a","b","v","g","d","đ","e","ž","z","i","j","k","l","lj","m","n","nj",
-                 "o","p","r","s","t","ć","u","f","h","c","č","dž","š"]))
-
-
-def latin(s):
-    """Srpska ćirilica → latinica (OSM `name` je na ćirilici, sajt je na latinici)."""
-    if not s:
-        return s
-    out = []
-    for i, ch in enumerate(s):
-        lo = ch.lower()
-        if lo not in _CYR:
-            out.append(ch)
-            continue
-        t = _CYR[lo]
-        if ch != lo:  # veliko slovo: Lj u reči, LJ kad je i sledeće slovo veliko
-            nxt = s[i + 1] if i + 1 < len(s) else ""
-            t = t.upper() if len(t) > 1 and nxt.isupper() else t.capitalize()
-        out.append(t)
-    return "".join(out)
 
 
 def street_key(way):
@@ -1093,7 +1071,8 @@ def connectivity(cells, d_all, d_k, radius, detour):
 def inputs_hash(osm_stamp):
     h = hashlib.sha1()
     for f in (MREZA_FILE, DEONICE_FILE, STEPENICE_FILE, PREKIDI_FILE, __file__,
-              os.path.join(ROOT, "lts_osm.py"), os.path.join(ROOT, "koridor.py")):
+              os.path.join(ROOT, "lts_osm.py"), os.path.join(ROOT, "koridor.py"),
+              os.path.join(ROOT, "latinica.py")):
         with open(f, "rb") as fh:
             h.update(fh.read())
     h.update(osm_stamp.encode())

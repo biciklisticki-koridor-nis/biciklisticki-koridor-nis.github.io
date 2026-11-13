@@ -12,6 +12,8 @@ import random
 import re
 import sys
 
+from latinica import latin
+
 ROOT = os.path.dirname(os.path.abspath(__file__))
 SURVEY_FILE = os.path.join(ROOT, "anketa.csv")
 OUT_FILE    = os.path.join(ROOT, "data", "anketa.json")
@@ -76,7 +78,7 @@ def collect_comments(rows):
         raw = r[COMMENT_COL].strip()
         if not raw:
             continue
-        anon = anonymize_comment(raw)
+        anon = latin(anonymize_comment(raw))
         if len(anon) < COMMENT_MIN_LEN:
             continue
         key = anon.lower()
@@ -94,7 +96,7 @@ def aggregate(rows, q):
         counts = {}
         answered = 0
         for r in rows:
-            v = (r[col] if len(r) > col else "").strip()
+            v = latin((r[col] if len(r) > col else "").strip())
             if not v:
                 continue
             counts[v] = counts.get(v, 0) + 1
@@ -112,7 +114,7 @@ def aggregate(rows, q):
     counts = {}
     respondents = 0
     for r in rows:
-        v = (r[col] if len(r) > col else "").strip()
+        v = latin((r[col] if len(r) > col else "").strip())
         if not v:
             continue
         respondents += 1
